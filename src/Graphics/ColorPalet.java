@@ -1,6 +1,7 @@
 package Graphics;
 
 import Control.Constants;
+import Control.Logics;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,11 +22,12 @@ public class ColorPalet extends Stage {
 	private Button[] colorButtons;
 	private KnobPanel kP;
 	private int indexButton;
+	private Logics logics;
 
 	public ColorPalet(KnobPanel kP, int indexButton) {
 
 		super();
-
+		logics = new Logics();
 		this.kP = kP;
 		this.setIndexButton(indexButton);
 		createColorButton();
@@ -55,13 +57,23 @@ public class ColorPalet extends Stage {
 	public void returnColor(Object button) {
 
 		Button tmpButton = (Button) button;
-
-		kP.getKnobs()[indexButton].setBackground(
-				new Background(new BackgroundFill(Constants.colors[Integer.parseInt(tmpButton.getId())], CornerRadii.EMPTY, Insets.EMPTY)));
-
 		
+		kP.getKnobs()[indexButton]
+				.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(tmpButton.getId())],
+						CornerRadii.EMPTY, Insets.EMPTY)));
+		kP.getKnobs()[indexButton].setObarven(true);
+		int identifikace = kP.getIdentifikace();
+		System.out.println(identifikace);
+		if (identifikace != Constants.countKnobsPanels -1) {
+
+			if (logics.controlCountChoosedKnobs(kP)) {
+				kP.getStWin().getKnobPanel()[identifikace].setDisable(true);
+				kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
+			}
+		}
+
 		this.close();
-	
+
 	}
 
 	public Parent createColorPickerPanel() {

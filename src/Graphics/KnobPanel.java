@@ -1,5 +1,9 @@
 package Graphics;
 
+import com.sun.swing.internal.plaf.basic.resources.basic;
+
+import Control.Constants;
+import Control.Logics;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,50 +19,51 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class KnobPanel extends HBox{
+public class KnobPanel extends HBox {
 
-	
-	private Button[] knobs;
+	private Knob[] knobs;
 	private int identifikace;
-	
-	public KnobPanel(int identifikace) {
+
+	private Logics logics;
+	private StartWindow stWin;
+
+	public KnobPanel(int identifikace, StartWindow stWin) {
 		super(5);
-		
+
+		this.setStWin(stWin);
 		this.setIdentifikace(identifikace);
-		
+		logics = new Logics();
 		createKnobs();
-		
-		
+
 	}
-	
-	private void createKnobs(){
-		
-		knobs = new Button[Control.Constants.countKnobs];
-		
+
+	private void createKnobs() {
+
+		knobs = new Knob[Control.Constants.countKnobs];
+
 		for (int i = 0; i < Control.Constants.countKnobs; i++) {
-			
-			knobs[i] = new Button();
-			
+
+			knobs[i] = new Knob();
+
 			knobs[i].setId(String.valueOf(i));
-			
-			knobs[i].setShape(new Circle(3,Color.GRAY));
+
+			knobs[i].setShape(new Circle(3));
 			knobs[i].setPadding(new Insets(8));
 			knobs[i].setOnAction(event -> setColor(event.getSource()));
+			knobs[i].setBackground(new Background(
+					new BackgroundFill(Constants.backgroundColorDefaulKnobs, CornerRadii.EMPTY, Insets.EMPTY)));
 			this.getChildren().add(knobs[i]);
 		}
-		
+
 	}
 
 	private void setColor(Object button) {
 		Button pomButton = (Button) button;
 		
-		ColorPalet cp = new ColorPalet(this,Integer.parseInt(pomButton.getId()));
-		
-		
+		ColorPalet cp = new ColorPalet(this, Integer.parseInt(pomButton.getId()));
+	
 	}
 
-	
-	
 	/************** Getrs and Setrs *******************/
 	public int getIdentifikace() {
 		return identifikace;
@@ -68,15 +73,20 @@ public class KnobPanel extends HBox{
 		this.identifikace = identifikace;
 	}
 
-	public Button[] getKnobs() {
+	public Knob[] getKnobs() {
 		return knobs;
 	}
 
-	public void setKnobs(Button[] knobs) {
+	public void setKnobs(Knob[] knobs) {
 		this.knobs = knobs;
 	}
 
-	
-	
+	public StartWindow getStWin() {
+		return stWin;
+	}
+
+	public void setStWin(StartWindow stWin) {
+		this.stWin = stWin;
+	}
 
 }
