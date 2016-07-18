@@ -12,5 +12,9 @@ public class Constants {
 	public static final int countKnobsPanels = 9;
 	public static final Color backgroundColorDefaulKnobs = Color.DARKGRAY;
 	
+	public static final int countControlKnobs = 4;
+	public static final int countControlKnobsLine = 2;
+	
+	
 
 }

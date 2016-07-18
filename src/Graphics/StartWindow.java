@@ -22,7 +22,7 @@ public class StartWindow extends Stage {
 	private BorderPane hlavniPanel;
 
 	private KnobPanel[] knobPanel;
-
+	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
 
 	public StartWindow(MasterMindRun mMR) {
@@ -31,6 +31,7 @@ public class StartWindow extends Stage {
 		this.mMR = mMR;
 
 		knobPanel = new KnobPanel[Constants.countKnobsPanels];
+		controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
 		logics = new Logics();
 		this.setTitle("MasterMind-Menu");
 
@@ -75,10 +76,19 @@ public class StartWindow extends Stage {
 
 	private Node creatGameDesk() {
 		createKnobsPanels();
-		VBox desk = new VBox(5);
-
-		desk.getChildren().addAll(knobPanel);
-
+		
+		BorderPane desk = new BorderPane();
+		
+		VBox leftDesk = new VBox(5);
+		VBox rightDesk = new VBox(5);
+		
+		rightDesk.getChildren().addAll(knobPanel);
+		leftDesk.getChildren().addAll(controlKnobPanel);
+		
+		desk.setLeft(leftDesk);
+		desk.setCenter(rightDesk);
+		
+		desk.setPadding(new Insets(5));
 		return desk;
 	}
 
@@ -87,9 +97,11 @@ public class StartWindow extends Stage {
 		for (int i = 0; i < knobPanel.length; i++) {
 
 			knobPanel[i] = new KnobPanel(i, this);
+			controlKnobPanel[i] = new ControlKnobsPanel(i,this);
 
 			if (i != 0) {
 				knobPanel[i].setVisible(false);
+				controlKnobPanel[i].setVisible(false);
 			}
 		}
 	}
