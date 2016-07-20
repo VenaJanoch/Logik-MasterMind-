@@ -15,6 +15,10 @@ public class Constants {
 	public static final int countControlKnobs = 4;
 	public static final int countControlKnobsLine = 2;
 	
+	public static final Color greatChoose = Color.BLACK;
+	public static final Color goodChoose = Color.WHITE;
+	
+	
 	
 
 }

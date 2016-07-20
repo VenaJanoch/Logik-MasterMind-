@@ -7,10 +7,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -24,6 +26,7 @@ public class StartWindow extends Stage {
 	private KnobPanel[] knobPanel;
 	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
+	private KnobPanel result;
 
 	public StartWindow(MasterMindRun mMR) {
 
@@ -55,16 +58,28 @@ public class StartWindow extends Stage {
 		hlavniPanel = new BorderPane();
 		hlavniPanel.setCenter(creatGameDesk());
 		hlavniPanel.setLeft(creatLegendPanel());
-		hlavniPanel.setBottom(creatColorPanel());
+		hlavniPanel.setBottom(creatResultPanel());
 
 		hlavniPanel.setBackground(new Background(new BackgroundFill(Color.HONEYDEW, CornerRadii.EMPTY, Insets.EMPTY)));
 		hlavniPanel.setPadding(new Insets(8));
 		return hlavniPanel;
 	}
 
-	private Node creatColorPanel() {
-
-		return null;
+	private Node creatResultPanel() {
+		
+		GridPane resultPanel = new GridPane();
+		Label resultLB = new Label("Color result");
+		setResult(new KnobPanel(100, this));
+		//result.setVisible(false);
+		
+		result.setResultColor(logics.creatResultColors());
+		
+		resultPanel.add(resultLB, 0, 0);
+		resultPanel.add(result, 1, 0);
+		
+		
+		
+		return resultPanel;
 	}
 
 	private Node creatLegendPanel() {
@@ -115,4 +130,29 @@ public class StartWindow extends Stage {
 		this.knobPanel = knobPanel;
 	}
 
+	public KnobPanel getResult() {
+		return result;
+	}
+
+	public void setResult(KnobPanel result) {
+		this.result = result;
+	}
+
+	public ControlKnobsPanel[] getControlKnobPanel() {
+		return controlKnobPanel;
+	}
+
+	public void setControlKnobPanel(ControlKnobsPanel[] controlKnobPanel) {
+		this.controlKnobPanel = controlKnobPanel;
+	}
+
+	public Logics getLogics() {
+		return logics;
+	}
+
+	public void setLogics(Logics logics) {
+		this.logics = logics;
+	}
+
+	
 }

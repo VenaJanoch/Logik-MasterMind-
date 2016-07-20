@@ -63,12 +63,17 @@ public class ColorPalet extends Stage {
 						CornerRadii.EMPTY, Insets.EMPTY)));
 		kP.getKnobs()[indexButton].setObarven(true);
 		int identifikace = kP.getIdentifikace();
-		System.out.println(identifikace);
+		
+		
 		if (identifikace != Constants.countKnobsPanels -1) {
 
 			if (logics.controlCountChoosedKnobs(kP)) {
+
+				logics.evaluate(kP.getStWin(), identifikace);
 				kP.getStWin().getKnobPanel()[identifikace].setDisable(true);
 				kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
+				kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);
+				
 			}
 		}
 

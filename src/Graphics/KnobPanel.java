@@ -63,6 +63,17 @@ public class KnobPanel extends HBox {
 		ColorPalet cp = new ColorPalet(this, Integer.parseInt(pomButton.getId()));
 	
 	}
+	
+	public void setResultColor(Color[] resultColor){
+		
+		for (int i = 0; i < Control.Constants.countKnobs; i++) {
+			knobs[i].setBackground(new Background(
+					new BackgroundFill(resultColor[i], CornerRadii.EMPTY, Insets.EMPTY)));
+			
+			knobs[i].setDisable(true);
+		}
+		
+	}
 
 	/************** Getrs and Setrs *******************/
 	public int getIdentifikace() {
