@@ -1,8 +1,14 @@
 package Graphics;
 
-import javafx.scene.control.RadioButton;
+import Control.Constants;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.shape.Rectangle;
 
-public class ControlKnob extends RadioButton{
+public class ControlKnob extends Button{
 
 	private boolean black;
 	private boolean white;
@@ -12,7 +18,9 @@ public class ControlKnob extends RadioButton{
 		super();
 		this.setBlack(false);
 		this.setWhite(false);
-	
+		this.setShape(new Rectangle(1,1));
+		this.setBackground(new Background(new BackgroundFill(Constants.backgroundColorDefaulKnobs,
+						CornerRadii.EMPTY, Insets.EMPTY)));
 	}
 
 	

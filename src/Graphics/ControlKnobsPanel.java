@@ -54,7 +54,6 @@ public class ControlKnobsPanel extends HBox{
 			}
 			
 			controlKnob[i].setId(String.valueOf(indexPanel-1)+ String.valueOf(i));
-			controlKnob[i].setDisable(true);
 			firstLine[indexPanel].getChildren().add(controlKnob[i]);
 			
 		}

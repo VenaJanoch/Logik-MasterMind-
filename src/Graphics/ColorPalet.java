@@ -69,11 +69,13 @@ public class ColorPalet extends Stage {
 
 			if (logics.controlCountChoosedKnobs(kP)) {
 
-				logics.evaluate(kP.getStWin(), identifikace);
-				kP.getStWin().getKnobPanel()[identifikace].setDisable(true);
-				kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
-				kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);
-				
+				if (logics.evaluate(kP.getStWin(), identifikace)) {
+					kP.getStWin().getKnobPanel()[identifikace].setDisable(true);
+					kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
+					kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);			
+				}else {
+					kP.getStWin().getResult().setVisible(true);
+				}
 			}
 		}
 

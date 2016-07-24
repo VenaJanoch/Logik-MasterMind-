@@ -44,7 +44,7 @@ public class StartWindow extends Stage {
 
 	public Scene creatScene() {
 
-		newScena = new Scene(creatPanel(), 300, 500);
+		newScena = new Scene(creatPanel(), 300, 600);
 		return newScena;
 
 	}
@@ -70,7 +70,7 @@ public class StartWindow extends Stage {
 		GridPane resultPanel = new GridPane();
 		Label resultLB = new Label("Color result");
 		setResult(new KnobPanel(100, this));
-		//result.setVisible(false);
+		result.setVisible(false);
 		
 		result.setResultColor(logics.creatResultColors());
 		

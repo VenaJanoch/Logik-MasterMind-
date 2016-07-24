@@ -1,6 +1,5 @@
 package Graphics;
 
-import com.sun.swing.internal.plaf.basic.resources.basic;
 
 import Control.Constants;
 import Control.Logics;
@@ -30,6 +29,8 @@ public class KnobPanel extends HBox {
 	public KnobPanel(int identifikace, StartWindow stWin) {
 		super(5);
 
+		this.setMaxHeight(50);
+		this.setMinHeight(50);
 		this.setStWin(stWin);
 		this.setIdentifikace(identifikace);
 		logics = new Logics();
@@ -69,9 +70,13 @@ public class KnobPanel extends HBox {
 		for (int i = 0; i < Control.Constants.countKnobs; i++) {
 			knobs[i].setBackground(new Background(
 					new BackgroundFill(resultColor[i], CornerRadii.EMPTY, Insets.EMPTY)));
+			knobs[i].setOnAction(event -> nothig());
 			
-			knobs[i].setDisable(true);
 		}
+		
+	}
+	
+	private void nothig(){
 		
 	}
 
