@@ -65,20 +65,22 @@ public class ColorPalet extends Stage {
 		int identifikace = kP.getIdentifikace();
 		
 		
-		if (identifikace != Constants.countKnobsPanels -1) {
-
 			if (logics.controlCountChoosedKnobs(kP)) {
 
 				if (logics.evaluate(kP.getStWin(), identifikace)) {
-					kP.getStWin().getKnobPanel()[identifikace].setDisable(true);
+					kP.getStWin().getKnobPanel()[identifikace].nothig();
 					kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
 					kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);			
 				}else {
 					kP.getStWin().getResult().setVisible(true);
+					kP.getStWin().getStatutL().setText("You Win");
 				}
+			}else if (logics.controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels -1) {
+				kP.getStWin().getResult().setVisible(true);
+				kP.getStWin().getStatutL().setText("Sorry, try again");
 			}
-		}
-
+		
+		
 		this.close();
 
 	}

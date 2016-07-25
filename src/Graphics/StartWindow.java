@@ -4,17 +4,22 @@ import Control.Constants;
 import Control.Logics;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class StartWindow extends Stage {
@@ -27,7 +32,11 @@ public class StartWindow extends Stage {
 	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
 	private KnobPanel result;
-
+	
+	private Label statutL;
+	private Button retryB;
+	private Button closeB;
+	
 	public StartWindow(MasterMindRun mMR) {
 
 		super();
@@ -44,7 +53,7 @@ public class StartWindow extends Stage {
 
 	public Scene creatScene() {
 
-		newScena = new Scene(creatPanel(), 300, 600);
+		newScena = new Scene(creatPanel(), 310, 600);
 		return newScena;
 
 	}
@@ -60,22 +69,25 @@ public class StartWindow extends Stage {
 		hlavniPanel.setLeft(creatLegendPanel());
 		hlavniPanel.setBottom(creatResultPanel());
 
-		hlavniPanel.setBackground(new Background(new BackgroundFill(Color.HONEYDEW, CornerRadii.EMPTY, Insets.EMPTY)));
+		hlavniPanel.setBackground(new Background(new BackgroundFill(Color.BURLYWOOD, CornerRadii.EMPTY, Insets.EMPTY)));
 		hlavniPanel.setPadding(new Insets(8));
 		return hlavniPanel;
 	}
 
 	private Node creatResultPanel() {
 		
-		GridPane resultPanel = new GridPane();
-		Label resultLB = new Label("Color result");
+		HBox resultPanel = new HBox(5);
+		Label resultLB = new Label("Color result: ");
+		
+		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD,13));
+		
 		setResult(new KnobPanel(100, this));
 		result.setVisible(false);
 		
 		result.setResultColor(logics.creatResultColors());
 		
-		resultPanel.add(resultLB, 0, 0);
-		resultPanel.add(result, 1, 0);
+		resultPanel.getChildren().add(resultLB);
+		resultPanel.getChildren().add(result);
 		
 		
 		
@@ -84,15 +96,44 @@ public class StartWindow extends Stage {
 
 	private Node creatLegendPanel() {
 
-		// TODO Auto-generated method stub
-		return null;
+		VBox legendPanel = new VBox(4);
+		HBox buttonPanel = new HBox(4);
+		
+		statutL = new Label("Find color combination");
+		retryB = new Button("Retry");
+		closeB = new Button("Exit");
+		
+		
+		statutL.setFont(Font.font("Verdana", FontWeight.BOLD,13));
+		
+		retryB.setOnAction(event -> resetDesk());
+		closeB.setOnAction(event -> mMR.getPrimaryStage().close());
+		
+		buttonPanel.getChildren().addAll(retryB,closeB);
+		buttonPanel.setAlignment(Pos.CENTER);
+		legendPanel.getChildren().addAll(statutL, buttonPanel);
+		
+		legendPanel.setAlignment(Pos.CENTER);
+		
+		legendPanel.setMaxWidth(170);
+		legendPanel.setMinWidth(170);
+		
+		return legendPanel;
 
+	}
+
+	private void resetDesk() {
+		
+		hlavniPanel.setCenter(creatGameDesk());
+		hlavniPanel.setLeft(creatLegendPanel());
+		hlavniPanel.setBottom(creatResultPanel());
+	
 	}
 
 	private Node creatGameDesk() {
 		createKnobsPanels();
 		
-		BorderPane desk = new BorderPane();
+		HBox desk = new HBox(4);
 		
 		VBox leftDesk = new VBox(5);
 		VBox rightDesk = new VBox(5);
@@ -100,8 +141,9 @@ public class StartWindow extends Stage {
 		rightDesk.getChildren().addAll(knobPanel);
 		leftDesk.getChildren().addAll(controlKnobPanel);
 		
-		desk.setLeft(leftDesk);
-		desk.setCenter(rightDesk);
+		
+		desk.getChildren().add(leftDesk);
+		desk.getChildren().add(rightDesk);
 		
 		desk.setPadding(new Insets(5));
 		return desk;
@@ -153,6 +195,16 @@ public class StartWindow extends Stage {
 	public void setLogics(Logics logics) {
 		this.logics = logics;
 	}
+
+	public Label getStatutL() {
+		return statutL;
+	}
+
+	public void setStatutL(Label statutL) {
+		this.statutL = statutL;
+	}
+	
+	
 
 	
 }

@@ -41,4 +41,16 @@ public class MasterMindRun extends Application{
 
 
 
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
+
+
+	public void setPrimaryStage(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+	}
+
+
+
 }

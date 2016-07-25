@@ -1,6 +1,8 @@
 package Graphics;
 
 
+import javax.swing.text.StyledEditorKit.ForegroundAction;
+
 import Control.Constants;
 import Control.Logics;
 import javafx.application.Application;
@@ -70,13 +72,18 @@ public class KnobPanel extends HBox {
 		for (int i = 0; i < Control.Constants.countKnobs; i++) {
 			knobs[i].setBackground(new Background(
 					new BackgroundFill(resultColor[i], CornerRadii.EMPTY, Insets.EMPTY)));
-			knobs[i].setOnAction(event -> nothig());
-			
+			nothig();
 		}
 		
 	}
 	
-	private void nothig(){
+	public void nothig(){
+		
+		for (int i = 0; i < knobs.length; i++) {
+			
+			knobs[i].setOnAction(event -> nothig());
+			
+		}
 		
 	}
 
