@@ -27,10 +27,11 @@ public class KnobPanel extends HBox {
 
 	private Logics logics;
 	private StartWindow stWin;
+	private ColorPalet cp;
 
-	public KnobPanel(int identifikace, StartWindow stWin) {
+	public KnobPanel(int identifikace, StartWindow stWin, ColorPalet cp) {
 		super(5);
-
+		this.cp = cp;
 		this.setMaxHeight(50);
 		this.setMinHeight(50);
 		this.setStWin(stWin);
@@ -63,8 +64,9 @@ public class KnobPanel extends HBox {
 	private void setColor(Object button) {
 		Button pomButton = (Button) button;
 		
-		ColorPalet cp = new ColorPalet(this, Integer.parseInt(pomButton.getId()));
-	
+		 cp.setkP(this);
+		 cp.setIndexButton(Integer.parseInt(pomButton.getId()));
+		 cp.setVisible(true);
 	}
 	
 	public void setResultColor(Color[] resultColor){

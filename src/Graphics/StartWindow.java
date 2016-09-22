@@ -1,5 +1,7 @@
 package Graphics;
 
+import com.sun.javafx.scene.control.skin.ColorPalette;
+
 import Control.Constants;
 import Control.Logics;
 import Run.MasterMindRun;
@@ -32,6 +34,7 @@ public class StartWindow extends Stage {
 	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
 	private KnobPanel result;
+	private ColorPalet cp;
 	
 	private Label statutL;
 	private Button retryB;
@@ -41,7 +44,7 @@ public class StartWindow extends Stage {
 
 		super();
 		this.mMR = mMR;
-
+		cp = new ColorPalet();
 		knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
 		logics = new Logics();
@@ -81,7 +84,7 @@ public class StartWindow extends Stage {
 		
 		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD,13));
 		
-		setResult(new KnobPanel(100, this));
+		setResult(new KnobPanel(100, this,cp));
 		result.setVisible(false);
 		
 		result.setResultColor(logics.creatResultColors());
@@ -111,7 +114,7 @@ public class StartWindow extends Stage {
 		
 		buttonPanel.getChildren().addAll(retryB,closeB);
 		buttonPanel.setAlignment(Pos.CENTER);
-		legendPanel.getChildren().addAll(statutL, buttonPanel);
+		legendPanel.getChildren().addAll(cp,statutL, buttonPanel);
 		
 		legendPanel.setAlignment(Pos.CENTER);
 		
@@ -153,7 +156,7 @@ public class StartWindow extends Stage {
 
 		for (int i = 0; i < knobPanel.length; i++) {
 
-			knobPanel[i] = new KnobPanel(i, this);
+			knobPanel[i] = new KnobPanel(i, this,cp);
 			controlKnobPanel[i] = new ControlKnobsPanel(i,this);
 
 			if (i != 0) {

@@ -17,25 +17,23 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class ColorPalet extends Stage {
+public class ColorPalet extends VBox {
 
 	private Button[] colorButtons;
 	private KnobPanel kP;
 	private int indexButton;
 	private Logics logics;
 
-	public ColorPalet(KnobPanel kP, int indexButton) {
+	public ColorPalet() {
 
-		super();
+		super(4);
 		logics = new Logics();
-		this.kP = kP;
-		this.setIndexButton(indexButton);
 		createColorButton();
-
-		this.setTitle("Color chooser");
-		this.setScene(new Scene(createColorPickerPanel(), 300, 100));
-
-		this.show();
+		createColorPickerPanel();
+		this.setVisible(false);
+		this.setWidth(300);
+		this.setHeight(100);
+		
 	}
 
 	private void createColorButton() {
@@ -81,13 +79,12 @@ public class ColorPalet extends Stage {
 			}
 		
 		
-		this.close();
+		this.setVisible(false);
 
 	}
 
-	public Parent createColorPickerPanel() {
+	public void createColorPickerPanel() {
 
-		VBox downBox = new VBox(4);
 		HBox firsLineColorBox = new HBox(4);
 		HBox secondLineColorBox = new HBox(4);
 
@@ -98,10 +95,10 @@ public class ColorPalet extends Stage {
 
 		secondLineColorBox.getChildren().addAll(colorButtons[3], colorButtons[4], colorButtons[5]);
 
-		downBox.getChildren().addAll(firsLineColorBox, secondLineColorBox);
-		downBox.setAlignment(Pos.CENTER_RIGHT);
-		downBox.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-		return downBox;
+		this.getChildren().addAll(firsLineColorBox, secondLineColorBox);
+		this.setAlignment(Pos.CENTER_RIGHT);
+		this.setBackground(new Background(new BackgroundFill(Color.BEIGE, CornerRadii.EMPTY, Insets.EMPTY)));
+		
 	}
 
 	public int getIndexButton() {
@@ -111,5 +108,22 @@ public class ColorPalet extends Stage {
 	public void setIndexButton(int indexButton) {
 		this.indexButton = indexButton;
 	}
+
+	public Button[] getColorButtons() {
+		return colorButtons;
+	}
+
+	public void setColorButtons(Button[] colorButtons) {
+		this.colorButtons = colorButtons;
+	}
+
+	public KnobPanel getkP() {
+		return kP;
+	}
+
+	public void setkP(KnobPanel kP) {
+		this.kP = kP;
+	}
+	
 
 }
