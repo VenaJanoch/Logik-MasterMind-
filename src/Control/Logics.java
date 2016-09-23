@@ -70,7 +70,7 @@ public class Logics {
 		catchColors = 0;
 		goodColors = 0;
 		
-		checkColors = new Color[4];
+		checkColors = new Color[Constants.countKnobs];
 		checkIndex = 0;
 		
 		findGreatColors(stWin.getKnobPanel()[identifikace], stWin);
@@ -90,6 +90,8 @@ public class Logics {
 		}
 
 		if (greatColors == 4) {
+			return false;
+		}else if(identifikace == Constants.countKnobsPanels-1 ){
 			return false;
 		}
 

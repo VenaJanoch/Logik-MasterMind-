@@ -35,17 +35,19 @@ public class StartWindow extends Stage {
 	private Logics logics;
 	private KnobPanel result;
 	private ColorPalet cp;
-	
+	private HBox lineBox[];
+
 	private Label statutL;
 	private Button retryB;
 	private Button closeB;
-	
+
 	public StartWindow(MasterMindRun mMR) {
 
 		super();
 		this.mMR = mMR;
 		cp = new ColorPalet();
 		knobPanel = new KnobPanel[Constants.countKnobsPanels];
+		lineBox = new HBox[Constants.countKnobsPanels];
 		controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
 		logics = new Logics();
 		this.setTitle("MasterMind-Menu");
@@ -78,22 +80,20 @@ public class StartWindow extends Stage {
 	}
 
 	private Node creatResultPanel() {
-		
+
 		HBox resultPanel = new HBox(5);
 		Label resultLB = new Label("Color result: ");
-		
-		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD,13));
-		
-		setResult(new KnobPanel(100, this,cp));
+
+		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
+
+		setResult(new KnobPanel(100, this, cp));
 		result.setVisible(false);
-		
+
 		result.setResultColor(logics.creatResultColors());
-		
+
 		resultPanel.getChildren().add(resultLB);
 		resultPanel.getChildren().add(result);
-		
-		
-		
+
 		return resultPanel;
 	}
 
@@ -101,68 +101,72 @@ public class StartWindow extends Stage {
 
 		VBox legendPanel = new VBox(4);
 		HBox buttonPanel = new HBox(4);
-		
+
 		statutL = new Label("Find color combination");
 		retryB = new Button("Retry");
 		closeB = new Button("Exit");
-		
-		
-		statutL.setFont(Font.font("Verdana", FontWeight.BOLD,13));
-		
+
+		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
+
 		retryB.setOnAction(event -> resetDesk());
 		closeB.setOnAction(event -> mMR.getPrimaryStage().close());
-		
-		buttonPanel.getChildren().addAll(retryB,closeB);
+
+		buttonPanel.getChildren().addAll(retryB, closeB);
 		buttonPanel.setAlignment(Pos.CENTER);
-		legendPanel.getChildren().addAll(cp,statutL, buttonPanel);
-		
+		legendPanel.getChildren().addAll(cp, statutL, buttonPanel);
+
 		legendPanel.setAlignment(Pos.CENTER);
-		
+
 		legendPanel.setMaxWidth(170);
 		legendPanel.setMinWidth(170);
-		
+
 		return legendPanel;
 
 	}
 
 	private void resetDesk() {
-		
+
 		hlavniPanel.setCenter(creatGameDesk());
 		hlavniPanel.setLeft(creatLegendPanel());
 		hlavniPanel.setBottom(creatResultPanel());
-	
+
 	}
 
 	private Node creatGameDesk() {
 		createKnobsPanels();
+
 		
-		HBox desk = new HBox(4);
+		VBox desk = new VBox(5);
 		
-		VBox leftDesk = new VBox(5);
-		VBox rightDesk = new VBox(5);
+		createLineBox();
 		
-		rightDesk.getChildren().addAll(knobPanel);
-		leftDesk.getChildren().addAll(controlKnobPanel);
-		
-		
-		desk.getChildren().add(leftDesk);
-		desk.getChildren().add(rightDesk);
-		
-		desk.setPadding(new Insets(5));
+		desk.getChildren().addAll(lineBox);
+
 		return desk;
 	}
 
+	private void createLineBox(){
+		
+		for (int i = 0; i < lineBox.length; i++) {
+			lineBox[i] = new HBox(5);
+			
+			lineBox[i].getChildren().add(controlKnobPanel[i]);
+			lineBox[i].getChildren().add(knobPanel[i]);
+			
+		}
+	}
 	private void createKnobsPanels() {
 
-		for (int i = 0; i < knobPanel.length; i++) {
+		knobPanel[0] = new KnobPanel(0, this, cp);
+		controlKnobPanel[0] = new ControlKnobsPanel(0, this);
 
-			knobPanel[i] = new KnobPanel(i, this,cp);
-			controlKnobPanel[i] = new ControlKnobsPanel(i,this);
+		for (int i = 1; i < knobPanel.length; i++) {
 
-			if (i != 0) {
-				knobPanel[i].setVisible(false);
-				controlKnobPanel[i].setVisible(false);
-			}
+			knobPanel[i] = new KnobPanel(i, this, cp);
+			controlKnobPanel[i] = new ControlKnobsPanel(i, this);
+
+			knobPanel[i].setVisible(false);
+			controlKnobPanel[i].setVisible(false);
 		}
 	}
 
@@ -206,8 +210,5 @@ public class StartWindow extends Stage {
 	public void setStatutL(Label statutL) {
 		this.statutL = statutL;
 	}
-	
-	
 
-	
 }

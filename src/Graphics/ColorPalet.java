@@ -69,13 +69,13 @@ public class ColorPalet extends VBox {
 					kP.getStWin().getKnobPanel()[identifikace].nothig();
 					kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
 					kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);			
+				}else if (logics.controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels -1) {
+					kP.getStWin().getResult().setVisible(true);
+					kP.getStWin().getStatutL().setText("Sorry, try again");
 				}else {
 					kP.getStWin().getResult().setVisible(true);
 					kP.getStWin().getStatutL().setText("You Win");
 				}
-			}else if (logics.controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels -1) {
-				kP.getStWin().getResult().setVisible(true);
-				kP.getStWin().getStatutL().setText("Sorry, try again");
 			}
 		
 		
