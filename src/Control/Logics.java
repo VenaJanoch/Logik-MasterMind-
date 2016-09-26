@@ -61,7 +61,6 @@ public class Logics {
 		}
 
 		return colors;
-
 	}
 
 	public boolean evaluate(StartWindow stWin, int identifikace) {
@@ -69,10 +68,10 @@ public class Logics {
 		greatColors = 0;
 		catchColors = 0;
 		goodColors = 0;
-		
+
 		checkColors = new Color[Constants.countKnobs];
 		checkIndex = 0;
-		
+
 		findGreatColors(stWin.getKnobPanel()[identifikace], stWin);
 		findGoodColors(stWin.getKnobPanel()[identifikace], stWin);
 
@@ -83,7 +82,7 @@ public class Logics {
 		}
 
 		for (int i = 0; i < greatColors; i++) {
-
+			
 			stWin.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
 					new Background(new BackgroundFill(Constants.greatChoose, CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -91,7 +90,7 @@ public class Logics {
 
 		if (greatColors == 4) {
 			return false;
-		}else if(identifikace == Constants.countKnobsPanels-1 ){
+		} else if (identifikace == Constants.countKnobsPanels - 1) {
 			return false;
 		}
 
@@ -103,28 +102,31 @@ public class Logics {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
 			for (int j = 0; j < colors.length; j++) {
-				
-					if (kP.getKnobs()[i].getBackground().equals(new Background(
-							new BackgroundFill(stWin.getLogics().colors[j], CornerRadii.EMPTY, Insets.EMPTY))) && checkColor(stWin.getLogics().colors[j])) {
-						
-						checkColors[checkIndex] = stWin.getLogics().colors[j];
-						goodColors++;
-						
+
+				if (kP.getKnobs()[i].getBackground()
+						.equals(new Background(
+								new BackgroundFill(stWin.getLogics().colors[j], CornerRadii.EMPTY, Insets.EMPTY)))
+						&& checkColor(stWin.getLogics().colors[j])) {
+
+					checkColors[checkIndex] = stWin.getLogics().colors[j];
+					checkIndex++;
+					goodColors++;
+
 				}
 			}
 		}
 
 	}
-	
-	private boolean checkColor(Color color){
-		
+
+	private boolean checkColor(Color color) {
+
 		for (int i = 0; i < checkColors.length; i++) {
-			
+
 			if (checkColors[i] == color) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
