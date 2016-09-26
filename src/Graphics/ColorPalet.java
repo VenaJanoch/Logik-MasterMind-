@@ -24,10 +24,10 @@ public class ColorPalet extends VBox {
 	private int indexButton;
 	private Logics logics;
 
-	public ColorPalet() {
+	public ColorPalet(Logics logics) {
 
 		super(4);
-		logics = new Logics();
+		this.logics = logics;
 		createColorButton();
 		createColorPickerPanel();
 		this.setVisible(false);

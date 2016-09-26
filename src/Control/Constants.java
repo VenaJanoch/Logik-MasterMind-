@@ -17,6 +17,8 @@ public class Constants {
 	
 	public static final Color greatChoose = Color.BLACK;
 	public static final Color goodChoose = Color.WHITE;
+	public static final Color menuButtonC =Color.DARKGOLDENROD;
+	public static final Color menuBackgroundC = Color.ALICEBLUE;
 	
 	
 	

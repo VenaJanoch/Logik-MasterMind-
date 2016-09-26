@@ -25,10 +25,8 @@ public class KnobPanel extends HBox {
 	private Knob[] knobs;
 	private int identifikace;
 
-	private Logics logics;
 	private StartWindow stWin;
 	private ColorPalet cp;
-
 	public KnobPanel(int identifikace, StartWindow stWin, ColorPalet cp) {
 		super(5);
 		this.cp = cp;
@@ -36,11 +34,10 @@ public class KnobPanel extends HBox {
 		this.setMinHeight(50);
 		this.setStWin(stWin);
 		this.setIdentifikace(identifikace);
-		logics = new Logics();
 		createKnobs();
-
 	}
 
+	
 	private void createKnobs() {
 
 		knobs = new Knob[Control.Constants.countKnobs];

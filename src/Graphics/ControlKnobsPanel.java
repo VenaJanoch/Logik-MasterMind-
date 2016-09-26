@@ -15,7 +15,6 @@ public class ControlKnobsPanel extends HBox{
 	private ControlKnob[] controlKnob;
 	private int identifikace;
 	private StartWindow stWin;
-	private ColorPalet cp;
 	
 	public ControlKnobsPanel(int identifikace, StartWindow stWin) {
 		
@@ -24,7 +23,6 @@ public class ControlKnobsPanel extends HBox{
 		firstLine = new VBox[Constants.countControlKnobsLine];
 		this.identifikace = identifikace;
 		this.stWin = stWin;
-		this.cp = new ColorPalet();
 		createLines();
 		createControlKnobs();
 		

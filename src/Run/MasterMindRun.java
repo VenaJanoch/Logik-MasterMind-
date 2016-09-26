@@ -1,8 +1,10 @@
 package Run;
 
 import Graphics.StartWindow;
+import Graphics.WellcomeWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import sun.print.resources.serviceui;
 
 public class MasterMindRun extends Application{
 	
@@ -20,7 +22,7 @@ public class MasterMindRun extends Application{
 	/** Atributy tridy **/
 	private Stage primaryStage;
 	private StartWindow stWindow;
-	
+	private WellcomeWindow wellcome;
 	
 	
 	/**
@@ -31,16 +33,32 @@ public class MasterMindRun extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
-		stWindow = new StartWindow(this);
+		wellcome = new WellcomeWindow(this);
 		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle(stWindow.getTitle());
-		this.primaryStage.setScene(stWindow.getScene());
-
+		
+		this.setStage(wellcome);
+		
 		this.primaryStage.show();
 	}
 
 
+	public void setStage(Stage stage){
+		
+		this.primaryStage.setTitle(stage.getTitle());
+		this.primaryStage.setScene(stage.getScene());
 
+	}
+
+	public void setGameWindowSingleMode(){
+		stWindow = new StartWindow(this,true);
+		setStage(stWindow);
+	}
+	
+	public void setGameWindowMultiMode(){
+		stWindow = new StartWindow(this,false);
+		setStage(stWindow);
+	}
+	
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}

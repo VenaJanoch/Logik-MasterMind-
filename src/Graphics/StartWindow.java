@@ -41,16 +41,18 @@ public class StartWindow extends Stage {
 	private Button retryB;
 	private Button closeB;
 
-	public StartWindow(MasterMindRun mMR) {
+	private boolean singleMode;
+	public StartWindow(MasterMindRun mMR, boolean singleMode) {
 
 		super();
 		this.mMR = mMR;
-		cp = new ColorPalet();
-		knobPanel = new KnobPanel[Constants.countKnobsPanels];
-		lineBox = new HBox[Constants.countKnobsPanels];
-		controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
-		logics = new Logics();
-		this.setTitle("MasterMind-Menu");
+		this.logics = new Logics(this);
+		this.singleMode = singleMode;
+		this.cp = new ColorPalet(logics);
+		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
+		this.lineBox = new HBox[Constants.countKnobsPanels];
+		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
+		this.setTitle("MasterMind-GameWindow");
 
 		this.setScene(creatScene());
 
@@ -86,10 +88,16 @@ public class StartWindow extends Stage {
 
 		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
-		setResult(new KnobPanel(100, this, cp));
-		result.setVisible(false);
 
-		result.setResultColor(logics.creatResultColors());
+		if (singleMode) {
+			
+			setResult(new KnobPanel(100, this, cp));
+			result.setVisible(false);
+			result.setResultColor(logics.creatResultColors());
+		}else {
+			setResult(new KnobPanel(100, this, cp));
+
+		}
 
 		resultPanel.getChildren().add(resultLB);
 		resultPanel.getChildren().add(result);
@@ -209,6 +217,14 @@ public class StartWindow extends Stage {
 
 	public void setStatutL(Label statutL) {
 		this.statutL = statutL;
+	}
+
+	public boolean isSingleMode() {
+		return singleMode;
+	}
+
+	public void setSingleMode(boolean singleMode) {
+		this.singleMode = singleMode;
 	}
 
 }

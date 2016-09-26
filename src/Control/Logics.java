@@ -22,9 +22,11 @@ public class Logics {
 	private int greatColors = 0;
 	private int catchColors = 0;
 	private int goodColors = 0;
+	private boolean nonResult;
 
-	public Logics() {
-
+	public Logics(StartWindow stWin) {
+		this.stWin = stWin;
+		setNonResult(stWin.isSingleMode());
 		r = new Random();
 		colors = new Color[Constants.countKnobs];
 
@@ -59,7 +61,7 @@ public class Logics {
 
 			System.out.println(randomc);
 		}
-
+		setNonResult(false);
 		return colors;
 	}
 
@@ -140,6 +142,14 @@ public class Logics {
 			}
 		}
 
+	}
+
+	public boolean isNonResult() {
+		return nonResult;
+	}
+
+	public void setNonResult(boolean nonResult) {
+		this.nonResult = nonResult;
 	}
 
 }
