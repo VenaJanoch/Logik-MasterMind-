@@ -26,13 +26,15 @@ public class KnobPanel extends HBox {
 	private int identifikace;
 
 	private StartWindow stWin;
+	private Desk desk;
 	private ColorPalet cp;
-	public KnobPanel(int identifikace, StartWindow stWin, ColorPalet cp) {
+	
+	public KnobPanel(int identifikace, Desk desk, ColorPalet cp) {
 		super(5);
 		this.cp = cp;
 		this.setMaxHeight(50);
 		this.setMinHeight(50);
-		this.setStWin(stWin);
+		this.setDesk(desk);
 		this.setIdentifikace(identifikace);
 		createKnobs();
 	}
@@ -61,8 +63,8 @@ public class KnobPanel extends HBox {
 	private void setColor(Object button) {
 		Button pomButton = (Button) button;
 		
-		 cp.setkP(this);
-		 cp.setIndexButton(Integer.parseInt(pomButton.getId()));
+		 cp.getLogics().setKp(this);
+		 cp.getLogics().setIndexButton(Integer.parseInt(pomButton.getId()));
 		 cp.setVisible(true);
 	}
 	
@@ -103,12 +105,14 @@ public class KnobPanel extends HBox {
 		this.knobs = knobs;
 	}
 
-	public StartWindow getStWin() {
-		return stWin;
+
+	public Desk getDesk() {
+		return desk;
 	}
 
-	public void setStWin(StartWindow stWin) {
-		this.stWin = stWin;
+
+	public void setDesk(Desk desk) {
+		this.desk = desk;
 	}
 
 }

@@ -4,9 +4,11 @@ import java.util.Random;
 
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
+import Graphics.Desk;
 import Graphics.KnobPanel;
 import Graphics.StartWindow;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -15,6 +17,7 @@ import javafx.scene.paint.Color;
 public class Logics {
 
 	private StartWindow stWin;
+	private Desk desk;
 	private Random r;
 	private Color[] colors;
 	private Color[] checkColors;
@@ -22,14 +25,74 @@ public class Logics {
 	private int greatColors = 0;
 	private int catchColors = 0;
 	private int goodColors = 0;
-	private boolean nonResult;
+	private KnobPanel kP;
+	private int indexButton;
+	private boolean multiMode;
 
-	public Logics(StartWindow stWin) {
-		this.stWin = stWin;
-		setNonResult(stWin.isSingleMode());
+	public Logics(Desk desk) {
+		// this.stWin = stWin;
+
+		this.desk = desk;
 		r = new Random();
 		colors = new Color[Constants.countKnobs];
 
+	}
+
+	public void returnColor(Object button) {
+
+		Button tmpButton = (Button) button;
+
+		kP.getKnobs()[indexButton]
+				.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(tmpButton.getId())],
+						CornerRadii.EMPTY, Insets.EMPTY)));
+		kP.getKnobs()[indexButton].setObarven(true);
+		int identifikace = kP.getIdentifikace();
+
+		if (controlCountChoosedKnobs(kP) && resultControl()) {
+
+			if (evaluate(kP.getDesk(), identifikace)) {
+				kP.getDesk().getKnobPanel()[identifikace].nothig();
+				kP.getDesk().getKnobPanel()[identifikace + 1].setVisible(true);
+				kP.getDesk().getControlKnobPanel()[identifikace + 1].setVisible(true);
+			} else if (controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels - 1) {
+				kP.getDesk().getResult().setVisible(true);
+				kP.getDesk().getStatutL().setText("Sorry, try again");
+			} else {
+				kP.getDesk().getResult().setVisible(true);
+				kP.getDesk().getStatutL().setText("You Win");
+			}
+		}
+
+		desk.getCp().setVisible(false);
+
+	}
+
+	private boolean resultControl() {
+
+		if (multiMode) {
+
+			kP.setVisible(false);
+			loadColorResult();
+			this.multiMode = false;
+			return false;
+		}
+
+		return true;
+	}
+
+	private void loadColorResult() {
+
+		for (int i = 0; i < Constants.countKnobs; i++) {
+			for (int j = 0; j < Constants.colors.length; j++) {
+
+				if (kP.getKnobs()[i].getBackground().equals(new Background(
+						new BackgroundFill(Constants.colors[j], CornerRadii.EMPTY, Insets.EMPTY)))) {
+
+					colors[i] = Constants.colors[j];
+					System.out.println(j);
+				}
+			}
+		}
 	}
 
 	public boolean controlCountChoosedKnobs(KnobPanel kp) {
@@ -61,11 +124,11 @@ public class Logics {
 
 			System.out.println(randomc);
 		}
-		setNonResult(false);
+
 		return colors;
 	}
 
-	public boolean evaluate(StartWindow stWin, int identifikace) {
+	public boolean evaluate(Desk desk, int identifikace) {
 
 		greatColors = 0;
 		catchColors = 0;
@@ -74,18 +137,18 @@ public class Logics {
 		checkColors = new Color[Constants.countKnobs];
 		checkIndex = 0;
 
-		findGreatColors(stWin.getKnobPanel()[identifikace], stWin);
-		findGoodColors(stWin.getKnobPanel()[identifikace], stWin);
+		findGreatColors(desk.getKnobPanel()[identifikace], desk);
+		findGoodColors(desk.getKnobPanel()[identifikace], desk);
 
 		for (int i = 0; i < goodColors; i++) {
 
-			stWin.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
+			desk.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
 					new Background(new BackgroundFill(Constants.goodChoose, CornerRadii.EMPTY, Insets.EMPTY)));
 		}
 
 		for (int i = 0; i < greatColors; i++) {
-			
-			stWin.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
+
+			desk.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
 					new Background(new BackgroundFill(Constants.greatChoose, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		}
@@ -100,17 +163,17 @@ public class Logics {
 
 	}
 
-	private void findGoodColors(KnobPanel kP, StartWindow stWin) {
+	private void findGoodColors(KnobPanel kP, Desk desk) {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
 			for (int j = 0; j < colors.length; j++) {
 
 				if (kP.getKnobs()[i].getBackground()
 						.equals(new Background(
-								new BackgroundFill(stWin.getLogics().colors[j], CornerRadii.EMPTY, Insets.EMPTY)))
-						&& checkColor(stWin.getLogics().colors[j])) {
+								new BackgroundFill(desk.getLogics().colors[j], CornerRadii.EMPTY, Insets.EMPTY)))
+						&& checkColor(desk.getLogics().colors[j])) {
 
-					checkColors[checkIndex] = stWin.getLogics().colors[j];
+					checkColors[checkIndex] = desk.getLogics().colors[j];
 					checkIndex++;
 					goodColors++;
 
@@ -132,24 +195,40 @@ public class Logics {
 		return true;
 	}
 
-	private void findGreatColors(KnobPanel kP, StartWindow stWin) {
+	private void findGreatColors(KnobPanel kP, Desk desk) {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
 
 			if (kP.getKnobs()[i].getBackground().equals(
-					new Background(new BackgroundFill(stWin.getLogics().colors[i], CornerRadii.EMPTY, Insets.EMPTY)))) {
+					new Background(new BackgroundFill(desk.getLogics().colors[i], CornerRadii.EMPTY, Insets.EMPTY)))) {
 				greatColors++;
 			}
 		}
 
 	}
 
-	public boolean isNonResult() {
-		return nonResult;
+	public KnobPanel getkP() {
+		return kP;
 	}
 
-	public void setNonResult(boolean nonResult) {
-		this.nonResult = nonResult;
+	public void setKp(KnobPanel kp) {
+		kP = kp;
+	}
+
+	public int getIndexButton() {
+		return indexButton;
+	}
+
+	public void setIndexButton(int indexButton) {
+		this.indexButton = indexButton;
+	}
+
+	public boolean isMultiMode() {
+		return multiMode;
+	}
+
+	public void setMultiMode(boolean multiMode) {
+		this.multiMode = multiMode;
 	}
 
 }

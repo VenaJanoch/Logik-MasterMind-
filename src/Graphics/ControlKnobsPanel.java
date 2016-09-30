@@ -15,14 +15,14 @@ public class ControlKnobsPanel extends HBox{
 	private ControlKnob[] controlKnob;
 	private int identifikace;
 	private StartWindow stWin;
-	
-	public ControlKnobsPanel(int identifikace, StartWindow stWin) {
+	private Desk desk;
+	public ControlKnobsPanel(int identifikace, Desk desk) {
 		
 		super(5);
 		setControlKnob(new ControlKnob[Constants.countControlKnobs]);
 		firstLine = new VBox[Constants.countControlKnobsLine];
 		this.identifikace = identifikace;
-		this.stWin = stWin;
+		this.desk = desk;
 		createLines();
 		createControlKnobs();
 		

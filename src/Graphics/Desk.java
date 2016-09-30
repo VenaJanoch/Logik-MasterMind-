@@ -1,7 +1,5 @@
 package Graphics;
 
-import com.sun.javafx.scene.control.skin.ColorPalette;
-
 import Control.Constants;
 import Control.Logics;
 import Run.MasterMindRun;
@@ -16,7 +14,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -24,7 +21,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class StartWindow extends Stage {
+public class Desk extends Stage {
 
 	private MasterMindRun mMR;
 	private Scene newScena;
@@ -40,19 +37,17 @@ public class StartWindow extends Stage {
 	private Label statutL;
 	private Button retryB;
 	private Button closeB;
-
-	private boolean singleMode;
-	public StartWindow(MasterMindRun mMR, boolean singleMode) {
+	
+	public Desk(MasterMindRun mMR) {
 
 		super();
 		this.mMR = mMR;
-		Desk desk = new Desk(mMR);
-		this.logics = new Logics(desk);
-		this.singleMode = singleMode;
+		this.logics = new Logics(this);
 		this.cp = new ColorPalet(logics);
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
 		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
+		
 		this.setTitle("MasterMind-GameWindow");
 
 		this.setScene(creatScene());
@@ -72,39 +67,16 @@ public class StartWindow extends Stage {
 	 * @return BorderPane
 	 */
 	public Parent creatPanel() {
+		
 		hlavniPanel = new BorderPane();
 		hlavniPanel.setCenter(creatGameDesk());
 		hlavniPanel.setLeft(creatLegendPanel());
-		hlavniPanel.setBottom(creatResultPanel());
-
+		
 		hlavniPanel.setBackground(new Background(new BackgroundFill(Color.BURLYWOOD, CornerRadii.EMPTY, Insets.EMPTY)));
 		hlavniPanel.setPadding(new Insets(8));
 		return hlavniPanel;
 	}
 
-	private Node creatResultPanel() {
-
-		HBox resultPanel = new HBox(5);
-		Label resultLB = new Label("Color result: ");
-
-		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-
-		/*
-		if (singleMode) {
-			
-			setResult(new KnobPanel(100, this, cp));
-			result.setVisible(false);
-			result.setResultColor(logics.creatResultColors());
-		}else {
-			setResult(new KnobPanel(100, this, cp));
-
-		}*/
-
-		resultPanel.getChildren().add(resultLB);
-		resultPanel.getChildren().add(result);
-
-		return resultPanel;
-	}
 
 	private Node creatLegendPanel() {
 
@@ -132,39 +104,38 @@ public class StartWindow extends Stage {
 		return legendPanel;
 
 	}
-
 	private void resetDesk() {
+		/*
 
 		hlavniPanel.setCenter(creatGameDesk());
 		hlavniPanel.setLeft(creatLegendPanel());
 		hlavniPanel.setBottom(creatResultPanel());
-
+*/
 	}
 
 	private Node creatGameDesk() {
-		//createKnobsPanels();
+		createKnobsPanels();
 
-		
 		VBox desk = new VBox(5);
-		
+
 		createLineBox();
-		
+
 		desk.getChildren().addAll(lineBox);
 
 		return desk;
 	}
 
-	private void createLineBox(){
-		
+	private void createLineBox() {
+
 		for (int i = 0; i < lineBox.length; i++) {
 			lineBox[i] = new HBox(5);
-			
+
 			lineBox[i].getChildren().add(controlKnobPanel[i]);
 			lineBox[i].getChildren().add(knobPanel[i]);
-			
+
 		}
 	}
-	/*
+
 	private void createKnobsPanels() {
 
 		knobPanel[0] = new KnobPanel(0, this, cp);
@@ -179,7 +150,7 @@ public class StartWindow extends Stage {
 			controlKnobPanel[i].setVisible(false);
 		}
 	}
-*/
+
 	/*********** Getrs and Setrs **************/
 	public KnobPanel[] getKnobPanel() {
 		return knobPanel;
@@ -221,12 +192,31 @@ public class StartWindow extends Stage {
 		this.statutL = statutL;
 	}
 
-	public boolean isSingleMode() {
-		return singleMode;
+	public MasterMindRun getmMR() {
+		return mMR;
 	}
 
-	public void setSingleMode(boolean singleMode) {
-		this.singleMode = singleMode;
+	public void setmMR(MasterMindRun mMR) {
+		this.mMR = mMR;
 	}
+
+	public ColorPalet getCp() {
+		return cp;
+	}
+
+	public void setCp(ColorPalet cp) {
+		this.cp = cp;
+	}
+
+	public BorderPane getHlavniPanel() {
+		return hlavniPanel;
+	}
+
+	public void setHlavniPanel(BorderPane hlavniPanel) {
+		this.hlavniPanel = hlavniPanel;
+	}
+
+	
+	
 
 }

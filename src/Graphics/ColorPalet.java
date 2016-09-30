@@ -20,10 +20,9 @@ import javafx.stage.Stage;
 public class ColorPalet extends VBox {
 
 	private Button[] colorButtons;
-	private KnobPanel kP;
 	private int indexButton;
 	private Logics logics;
-
+	
 	public ColorPalet(Logics logics) {
 
 		super(4);
@@ -47,42 +46,12 @@ public class ColorPalet extends VBox {
 			colorButtons[i].setShape(new Rectangle(5, 5));
 			colorButtons[i].setBackground(
 					new Background(new BackgroundFill(Constants.colors[i], CornerRadii.EMPTY, Insets.EMPTY)));
-			colorButtons[i].setOnAction(event -> returnColor(event.getSource()));
+			colorButtons[i].setOnAction(event -> logics.returnColor(event.getSource()));
 
 		}
 	}
 
-	public void returnColor(Object button) {
-
-		Button tmpButton = (Button) button;
-		
-		kP.getKnobs()[indexButton]
-				.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(tmpButton.getId())],
-						CornerRadii.EMPTY, Insets.EMPTY)));
-		kP.getKnobs()[indexButton].setObarven(true);
-		int identifikace = kP.getIdentifikace();
-		
-		
-			if (logics.controlCountChoosedKnobs(kP)) {
-
-				if (logics.evaluate(kP.getStWin(), identifikace)) {
-					kP.getStWin().getKnobPanel()[identifikace].nothig();
-					kP.getStWin().getKnobPanel()[identifikace + 1].setVisible(true);
-					kP.getStWin().getControlKnobPanel()[identifikace + 1].setVisible(true);			
-				}else if (logics.controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels -1) {
-					kP.getStWin().getResult().setVisible(true);
-					kP.getStWin().getStatutL().setText("Sorry, try again");
-				}else {
-					kP.getStWin().getResult().setVisible(true);
-					kP.getStWin().getStatutL().setText("You Win");
-				}
-			}
-		
-		
-		this.setVisible(false);
-
-	}
-
+	
 	public void createColorPickerPanel() {
 
 		HBox firsLineColorBox = new HBox(4);
@@ -117,13 +86,16 @@ public class ColorPalet extends VBox {
 		this.colorButtons = colorButtons;
 	}
 
-	public KnobPanel getkP() {
-		return kP;
+	public Logics getLogics() {
+		return logics;
 	}
 
-	public void setkP(KnobPanel kP) {
-		this.kP = kP;
+	public void setLogics(Logics logics) {
+		this.logics = logics;
 	}
+
+	
+	
 	
 
 }

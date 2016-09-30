@@ -1,5 +1,7 @@
 package Run;
 
+import Graphics.MultiMode;
+import Graphics.SingleMode;
 import Graphics.StartWindow;
 import Graphics.WellcomeWindow;
 import javafx.application.Application;
@@ -23,6 +25,9 @@ public class MasterMindRun extends Application{
 	private Stage primaryStage;
 	private StartWindow stWindow;
 	private WellcomeWindow wellcome;
+	private SingleMode sM;
+	private MultiMode mM;
+	
 	
 	
 	/**
@@ -50,13 +55,15 @@ public class MasterMindRun extends Application{
 	}
 
 	public void setGameWindowSingleMode(){
-		stWindow = new StartWindow(this,true);
-		setStage(stWindow);
+		//stWindow = new StartWindow(this,true);
+		sM= new SingleMode(this);
+		
+		setStage(sM);
 	}
 	
 	public void setGameWindowMultiMode(){
-		stWindow = new StartWindow(this,false);
-		setStage(stWindow);
+		mM = new MultiMode(this);
+		setStage(mM);
 	}
 	
 	public Stage getPrimaryStage() {
