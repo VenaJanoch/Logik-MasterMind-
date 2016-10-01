@@ -34,9 +34,12 @@ public class Desk extends Stage {
 	private ColorPalet cp;
 	private HBox lineBox[];
 
-	private Label statutL;
-	private Button retryB;
-	private Button closeB;
+	protected Label statutL;
+	protected Button retryB;
+	protected Button closeB;
+	
+	private Button menuB;
+	private Button singOutB;
 	
 	public Desk(MasterMindRun mMR) {
 
@@ -70,7 +73,7 @@ public class Desk extends Stage {
 		
 		hlavniPanel = new BorderPane();
 		hlavniPanel.setCenter(creatGameDesk());
-		hlavniPanel.setLeft(creatLegendPanel());
+		hlavniPanel.setTop(createMenuBar());
 		
 		hlavniPanel.setBackground(new Background(new BackgroundFill(Color.BURLYWOOD, CornerRadii.EMPTY, Insets.EMPTY)));
 		hlavniPanel.setPadding(new Insets(8));
@@ -78,42 +81,23 @@ public class Desk extends Stage {
 	}
 
 
-	private Node creatLegendPanel() {
 
-		VBox legendPanel = new VBox(4);
-		HBox buttonPanel = new HBox(4);
-
-		statutL = new Label("Find color combination");
-		retryB = new Button("Retry");
-		closeB = new Button("Exit");
-
-		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-
-		retryB.setOnAction(event -> resetDesk());
-		closeB.setOnAction(event -> mMR.getPrimaryStage().close());
-
-		buttonPanel.getChildren().addAll(retryB, closeB);
-		buttonPanel.setAlignment(Pos.CENTER);
-		legendPanel.getChildren().addAll(cp, statutL, buttonPanel);
-
-		legendPanel.setAlignment(Pos.CENTER);
-
-		legendPanel.setMaxWidth(170);
-		legendPanel.setMinWidth(170);
-
-		return legendPanel;
-
-	}
-	private void resetDesk() {
-		/*
-
-		hlavniPanel.setCenter(creatGameDesk());
-		hlavniPanel.setLeft(creatLegendPanel());
-		hlavniPanel.setBottom(creatResultPanel());
-*/
+	private Node createMenuBar() {
+		HBox menuBar = new HBox(5);
+		
+		menuB = new Button("Menu");
+		singOutB = new Button("Sing out");
+		
+		menuB.setOnAction(event -> mMR.setWellcomeWindow());
+	
+		menuBar.getChildren().addAll(menuB,singOutB);
+		
+		menuBar.setAlignment(Pos.CENTER_LEFT);
+		menuBar.setPadding(new Insets(3,3,3,5));
+		return menuBar;
 	}
 
-	private Node creatGameDesk() {
+	public Node creatGameDesk() {
 		createKnobsPanels();
 
 		VBox desk = new VBox(5);

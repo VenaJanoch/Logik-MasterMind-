@@ -38,10 +38,8 @@ public class MasterMindRun extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
-		wellcome = new WellcomeWindow(this);
 		this.primaryStage = primaryStage;
-		
-		this.setStage(wellcome);
+		setWellcomeWindow();
 		
 		this.primaryStage.show();
 	}
@@ -65,6 +63,15 @@ public class MasterMindRun extends Application{
 		mM = new MultiMode(this);
 		setStage(mM);
 	}
+	
+	
+	public void setWellcomeWindow(){
+		wellcome = new WellcomeWindow(this);
+		this.setStage(wellcome);
+
+	}
+	
+	/*** Setrs and Getrs ***/
 	
 	public Stage getPrimaryStage() {
 		return primaryStage;

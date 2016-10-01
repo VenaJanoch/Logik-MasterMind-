@@ -7,5 +7,7 @@ public interface IGameMode {
 
 	
 	public HBox creatResultPanel();
+	public Node creatLegendPanel();
+	public void resetDesk();
 	
 }
