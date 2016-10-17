@@ -110,7 +110,7 @@ public class ServerWindow extends Stage{
 	private void confirmForm() {
 		if (mMR.getLogLogics().confirmDataInServerForm(serverAddresTF.getText(), serverPortTF.getText())) {
 			
-		
+		mMR.setWellcomeWindow();
 		}
 		
 	}

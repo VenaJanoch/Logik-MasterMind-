@@ -16,7 +16,7 @@ public class UiCommObserver implements ICommObserver{
 	  public void processData(String data)
 	  {
 	    // TODO sync with GUI thread
-	    m_label.setText(data);
+	   System.out.println(data);
 	  }
 
 }

@@ -60,7 +60,7 @@ public class SignUpWindow extends Stage {
 
 		super();
 		this.mMR = mMR;
-		m_comm = mMR.getTcp();
+		m_comm = mMR.getComm();
 		this.setTitle("MasterMind-Sing up");
 		hlavniPanel = new BorderPane();
 
@@ -160,6 +160,7 @@ public class SignUpWindow extends Stage {
 
 		    
 		    m_comm.send(mMR.getLogLogics().createMessage());
+		    mMR.setWellcomeWindow();
 	         
 		}
 

@@ -56,8 +56,7 @@ public class LogginLogics {
 
 	public void confirmDataInForm(String nickname, String passwd) {
 
-		if (nicknameConfirm(nickname) && passwdConfirm(passwd))
-			;
+		if (nicknameConfirm(nickname) && passwdConfirm(passwd));
 
 	}
 
@@ -65,8 +64,8 @@ public class LogginLogics {
 		if (addres.length() == 0) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
 			alert.setTitle("Sign error");
-			alert.setHeaderText("No nickname!");
-			alert.setContentText("You must fill nickname !");
+			alert.setHeaderText("No IP address!");
+			alert.setContentText("You must fill IP address of server !");
 			alert.showAndWait();
 
 		} else {

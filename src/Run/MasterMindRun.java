@@ -169,5 +169,16 @@ public class MasterMindRun extends Application{
 	}
 
 
+	public TCPComm getComm() {
+		return comm;
+	}
+
+
+	public void setComm(TCPComm comm) {
+		this.comm = comm;
+	}
+
+	
+
 
 }
