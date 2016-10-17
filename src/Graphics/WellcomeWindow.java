@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -31,7 +32,7 @@ public class WellcomeWindow extends Stage{
 	private Button signInB;
 	private Button signUpB;
 	private Button signOutB;
-
+	
 	public WellcomeWindow(MasterMindRun mMR) {
 		
 		super();

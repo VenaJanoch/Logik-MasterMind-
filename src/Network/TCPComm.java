@@ -14,7 +14,20 @@ public class TCPComm implements ITCP, Runnable {
 	
 	private ICommObserver m_observer;
 	OutputStream m_output;
+	private InetAddress address;
+	private int port;
 
+	
+	public TCPComm(InetAddress address, int port) {
+		
+		this.address = address;
+		this.port = port;
+		
+		
+	}
+	
+	
+	
 	// ---------------------------------------------------------
 	@Override
 	public void send(String data) {
@@ -41,8 +54,6 @@ public class TCPComm implements ITCP, Runnable {
 		System.out.println("Hello from a thread!");
 
 		try {
-			InetAddress address = InetAddress.getByName("localhost");
-			int port = 22434;
 			Socket socket = new Socket(address, port);
 			m_output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();

@@ -1,15 +1,20 @@
 package Run;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import Control.LogginLogics;
 import Graphics.MultiMode;
+import Graphics.ServerWindow;
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
 import Graphics.SingleMode;
 import Graphics.StartWindow;
 import Graphics.WellcomeWindow;
+import Interfaces.ITCP;
+import Network.TCPComm;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import sun.print.resources.serviceui;
 
 public class MasterMindRun extends Application{
 	
@@ -33,7 +38,9 @@ public class MasterMindRun extends Application{
 	private SignUpWindow signUpW;
 	private SignInWindow signInW;
 	private LogginLogics logLogics;
-	
+	private TCPComm comm;
+	private ITCP tcp;
+	private ServerWindow serverWindow;
 	
 	
 	
@@ -46,8 +53,9 @@ public class MasterMindRun extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		this.logLogics = new LogginLogics();
 		this.primaryStage = primaryStage;
-		setWellcomeWindow();
-		
+		setServerWindow();
+	
+		   
 		this.primaryStage.show();
 	}
 
@@ -74,8 +82,26 @@ public class MasterMindRun extends Application{
 	
 	public void setWellcomeWindow(){
 		wellcome = new WellcomeWindow(this);
+		
+		try {
+			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()),logLogics.getServerPort());
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Spatne");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    comm.start();
+		
 		this.setStage(wellcome);
-
+		
+	}
+	
+	public void setServerWindow(){
+		serverWindow = new ServerWindow(this);
+		this.setStage(serverWindow);
 	}
 	
 	public void setSignUpWindow(){
@@ -130,6 +156,16 @@ public class MasterMindRun extends Application{
 
 	public void setLogLogics(LogginLogics logLogics) {
 		this.logLogics = logLogics;
+	}
+
+
+	public ITCP getTcp() {
+		return tcp;
+	}
+
+
+	public void setTcp(ITCP tcp) {
+		this.tcp = tcp;
 	}
 
 
