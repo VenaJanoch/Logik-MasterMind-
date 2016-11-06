@@ -1,6 +1,9 @@
 package Graphics;
 
 import Control.Constants;
+import Control.ObservableText;
+import Control.ObservingLabel;
+import Interfaces.ITCP;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,6 +40,12 @@ public class SignInWindow extends Stage {
 	private Button confirmBT;
 	private Button backBT;
 
+	private ObservingLabel logLB;
+
+	private ObservableText obserText = new ObservableText("");
+
+	private ITCP m_comm;
+
 	public SignInWindow(MasterMindRun mMR) {
 
 		super();
@@ -44,7 +53,7 @@ public class SignInWindow extends Stage {
 
 		this.setTitle("MasterMind-Sing in");
 		hlavniPanel = new BorderPane();
-
+		m_comm = mMR.getComm();
 		this.setScene(creatScene());
 
 	}
@@ -62,6 +71,8 @@ public class SignInWindow extends Stage {
 				new Background(new BackgroundFill(Constants.menuBackgroundC, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		BorderPane.setAlignment(netPanel, Pos.CENTER);
+		logLB = new ObservingLabel();
+		hlavniPanel.setBottom(logLB);
 		hlavniPanel.setPadding(new Insets(55));
 
 		return hlavniPanel;
@@ -106,7 +117,10 @@ public class SignInWindow extends Stage {
 
 		netPanel.add(backBT, 0, 5);
 		netPanel.add(confirmBT, 1, 5);
-
+		Button server = new Button("Server");
+				server.setOnAction(event -> mMR.setServerWindow());
+				
+		netPanel.add(server, 2,5);		
 		netPanel.setHgap(10);
 		netPanel.setVgap(10);
 
@@ -115,7 +129,15 @@ public class SignInWindow extends Stage {
 	}
 
 	private void confirmForm() {
-		mMR.getLogLogics().confirmDataInForm(nicknameTF.getText(), mMR.getLogLogics().hashPassword(passwdTF.getText()));
+
+		if (mMR.getLogLogics().confirmDataInForm(nicknameTF.getText(),
+				mMR.getLogLogics().hashPassword(passwdTF.getText()))) {
+
+			obserText.addObserver(logLB);
+			m_comm.send(mMR.getLogLogics().createLogMessage(nicknameTF.getText(),
+					mMR.getLogLogics().hashPassword(passwdTF.getText())));
+
+		}
 	}
 
 	/*** Getrs and Setrs **/
@@ -134,6 +156,14 @@ public class SignInWindow extends Stage {
 
 	public void setPasswdTF(PasswordField passwdTF) {
 		this.passwdTF = passwdTF;
+	}
+
+	public ObservableText getObserText() {
+		return obserText;
+	}
+
+	public void setObserText(ObservableText obserText) {
+		this.obserText = obserText;
 	}
 
 }

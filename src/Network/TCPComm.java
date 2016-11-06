@@ -19,14 +19,13 @@ public class TCPComm implements ITCP, Runnable {
 
 	
 	public TCPComm(InetAddress address, int port) {
-		
 		this.address = address;
 		this.port = port;
 		
 		
+	
+	
 	}
-	
-	
 	
 	// ---------------------------------------------------------
 	@Override

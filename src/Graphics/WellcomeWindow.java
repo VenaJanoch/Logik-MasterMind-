@@ -1,6 +1,8 @@
 package Graphics;
 
 import Control.Constants;
+import Control.LogginLogics;
+import Network.TCPComm;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,11 +34,14 @@ public class WellcomeWindow extends Stage{
 	private Button signInB;
 	private Button signUpB;
 	private Button signOutB;
+	private LogginLogics lLog;
 	
-	public WellcomeWindow(MasterMindRun mMR) {
+	
+	public WellcomeWindow(MasterMindRun mMR, LogginLogics lLog) {
 		
 		super();
 		this.mMR = mMR;
+		this.lLog = lLog;
 		
 		this.setTitle("MasterMind-Menu");
 		hlavniPanel = new BorderPane();
@@ -108,7 +113,7 @@ public class WellcomeWindow extends Stage{
 		
 		signInB.setOnAction(event -> mMR.setSignInWindow());
 		signUpB.setOnAction(event -> mMR.setSignUpWindow());
-		
+		signOutB.setOnAction(event -> lLog.signOutUser("LogOut,wellcomeWindow\n"));
 		
 		signInB.setMinSize(100, 50);
 		signUpB.setMinSize(100, 50);
@@ -128,8 +133,15 @@ public class WellcomeWindow extends Stage{
 		
 		signInB.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 		signUpB.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
+		signOutB.setFont(Font.font("Verdana", FontWeight.BOLD, 15));
 
-		logBarPanel.getChildren().addAll(signInB,signUpB);
+		if (lLog.isLog()) {
+			
+			logBarPanel.getChildren().addAll(signOutB,signUpB);
+		}else{
+			
+			logBarPanel.getChildren().addAll(signInB,signUpB);
+		}
 		
 		return logBarPanel;
 	}

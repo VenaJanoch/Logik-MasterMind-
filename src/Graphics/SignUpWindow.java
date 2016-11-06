@@ -1,6 +1,8 @@
 package Graphics;
 
 import Control.Constants;
+import Control.ObservableText;
+import Control.ObservingLabel;
 import Interfaces.ICommObserver;
 import Interfaces.ITCP;
 import Run.MasterMindRun;
@@ -49,27 +51,32 @@ public class SignUpWindow extends Stage {
 	private Button confirmBT;
 	private Button backBT;
 
-	private Label regLB;
+	private ObservingLabel regLB;
 	
 	
 	private ITCP m_comm;
-	private Control.UiCommObserver m_commObserver;
+	private String changeText;
 
-
+	private ObservableText obserText = new ObservableText("");
+	
 	public SignUpWindow(MasterMindRun mMR) {
 
 		super();
 		this.mMR = mMR;
+		this.changeText = "";
 		m_comm = mMR.getComm();
 		this.setTitle("MasterMind-Sing up");
 		hlavniPanel = new BorderPane();
 
 		this.setScene(creatScene());
-
 	}
 
-	private Scene creatScene() {
+	
+	
+	
+	public Scene creatScene() {
 		newScena = new Scene(creatPanel(), 310, 600);
+		
 		return newScena;
 	}
 
@@ -82,6 +89,9 @@ public class SignUpWindow extends Stage {
 
 		BorderPane.setAlignment(netPanel, Pos.CENTER);
 		hlavniPanel.setPadding(new Insets(55));
+		regLB = new ObservingLabel();
+
+		hlavniPanel.setBottom(regLB);
 
 		return hlavniPanel;
 
@@ -96,7 +106,7 @@ public class SignUpWindow extends Stage {
 		nicknameLB = new Label("Nickname");
 		passwdLB = new Label("Password");
 		passwdLB2 = new Label("Password again");
-
+		
 		nameTF = new TextField("name");
 		surnameTF = new TextField("surname");
 		nicknameTF = new TextField("nickname");
@@ -135,8 +145,8 @@ public class SignUpWindow extends Stage {
 		netPanel.add(passwdLB2, 0, 4);
 		netPanel.add(passwd2TF, 1, 4);
 
-		netPanel.add(backBT, 0, 5);
-		netPanel.add(confirmBT, 1, 5);
+		netPanel.add(backBT, 0, 6);
+		netPanel.add(confirmBT, 1, 6);
 
 		netPanel.setHgap(10);
 		netPanel.setVgap(10);
@@ -151,21 +161,22 @@ public class SignUpWindow extends Stage {
 				mMR.getLogLogics().hashPassword(passwdTF.getText()),
 				mMR.getLogLogics().hashPassword(passwd2TF.getText()))) {
 
-			regLB = new Label();
+			obserText.addObserver(regLB);
 			
-			netPanel.add( regLB,0, 6);
-			
-			m_commObserver = new Control.UiCommObserver(regLB);
-		    m_comm.registerObserver(m_commObserver);
 
+			
 		    
-		    m_comm.send(mMR.getLogLogics().createMessage());
-		    mMR.setWellcomeWindow();
-	         
+		    m_comm.send(mMR.getLogLogics().createRegMessage());
+		    
+		     
 		}
 
 	}
 	
+	public void regSuces(){
+		  mMR.setWellcomeWindow();
+		    
+	}
 	
 
 	/*** Getrs and Setrs **/
@@ -201,12 +212,36 @@ public class SignUpWindow extends Stage {
 		passwd2TF = passwd2tf;
 	}
 
-	public Label getRegLB() {
-		return regLB;
+	
+	
+
+
+
+	public String getChangeText() {
+		return changeText;
 	}
 
-	public void setRegLB(Label regLB) {
-		this.regLB = regLB;
+
+
+
+	public void setChangeText(String changeText) {
+		this.changeText = changeText;
 	}
+
+
+
+
+	public ObservableText getObserText() {
+		return obserText;
+	}
+
+
+
+
+	public void setObserText(ObservableText obserText) {
+		this.obserText = obserText;
+	}
+	
+	
 
 }

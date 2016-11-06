@@ -76,8 +76,8 @@ public class ServerWindow extends Stage{
 		serverAddresLB = new Label("Server IP");
 		serverPortLB = new Label("Port");
 
-		serverAddresTF = new TextField();
-		serverPortTF = new TextField();
+		serverAddresTF = new TextField("localhost");
+		serverPortTF = new TextField("22434");
 
 		confirmBT = new Button("OK");
 
@@ -109,7 +109,7 @@ public class ServerWindow extends Stage{
 	
 	private void confirmForm() {
 		if (mMR.getLogLogics().confirmDataInServerForm(serverAddresTF.getText(), serverPortTF.getText())) {
-			
+		mMR.createConnect();	
 		mMR.setWellcomeWindow();
 		}
 		

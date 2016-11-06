@@ -5,11 +5,15 @@ import java.security.NoSuchAlgorithmException;
 
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
+import Network.TCPComm;
+import Run.MasterMindRun;
 import javafx.scene.control.Alert;
 
 public class LogginLogics {
 
 	private boolean isLog = false;
+	private String userNick;
+	
 	private String name;
 	private String surname;
 	private String nickname;
@@ -21,9 +25,15 @@ public class LogginLogics {
 
 	private SignUpWindow sUW;
 	private SignInWindow sIW;
+	private MasterMindRun mMR;
+	private TCPComm comm;
 
-	public LogginLogics() {
+	
+	public LogginLogics(MasterMindRun mMR) {
 		serverAddres = new byte[4];
+		this.mMR = mMR;
+		
+	
 	}
 
 	public boolean confirmDataInForm(String name, String surname, String nickname, String passwd, String passwd2) {
@@ -44,19 +54,37 @@ public class LogginLogics {
 			return true;
 		}
 		// Upravit
-		return true;
+		return false;
 
 	}
 
-	public String createMessage(){
+	public String createRegMessage(){
 		
-		return getName() + "," + getSurname() + "," + getNickname() + "," + getPasswd(); 
+		return "Registrace," + getNickname() + "," + getPasswd() + "\n" ; 
+		
+	}
+	
+	public void signOutUser(String message){
+		
+		setLog(false);
+		comm.send(message);
+		mMR.setWellcomeWindow();
+	}
+	
+	
+	public String createLogMessage(String nick, String passwd){
+		
+		return "Log," + nick + "," + passwd + "\n" ; 
 		
 	}
 
-	public void confirmDataInForm(String nickname, String passwd) {
+	public boolean confirmDataInForm(String nickname, String passwd) {
 
-		if (nicknameConfirm(nickname) && passwdConfirm(passwd));
+		if (nicknameConfirm(nickname) && passwdConfirm(passwd)){
+			return true;
+		}
+		
+		return false;
 
 	}
 
@@ -223,7 +251,7 @@ public class LogginLogics {
 			e.printStackTrace();
 
 		}
-
+	
 		return sb.toString();
 
 	}
@@ -309,5 +337,22 @@ public class LogginLogics {
 	public void setServerPort(int serverPort) {
 		this.serverPort = serverPort;
 	}
+
+	public String getUserNick() {
+		return userNick;
+	}
+
+	public void setUserNick(String userNick) {
+		this.userNick = userNick;
+	}
+
+	public TCPComm getComm() {
+		return comm;
+	}
+
+	public void setComm(TCPComm comm) {
+		this.comm = comm;
+	}
+	
 
 }

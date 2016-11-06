@@ -1,6 +1,7 @@
 package Graphics;
 
 import Control.Constants;
+import Control.LogginLogics;
 import Control.Logics;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
@@ -30,6 +31,7 @@ public class Desk extends Stage {
 	private KnobPanel[] knobPanel;
 	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
+	private LogginLogics lLog;
 	private KnobPanel result;
 	private ColorPalet cp;
 	private HBox lineBox[];
@@ -50,7 +52,7 @@ public class Desk extends Stage {
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
 		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
-		
+		this.lLog = mMR.getLogLogics();
 		this.setTitle("MasterMind-GameWindow");
 
 		this.setScene(creatScene());
@@ -90,6 +92,7 @@ public class Desk extends Stage {
 		
 		menuB.setOnAction(event -> mMR.setWellcomeWindow());
 	
+		singOutB.setOnAction(event -> lLog.signOutUser("LogOut,Desk\n"));
 		menuBar.getChildren().addAll(menuB,singOutB);
 		
 		menuBar.setAlignment(Pos.CENTER_LEFT);
@@ -198,6 +201,14 @@ public class Desk extends Stage {
 
 	public void setHlavniPanel(BorderPane hlavniPanel) {
 		this.hlavniPanel = hlavniPanel;
+	}
+
+	public LogginLogics getlLog() {
+		return lLog;
+	}
+
+	public void setlLog(LogginLogics lLog) {
+		this.lLog = lLog;
 	}
 
 	
