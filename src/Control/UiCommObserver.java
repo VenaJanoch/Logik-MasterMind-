@@ -31,11 +31,11 @@ public class UiCommObserver implements ICommObserver {
 				switch (pomData[0]) {
 				case "Registrace":
 
-					if (pomData[1].equals("bad")) {
+					
+					if (pomData[1].contains("bad")) {
 						sUW.getObserText().inc("This nickname is using");
 
 					} else {
-
 						mMR.setWellcomeWindow();
 					}
 
@@ -46,7 +46,7 @@ public class UiCommObserver implements ICommObserver {
 						lLog.setLog(true);
 						mMR.setWellcomeWindow();
 						
-					}else if(pomData[1].equals("no") && pomData[2].equals("badLog")){
+					}else if(pomData[1].contains("no") && pomData[2].contains("badLog")){
 							sIW.getObserText().inc("This nickname is not using");
 					}else{
 						sIW.getObserText().inc("Bad password");
