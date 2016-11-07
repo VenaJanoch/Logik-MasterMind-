@@ -4,7 +4,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import Control.LogginLogics;
+import Control.NetworkLogics;
 import Control.UiCommObserver;
+import Graphics.FreePlayersListWindow;
 import Graphics.MultiMode;
 import Graphics.ServerWindow;
 import Graphics.SignInWindow;
@@ -38,6 +40,8 @@ public class MasterMindRun extends Application {
 	private ITCP tcp;
 	private UiCommObserver m_commObserver;
 	private ServerWindow serverWindow;
+	private NetworkLogics netLog;
+	private FreePlayersListWindow freePlayerL;
 
 	public static void main(String[] args) {
 
@@ -51,6 +55,7 @@ public class MasterMindRun extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.logLogics = new LogginLogics(this);
+		this.netLog = new NetworkLogics(this);
 		this.primaryStage = primaryStage;
 
 		setServerWindow();
@@ -65,6 +70,15 @@ public class MasterMindRun extends Application {
 
 	}
 
+	public void setFreePlayersListWindow(){
+		
+		this.freePlayerL = new FreePlayersListWindow(this, netLog);
+		
+		setStage(freePlayerL);
+		m_commObserver.setFreePlayerL(freePlayerL);
+		
+		
+	}
 	public void setGameWindowSingleMode() {
 		// stWindow = new StartWindow(this,true);
 		sM = new SingleMode(this);
@@ -96,10 +110,11 @@ public class MasterMindRun extends Application {
 		try {
 
 			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()), logLogics.getServerPort());
-			m_commObserver = new UiCommObserver(this,logLogics);
+			m_commObserver = new UiCommObserver(this,logLogics,netLog);
 			comm.registerObserver(m_commObserver);
 		
 			logLogics.setComm(comm);
+			netLog.setComm(comm);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -184,6 +199,22 @@ public class MasterMindRun extends Application {
 
 	public void setM_commObserver(UiCommObserver m_commObserver) {
 		this.m_commObserver = m_commObserver;
+	}
+
+	public NetworkLogics getNetLog() {
+		return netLog;
+	}
+
+	public void setNetLog(NetworkLogics netLog) {
+		this.netLog = netLog;
+	}
+
+	public FreePlayersListWindow getFreePlayerL() {
+		return freePlayerL;
+	}
+
+	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
+		this.freePlayerL = freePlayerL;
 	}
 
 }

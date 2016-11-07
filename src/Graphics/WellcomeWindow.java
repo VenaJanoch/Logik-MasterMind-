@@ -99,7 +99,7 @@ public class WellcomeWindow extends Stage{
 	 
 		}else {
 			
-			mMR.setGameWindowMultiMode();
+			mMR.setFreePlayersListWindow();
 		}
 		
 	}

@@ -196,7 +196,6 @@ int is_bad_loggin(char* log) {
 
 }
 
-
 void log_control(User_conected* user, char* buffer) {
 
 	char *ret = strchr(buffer, ',');
@@ -215,6 +214,7 @@ void log_control(User_conected* user, char* buffer) {
 				printf("Prihlaseny uzivatel %s %d \n", buffer, i);
 
 				user->isLog = 1;
+				strcpy(user->nickname, buffer);
 				send_message(user, "Log,yes\n");
 
 				break;
@@ -232,6 +232,65 @@ void log_control(User_conected* user, char* buffer) {
 		} else {
 			send_message(user, "Log,no,badPasswd\n");
 		}
+	}
+
+}
+
+void send_free_players(User_conected* user) {
+
+	int i;
+	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char strednik[2];
+
+	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	strcpy(message, "PlayerList,");
+	strcpy(strednik, ";");
+	pthread_mutex_lock(&lock);
+
+	for (i = 0; i < MAX_CONECTED; ++i) {
+
+		if (conected_users[i] != NULL) {
+			if (conected_users[i]->isLog == 1
+					&& strcmp(conected_users[i]->nickname, user->nickname)
+							!= 0) {
+
+				finish = strcat(message, conected_users[i]->nickname);
+				message = strcat(finish, strednik);
+
+			}
+		}
+	}
+
+	finish = strcat(message, "\n");
+	printf("zprava %s \n", finish);
+	pthread_mutex_unlock(&lock);
+
+	send_message(user, finish);
+
+}
+
+void send_invitation(User_conected* user, char* player) {
+	int i;
+	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	strcpy(message, "ChoosePlayer,");
+
+	for (i = 0; i < MAX_CONECTED; ++i) {
+
+		if (conected_users[i] != NULL) {
+			if (strcmp(conected_users[i]->nickname, player) == 0) {
+
+				finish = strcat(message, user->nickname);
+				message = strcat(finish, ",invite\n");
+
+				send_message(conected_users[i], message);
+			}
+
+		}
+
 	}
 
 }
@@ -274,9 +333,17 @@ void *createThread(void *incoming_socket) {
 		} else if (strcmp(buffer, "Log") == 0) {
 
 			log_control(user, ret2);
-		} else if(strcmp(buffer, "LogOut") == 0){
+		} else if (strcmp(buffer, "LogOut") == 0) {
 
 			user->isLog = 0;
+		} else if (strcmp(buffer, "PlayerList") == 0) {
+
+			send_free_players(user);
+
+		} else if (strcmp(buffer, "ChoosePlayer") == 0) {
+
+			send_invitation(user, ret2);
+
 		}
 
 	}

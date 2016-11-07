@@ -1,5 +1,6 @@
 package Control;
 
+import Graphics.FreePlayersListWindow;
 import Graphics.MultiMode;
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
@@ -14,11 +15,13 @@ public class UiCommObserver implements ICommObserver {
 	private MultiMode mM;
 	private MasterMindRun mMR;
 	private LogginLogics lLog;
+	private FreePlayersListWindow freePlayerL;
+	private NetworkLogics netLog;
 
-	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog) {
+	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
 		this.mMR = mMR;
 		this.lLog = lLog;
-
+		this.netLog = netLog;
 	}
 
 	public void processData(String data) {
@@ -53,6 +56,16 @@ public class UiCommObserver implements ICommObserver {
 						
 					}
 					break;
+				case "PlayerList":
+					freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));
+					
+					break;
+				case "ChoosePlayer":
+					if(pomData[2].contains("invite")){
+						
+						System.out.println("invited form " + pomData[1]);
+					}
+					break;
 				default:
 					break;
 				}
@@ -60,6 +73,8 @@ public class UiCommObserver implements ICommObserver {
 		});
 	}
 
+	
+	/*************** Getrs and Setrs******************/
 	public SignUpWindow getsUW() {
 		return sUW;
 	}
@@ -84,4 +99,13 @@ public class UiCommObserver implements ICommObserver {
 		this.mM = mM;
 	}
 
+	public FreePlayersListWindow getFreePlayerL() {
+		return freePlayerL;
+	}
+
+	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
+		this.freePlayerL = freePlayerL;
+	}
+
+	
 }
