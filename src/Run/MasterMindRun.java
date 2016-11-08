@@ -2,6 +2,7 @@ package Run;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Optional;
 
 import Control.LogginLogics;
 import Control.NetworkLogics;
@@ -17,6 +18,9 @@ import Graphics.WellcomeWindow;
 import Interfaces.ITCP;
 import Network.TCPComm;
 import javafx.application.Application;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 public class MasterMindRun extends Application {
@@ -143,6 +147,76 @@ public class MasterMindRun extends Application {
 		this.logLogics.setsIW(signInW);
 	}
 
+	public void showPlayerMessage(String player){
+		
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("Player " + player + "  invited you into their game" );
+		alert.setContentText("Choose your option.");
+
+		ButtonType submitButton = new ButtonType("Accept");
+		ButtonType refuseButton = new ButtonType("Refuse");
+		
+		alert.getButtonTypes().setAll(submitButton, refuseButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		
+		if (result.get() == submitButton){
+			
+			netLog.challengeAccepted(player);
+			netLog.setChallenger(false);
+		
+		} else{
+			netLog.challengeRefuse(player);
+	
+		}
+		
+		
+	}
+
+public void showAcceptMessage(String player){
+		
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("Player " + player + " accept invited into your game" );
+
+		ButtonType submitButton = new ButtonType("OK");
+		
+		alert.getButtonTypes().setAll(submitButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		
+		if (result.get() == submitButton){
+			
+			setGameWindowMultiMode();
+		
+		} 	
+		
+	}
+
+public void showRefusetMessage(String player){
+	
+	Alert alert = new Alert(AlertType.CONFIRMATION);
+	alert.setTitle("Message from player");
+	alert.setHeaderText("Player " + player + " refuse invited into your game, choose another player" );
+
+
+	ButtonType submitButton = new ButtonType("OK");
+	
+	alert.getButtonTypes().setAll(submitButton);
+
+	Optional<ButtonType> result = alert.showAndWait();
+	
+	if (result.get() == submitButton){
+		
+	netLog.getFreePlayerList();
+	
+	} 	
+	
+}
+
+
+	
 	/*** Setrs and Getrs ***/
 
 	public Stage getPrimaryStage() {

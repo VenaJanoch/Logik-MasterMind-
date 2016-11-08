@@ -34,7 +34,6 @@ public class UiCommObserver implements ICommObserver {
 				switch (pomData[0]) {
 				case "Registrace":
 
-					
 					if (pomData[1].contains("bad")) {
 						sUW.getObserText().inc("This nickname is using");
 
@@ -44,28 +43,39 @@ public class UiCommObserver implements ICommObserver {
 
 					break;
 				case "Log":
-					
-					if(pomData[1].contains("yes")){
+
+					if (pomData[1].contains("yes")) {
 						lLog.setLog(true);
 						mMR.setWellcomeWindow();
-						
-					}else if(pomData[1].contains("no") && pomData[2].contains("badLog")){
-							sIW.getObserText().inc("This nickname is not using");
-					}else{
+
+					} else if (pomData[1].contains("no") && pomData[2].contains("badLog")) {
+						sIW.getObserText().inc("This nickname is not using");
+					} else {
 						sIW.getObserText().inc("Bad password");
-						
+
 					}
 					break;
 				case "PlayerList":
 					freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));
-					
+
 					break;
-				case "ChoosePlayer":
-					if(pomData[2].contains("invite")){
+				case "Challenge":
+
+					if (pomData[2].contains("invite")) {
+
+						netLog.createChallengeMesagge(pomData[1]);
+					
+					}else if (pomData[2].contains("refuse")) {
+
+						mMR.showRefusetMessage(pomData[1]);
+
+					} else {
 						
-						System.out.println("invited form " + pomData[1]);
+						mMR.showAcceptMessage(pomData[1]);
+
 					}
 					break;
+
 				default:
 					break;
 				}
@@ -73,8 +83,7 @@ public class UiCommObserver implements ICommObserver {
 		});
 	}
 
-	
-	/*************** Getrs and Setrs******************/
+	/*************** Getrs and Setrs ******************/
 	public SignUpWindow getsUW() {
 		return sUW;
 	}
@@ -107,5 +116,4 @@ public class UiCommObserver implements ICommObserver {
 		this.freePlayerL = freePlayerL;
 	}
 
-	
 }

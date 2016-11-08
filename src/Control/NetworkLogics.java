@@ -7,12 +7,16 @@ import javafx.collections.ObservableList;
 
 public class NetworkLogics {
 
-	TCPComm comm;
-	MasterMindRun mMR;
-
+	private TCPComm comm;
+	private MasterMindRun mMR;
+	private String playerName;
+	private boolean challenger;
+	
+	
 	public NetworkLogics(MasterMindRun mMR) {
 
 		this.mMR = mMR;
+		this.setChallenger(true);
 		
 
 	}
@@ -37,10 +41,30 @@ public class NetworkLogics {
 	
 	public void createGame(String playerName){
 		
-		comm.send("ChoosePlayer," + playerName + "\n");
+		comm.send("Challenge,invite," + playerName + "\n");
 		
 	}
 
+	public void challengeAccepted(String player){
+
+		comm.send("Challenge,accept," + player + "\n");
+		mMR.setGameWindowMultiMode();
+
+	}
+	
+	public void challengeRefuse(String player){
+
+		comm.send("Challenge,refuse," + player + "\n");
+
+	}
+	
+	public void createChallengeMesagge(String player){
+		
+		mMR.showPlayerMessage(player);
+		
+		
+	}
+	
 	/***************************************** Getrs and Setrs *******************/
 
 	public TCPComm getComm() {
@@ -49,6 +73,22 @@ public class NetworkLogics {
 
 	public void setComm(TCPComm comm) {
 		this.comm = comm;
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
+
+	public boolean isChallenger() {
+		return challenger;
+	}
+
+	public void setChallenger(boolean challenger) {
+		this.challenger = challenger;
 	}
 
 	

@@ -238,6 +238,7 @@ void log_control(User_conected* user, char* buffer) {
 
 void send_free_players(User_conected* user) {
 
+
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char strednik[2];
@@ -246,7 +247,6 @@ void send_free_players(User_conected* user) {
 
 	strcpy(message, "PlayerList,");
 	strcpy(strednik, ";");
-	pthread_mutex_lock(&lock);
 
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
@@ -264,9 +264,9 @@ void send_free_players(User_conected* user) {
 
 	finish = strcat(message, "\n");
 	printf("zprava %s \n", finish);
-	pthread_mutex_unlock(&lock);
 
 	send_message(user, finish);
+
 
 }
 
@@ -276,7 +276,7 @@ void send_invitation(User_conected* user, char* player) {
 
 	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	strcpy(message, "ChoosePlayer,");
+	strcpy(message, "Challenge,");
 
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
@@ -292,6 +292,55 @@ void send_invitation(User_conected* user, char* player) {
 		}
 
 	}
+
+}
+
+void send_accept_chellange(User_conected* user, char* player) {
+	int i;
+	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	strcpy(message, "Challenge,");
+	for (i = 0; i < MAX_CONECTED; ++i) {
+
+			if (conected_users[i] != NULL) {
+				if (strcmp(conected_users[i]->nickname, player) == 0) {
+
+					finish = strcat(message, player);
+					message = strcat(finish, ",accept\n");
+					send_message(conected_users[i], message);
+				}
+
+			}
+
+		}
+
+}
+
+void send_refuse_chellange(User_conected* user, char* player) {
+	int i;
+	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	strcpy(message, "Challenge,");
+
+	for (i = 0; i < MAX_CONECTED; ++i) {
+
+				if (conected_users[i] != NULL) {
+					if (strcmp(conected_users[i]->nickname, player) == 0) {
+
+						finish = strcat(message, player);
+						message = strcat(finish, ",refuse\n");
+
+						send_message(conected_users[i], message);
+
+					}
+
+				}
+
+			}
 
 }
 
@@ -340,10 +389,22 @@ void *createThread(void *incoming_socket) {
 
 			send_free_players(user);
 
-		} else if (strcmp(buffer, "ChoosePlayer") == 0) {
+		} else if (strcmp(buffer, "Challenge") == 0) {
 
-			send_invitation(user, ret2);
+			char *ret3 = strchr(ret2, ',');
 
+			*ret3 = '\0';
+
+			ret3++;
+
+			if (strcmp(ret2, "accept") == 0) {
+				printf("invite\n");
+				send_accept_chellange(user, ret3);
+			} else if (strcmp(ret2, "refuse") == 0) {
+				send_refuse_chellange(user, ret3);
+			} else if (strcmp(ret2, "invite") == 0) {
+				send_invitation(user, ret3);
+			}
 		}
 
 	}

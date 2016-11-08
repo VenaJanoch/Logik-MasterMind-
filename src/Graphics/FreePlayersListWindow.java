@@ -105,7 +105,7 @@ public class FreePlayersListWindow extends Stage {
 			// when at least one item is selected, all selected items are
 			// displayed in the dialog
 		} else {
-			
+			netLog.setPlayerName(selection.get(0));
 			netLog.createGame(selection.get(0));
 			
 		}
