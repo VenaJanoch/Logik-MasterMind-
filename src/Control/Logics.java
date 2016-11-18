@@ -27,7 +27,7 @@ public class Logics {
 	private int goodColors = 0;
 	private KnobPanel kP;
 	private int indexButton;
-	private boolean multiMode;
+	private boolean multiMode = true;
 
 	public Logics(Desk desk) {
 		// this.stWin = stWin;
@@ -51,15 +51,15 @@ public class Logics {
 		if (controlCountChoosedKnobs(kP) && resultControl()) {
 
 			if (evaluate(kP.getDesk(), identifikace)) {
-				kP.getDesk().getKnobPanel()[identifikace].nothig();
-				kP.getDesk().getKnobPanel()[identifikace + 1].setVisible(true);
-				kP.getDesk().getControlKnobPanel()[identifikace + 1].setVisible(true);
+				desk.getKnobPanel()[identifikace].nothig();
+				desk.getKnobPanel()[identifikace + 1].setVisible(true);
+				desk.getControlKnobPanel()[identifikace + 1].setVisible(true);
 			} else if (controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels - 1) {
-				kP.getDesk().getResult().setVisible(true);
-				kP.getDesk().getStatutL().setText("Sorry, try again");
+				desk.getResult().setVisible(true);
+				desk.getStatutL().setText("Sorry, try again");
 			} else {
-				kP.getDesk().getResult().setVisible(true);
-				kP.getDesk().getStatutL().setText("You Win");
+				desk.getResult().setVisible(true);
+				desk.getStatutL().setText("You Win");
 			}
 		}
 
@@ -122,7 +122,7 @@ public class Logics {
 			randomc = r.nextInt(Constants.countColorButton);
 			colors[i] = Constants.colors[randomc];
 
-			System.out.println(randomc);
+			System.out.println(randomc + " logic");
 		}
 
 		return colors;
@@ -207,6 +207,8 @@ public class Logics {
 
 	}
 
+	/********** Getrs and setrs ********/
+	
 	public KnobPanel getkP() {
 		return kP;
 	}
@@ -230,5 +232,15 @@ public class Logics {
 	public void setMultiMode(boolean multiMode) {
 		this.multiMode = multiMode;
 	}
+
+	public Color[] getColors() {
+		return colors;
+	}
+
+	public void setColors(Color[] colors) {
+		this.colors = colors;
+	}
+	
+	
 
 }

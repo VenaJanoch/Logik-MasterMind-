@@ -1,5 +1,6 @@
 package Graphics;
 
+import Control.ObservingLabel;
 import Interfaces.IGameMode;
 import Run.MasterMindRun;
 import javafx.geometry.Pos;
@@ -28,7 +29,7 @@ public class SingleMode extends Desk implements IGameMode {
 
 		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
-		setResult(new KnobPanel(100, this, super.getCp()));
+		setResult(new KnobPanel(100, this, super.getCp(),getLogics()));
 		super.getResult().setVisible(false);
 		super.getResult().setResultColor(super.getLogics().creatResultColors());
 
@@ -43,18 +44,18 @@ public class SingleMode extends Desk implements IGameMode {
 		VBox legendPanel = new VBox(4);
 		HBox buttonPanel = new HBox(4);
 
-		statutL = new Label("Find color combination");
+		statuL = new Label("Find color combination");
 		retryB = new Button("Retry");
 		closeB = new Button("Exit");
 
-		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
+		statuL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
 		retryB.setOnAction(event -> resetDesk());
 		closeB.setOnAction(event -> getmMR().getPrimaryStage().close());
 
 		buttonPanel.getChildren().addAll(retryB, closeB);
 		buttonPanel.setAlignment(Pos.CENTER);
-		legendPanel.getChildren().addAll(getCp(), statutL, buttonPanel);
+		legendPanel.getChildren().addAll(getCp(), statuL, buttonPanel);
 
 		legendPanel.setAlignment(Pos.CENTER);
 

@@ -1,10 +1,10 @@
 package Graphics;
 
-
 import javax.swing.text.StyledEditorKit.ForegroundAction;
 
 import Control.Constants;
 import Control.Logics;
+import Control.NetworkLogics;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,10 +28,25 @@ public class KnobPanel extends HBox {
 	private StartWindow stWin;
 	private Desk desk;
 	private ColorPalet cp;
-	
-	public KnobPanel(int identifikace, Desk desk, ColorPalet cp) {
+	Logics logics;
+	NetworkLogics netLog;
+
+	public KnobPanel(int identifikace, Desk desk, ColorPalet cp, Logics logics, NetworkLogics netLog) {
 		super(5);
 		this.cp = cp;
+		this.logics = logics;
+		this.netLog = netLog;
+		this.setMaxHeight(50);
+		this.setMinHeight(50);
+		this.setDesk(desk);
+		this.setIdentifikace(identifikace);
+		createKnobs();
+	}
+	
+	public KnobPanel(int identifikace, Desk desk, ColorPalet cp, Logics logics) {
+		super(5);
+		this.cp = cp;
+		this.logics = logics;
 		this.setMaxHeight(50);
 		this.setMinHeight(50);
 		this.setDesk(desk);
@@ -39,7 +54,6 @@ public class KnobPanel extends HBox {
 		createKnobs();
 	}
 
-	
 	private void createKnobs() {
 
 		knobs = new Knob[Control.Constants.countKnobs];
@@ -62,30 +76,36 @@ public class KnobPanel extends HBox {
 
 	private void setColor(Object button) {
 		Button pomButton = (Button) button;
-		
-		 cp.getLogics().setKp(this);
-		 cp.getLogics().setIndexButton(Integer.parseInt(pomButton.getId()));
-		 cp.setVisible(true);
+		if (logics.isMultiMode()) {
+
+			netLog.setKp(this);
+			netLog.setIndexButton(Integer.parseInt(pomButton.getId()));
+			cp.setVisible(true);
+			
+		} else {
+			logics.setKp(this);
+			logics.setIndexButton(Integer.parseInt(pomButton.getId()));
+			cp.setVisible(true);
+		}
 	}
-	
-	public void setResultColor(Color[] resultColor){
-		
+
+	public void setResultColor(Color[] resultColor) {
+
 		for (int i = 0; i < Control.Constants.countKnobs; i++) {
-			knobs[i].setBackground(new Background(
-					new BackgroundFill(resultColor[i], CornerRadii.EMPTY, Insets.EMPTY)));
+			knobs[i].setBackground(new Background(new BackgroundFill(resultColor[i], CornerRadii.EMPTY, Insets.EMPTY)));
 			nothig();
 		}
-		
+
 	}
-	
-	public void nothig(){
-		
+
+	public void nothig() {
+
 		for (int i = 0; i < knobs.length; i++) {
-			
+
 			knobs[i].setOnAction(event -> nothig());
-			
+
 		}
-		
+
 	}
 
 	/************** Getrs and Setrs *******************/
@@ -105,11 +125,9 @@ public class KnobPanel extends HBox {
 		this.knobs = knobs;
 	}
 
-
 	public Desk getDesk() {
 		return desk;
 	}
-
 
 	public void setDesk(Desk desk) {
 		this.desk = desk;

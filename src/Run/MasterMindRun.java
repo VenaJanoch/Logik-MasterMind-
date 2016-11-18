@@ -18,10 +18,13 @@ import Graphics.WellcomeWindow;
 import Interfaces.ITCP;
 import Network.TCPComm;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class MasterMindRun extends Application {
 
@@ -65,6 +68,14 @@ public class MasterMindRun extends Application {
 		setServerWindow();
 
 		this.primaryStage.show();
+		
+		 primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		       @Override
+		       public void handle(WindowEvent e) {
+		          Platform.exit();
+		          System.exit(0);
+		       }
+		    });
 	}
 
 	public void setStage(Stage stage) {
@@ -91,8 +102,11 @@ public class MasterMindRun extends Application {
 	}
 
 	public void setGameWindowMultiMode() {
-		mM = new MultiMode(this);
-		m_commObserver.setmM(mM);
+		mM = new MultiMode(this,netLog);
+		mM.getLogics().setMultiMode(true);
+		netLog.setMultiM(mM);
+		m_commObserver.setmultiM(mM);
+		m_commObserver.setLogics(mM.getLogics());
 		setStage(mM);
 
 	}
@@ -114,6 +128,7 @@ public class MasterMindRun extends Application {
 		try {
 
 			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()), logLogics.getServerPort());
+			
 			m_commObserver = new UiCommObserver(this,logLogics,netLog);
 			comm.registerObserver(m_commObserver);
 		
@@ -163,8 +178,9 @@ public class MasterMindRun extends Application {
 		
 		if (result.get() == submitButton){
 			
-			netLog.challengeAccepted(player);
 			netLog.setChallenger(false);
+			netLog.challengeAccepted(player);
+			
 		
 		} else{
 			netLog.challengeRefuse(player);
@@ -184,13 +200,7 @@ public void showAcceptMessage(String player){
 		
 		alert.getButtonTypes().setAll(submitButton);
 
-		Optional<ButtonType> result = alert.showAndWait();
-		
-		if (result.get() == submitButton){
-			
-			setGameWindowMultiMode();
-		
-		} 	
+		alert.showAndWait();
 		
 	}
 
@@ -215,7 +225,25 @@ public void showRefusetMessage(String player){
 	
 }
 
+public void showLeaveMessage(String player){
+	
+	Alert alert = new Alert(AlertType.CONFIRMATION);
+	alert.setTitle("Message from player");
+	alert.setHeaderText("Player " + player + " leave game" );
 
+	ButtonType submitButton = new ButtonType("OK");
+	
+	alert.getButtonTypes().setAll(submitButton);
+
+	Optional<ButtonType> result = alert.showAndWait();
+	
+	if (result.get() == submitButton){
+		
+		setWellcomeWindow();
+	
+	} 	
+	
+}
 	
 	/*** Setrs and Getrs ***/
 

@@ -4,6 +4,7 @@ import com.sun.javafx.scene.control.skin.ColorPalette;
 
 import Control.Constants;
 import Control.Logics;
+import Control.NetworkLogics;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -49,7 +50,7 @@ public class StartWindow extends Stage {
 		Desk desk = new Desk(mMR);
 		this.logics = new Logics(desk);
 		this.singleMode = singleMode;
-		this.cp = new ColorPalet(logics);
+		this.cp = new ColorPalet(logics, new NetworkLogics(mMR));
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
 		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];

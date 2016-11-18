@@ -1,5 +1,8 @@
 package Graphics;
 
+import Control.NetworkLogics;
+import Control.ObservableText;
+import Control.ObservingLabel;
 import Interfaces.IGameMode;
 import Run.MasterMindRun;
 import javafx.geometry.Pos;
@@ -13,8 +16,13 @@ import javafx.scene.text.FontWeight;
 
 public class MultiMode extends Desk implements IGameMode {
 
-	public MultiMode(MasterMindRun mMR) {
-		super(mMR);
+	private ObservingLabel statutL;
+
+	private ObservableText obserText = new ObservableText("Find color combination");
+
+	public MultiMode(MasterMindRun mMR, NetworkLogics netLog) {
+		super(mMR, netLog);
+		setNetLog(netLog);
 		getHlavniPanel().setBottom(creatResultPanel());
 		getHlavniPanel().setLeft(creatLegendPanel());
 	}
@@ -27,22 +35,28 @@ public class MultiMode extends Desk implements IGameMode {
 
 		resultLB.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
-		setResult(new KnobPanel(100, this, getCp()));
+		
+		setResult(new KnobPanel(100, this, getCp(),getLogics(),getNetLog()));
 		
 		resultPanel.getChildren().add(resultLB);
 		resultPanel.getChildren().add(getResult());
 
-
+		System.out.println("Hrac " + getNetLog().getName() + " je vyzivatel " + getNetLog().isChallenger() );
+		if (getNetLog().isChallenger()) {
+			resultPanel.setVisible(false);
+			
+		}else{
+			
+			obserText.inc("Create color combination");
+		}
 		return resultPanel;
 	}
 	
 	@Override
 	public void resetDesk(){
 
-		getHlavniPanel().setCenter(creatGameDesk());
-		getHlavniPanel().setLeft(creatLegendPanel());
-		getHlavniPanel().setBottom(creatResultPanel());
-
+		getNetLog().leaveGame();
+		getmMR().setWellcomeWindow();
 	}
 
 	@Override
@@ -51,16 +65,17 @@ public class MultiMode extends Desk implements IGameMode {
 		VBox legendPanel = new VBox(4);
 		HBox buttonPanel = new HBox(4);
 
-		super.statutL = new Label("Find color combination");
-		super.retryB = new Button("Retry");
+		statutL = new ObservingLabel();
+		obserText.addObserver(statutL);
+		leaveB = new Button("Leave");
 		closeB = new Button("Exit");
 
 		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
-		retryB.setOnAction(event -> resetDesk());
+		leaveB.setOnAction(event -> resetDesk());
 		closeB.setOnAction(event -> getmMR().getPrimaryStage().close());
 
-		buttonPanel.getChildren().addAll(retryB, closeB);
+		buttonPanel.getChildren().addAll(leaveB, closeB);
 		buttonPanel.setAlignment(Pos.CENTER);
 		legendPanel.getChildren().addAll(getCp(), statutL, buttonPanel);
 
@@ -71,6 +86,14 @@ public class MultiMode extends Desk implements IGameMode {
 
 		return legendPanel;
 
+	}
+
+	public ObservableText getObserText() {
+		return obserText;
+	}
+
+	public void setObserText(ObservableText obserText) {
+		this.obserText = obserText;
 	}
 
 }

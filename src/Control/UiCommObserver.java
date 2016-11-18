@@ -1,5 +1,6 @@
 package Control;
 
+import Graphics.Desk;
 import Graphics.FreePlayersListWindow;
 import Graphics.MultiMode;
 import Graphics.SignInWindow;
@@ -12,11 +13,13 @@ public class UiCommObserver implements ICommObserver {
 
 	private SignUpWindow sUW;
 	private SignInWindow sIW;
-	private MultiMode mM;
+	private MultiMode multiM;
+	private Desk desk;
 	private MasterMindRun mMR;
 	private LogginLogics lLog;
 	private FreePlayersListWindow freePlayerL;
 	private NetworkLogics netLog;
+	private Logics logics;
 
 	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
 		this.mMR = mMR;
@@ -26,11 +29,13 @@ public class UiCommObserver implements ICommObserver {
 
 	public void processData(String data) {
 
+		System.out.println(data);
+		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				String[] pomData = data.split(",");
-
+				
 				switch (pomData[0]) {
 				case "Registrace":
 
@@ -46,6 +51,7 @@ public class UiCommObserver implements ICommObserver {
 
 					if (pomData[1].contains("yes")) {
 						lLog.setLog(true);
+						netLog.setName(sIW.getNicknameTF().getText());
 						mMR.setWellcomeWindow();
 
 					} else if (pomData[1].contains("no") && pomData[2].contains("badLog")) {
@@ -72,10 +78,41 @@ public class UiCommObserver implements ICommObserver {
 					} else {
 						
 						mMR.showAcceptMessage(pomData[1]);
-
+						netLog.setChallenger(true);
+						
+						mMR.setGameWindowMultiMode();
+						multiM.getLogics().setMultiMode(true);
+						multiM.getObserText().inc("Wait for color combination");
+						
 					}
 					break;
+				case "Game":
+					if(pomData[2].contains("leave")){
+						
+						mMR.showLeaveMessage(pomData[1]);
+						
+					}else if(pomData[1].contains("colorResult")){
+						
+						netLog.setResult(pomData[2]);
+						multiM.getObserText().inc("Find color combination");
+						
+					}else if(pomData[1].contains("goodColor")){
+						
+						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
+						
+					}else if(pomData[1].contains("greatColor")){
+						
 
+						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
+						
+					}else if(pomData[1].contains("knobPanel")){
+						
+						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
+					}
+					
+					
+					
+					break;
 				default:
 					break;
 				}
@@ -100,12 +137,12 @@ public class UiCommObserver implements ICommObserver {
 		this.sIW = sIW;
 	}
 
-	public MultiMode getmM() {
-		return mM;
+	public MultiMode getmultiM() {
+		return multiM;
 	}
 
-	public void setmM(MultiMode mM) {
-		this.mM = mM;
+	public void setmultiM(MultiMode multiM) {
+		this.multiM = multiM;
 	}
 
 	public FreePlayersListWindow getFreePlayerL() {
@@ -114,6 +151,22 @@ public class UiCommObserver implements ICommObserver {
 
 	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
 		this.freePlayerL = freePlayerL;
+	}
+
+	public Desk getDesk() {
+		return desk;
+	}
+
+	public void setDesk(Desk desk) {
+		this.desk = desk;
+	}
+
+	public Logics getLogics() {
+		return logics;
+	}
+
+	public void setLogics(Logics logics) {
+		this.logics = logics;
 	}
 
 }

@@ -2,6 +2,7 @@ package Graphics;
 
 import Control.Constants;
 import Control.Logics;
+import Control.NetworkLogics;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,11 +23,13 @@ public class ColorPalet extends VBox {
 	private Button[] colorButtons;
 	private int indexButton;
 	private Logics logics;
+	private NetworkLogics netLog;
 	
-	public ColorPalet(Logics logics) {
+	public ColorPalet(Logics logics, NetworkLogics netLog) {
 
 		super(4);
 		this.logics = logics;
+		this.netLog = netLog;
 		createColorButton();
 		createColorPickerPanel();
 		this.setVisible(false);
@@ -46,7 +49,15 @@ public class ColorPalet extends VBox {
 			colorButtons[i].setShape(new Rectangle(5, 5));
 			colorButtons[i].setBackground(
 					new Background(new BackgroundFill(Constants.colors[i], CornerRadii.EMPTY, Insets.EMPTY)));
-			colorButtons[i].setOnAction(event -> logics.returnColor(event.getSource()));
+			
+			if(logics.isMultiMode()){
+				System.out.println(colorButtons[i]);
+				colorButtons[i].setOnAction(event -> netLog.returnColor(event.getSource()));				
+				
+			}else{
+
+				colorButtons[i].setOnAction(event -> logics.returnColor(event.getSource()));
+			}
 
 		}
 	}

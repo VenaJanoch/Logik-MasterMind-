@@ -3,6 +3,9 @@ package Graphics;
 import Control.Constants;
 import Control.LogginLogics;
 import Control.Logics;
+import Control.NetworkLogics;
+import Control.ObservableText;
+import Control.ObservingLabel;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -32,23 +35,26 @@ public class Desk extends Stage {
 	private ControlKnobsPanel[] controlKnobPanel;
 	private Logics logics;
 	private LogginLogics lLog;
+	private NetworkLogics netLog;
 	private KnobPanel result;
 	private ColorPalet cp;
 	private HBox lineBox[];
 
-	protected Label statutL;
+	protected Label statuL;
 	protected Button retryB;
+	protected Button leaveB;
 	protected Button closeB;
 	
 	private Button menuB;
 	private Button singOutB;
 	
-	public Desk(MasterMindRun mMR) {
+	public Desk(MasterMindRun mMR, NetworkLogics netLog) {
 
 		super();
 		this.mMR = mMR;
+		this.netLog = netLog;
 		this.logics = new Logics(this);
-		this.cp = new ColorPalet(logics);
+		this.cp = new ColorPalet(logics,netLog);
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
 		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
@@ -59,6 +65,22 @@ public class Desk extends Stage {
 
 	}
 
+	
+	public Desk(MasterMindRun mMR) {
+
+		super();
+		this.mMR = mMR;
+		this.logics = new Logics(this);
+		this.cp = new ColorPalet(logics,mMR.getNetLog());
+		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
+		this.lineBox = new HBox[Constants.countKnobsPanels];
+		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
+		this.lLog = mMR.getLogLogics();
+		this.setTitle("MasterMind-GameWindow");
+
+		this.setScene(creatScene());
+
+	}
 	public Scene creatScene() {
 
 		newScena = new Scene(creatPanel(), 310, 600);
@@ -111,6 +133,18 @@ public class Desk extends Stage {
 
 		return desk;
 	}
+	
+	public void repaintDesk(){
+		
+		VBox desk = new VBox(5);
+
+		
+		knobPanel[0].setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt("1")], CornerRadii.EMPTY, Insets.EMPTY)));	
+		
+		desk.getChildren().addAll(lineBox);
+		hlavniPanel.setCenter(desk);
+	}
+	
 
 	private void createLineBox() {
 
@@ -125,12 +159,12 @@ public class Desk extends Stage {
 
 	private void createKnobsPanels() {
 
-		knobPanel[0] = new KnobPanel(0, this, cp);
+		knobPanel[0] = new KnobPanel(0, this, cp, logics, netLog);
 		controlKnobPanel[0] = new ControlKnobsPanel(0, this);
 
 		for (int i = 1; i < knobPanel.length; i++) {
 
-			knobPanel[i] = new KnobPanel(i, this, cp);
+			knobPanel[i] = new KnobPanel(i, this, cp,logics, netLog);
 			controlKnobPanel[i] = new ControlKnobsPanel(i, this);
 
 			knobPanel[i].setVisible(false);
@@ -171,14 +205,7 @@ public class Desk extends Stage {
 		this.logics = logics;
 	}
 
-	public Label getStatutL() {
-		return statutL;
-	}
-
-	public void setStatutL(Label statutL) {
-		this.statutL = statutL;
-	}
-
+	
 	public MasterMindRun getmMR() {
 		return mMR;
 	}
@@ -209,6 +236,22 @@ public class Desk extends Stage {
 
 	public void setlLog(LogginLogics lLog) {
 		this.lLog = lLog;
+	}
+
+	public NetworkLogics getNetLog() {
+		return netLog;
+	}
+
+	public void setNetLog(NetworkLogics netLog) {
+		this.netLog = netLog;
+	}
+
+	public Label getStatutL() {
+		return statuL;
+	}
+
+	public void setStatutL(Label statuL) {
+		this.statuL = statuL;
 	}
 
 	

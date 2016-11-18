@@ -76,6 +76,7 @@ public class TCPComm implements ITCP, Runnable {
 	// ---------------------------------------------------------
 
 	public void start() {
+		
 		(new Thread(this)).start();
 	}
 
