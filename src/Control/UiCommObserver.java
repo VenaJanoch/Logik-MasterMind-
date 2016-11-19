@@ -81,7 +81,6 @@ public class UiCommObserver implements ICommObserver {
 						netLog.setChallenger(true);
 						
 						mMR.setGameWindowMultiMode();
-						multiM.getLogics().setMultiMode(true);
 						multiM.getObserText().inc("Wait for color combination");
 						
 					}
@@ -108,6 +107,14 @@ public class UiCommObserver implements ICommObserver {
 					}else if(pomData[1].contains("knobPanel")){
 						
 						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
+					}else if(pomData[1].contains("gameOver")){
+						
+						multiM.getObserText().inc("Challenger had failed");
+						
+					}else if(pomData[1].contains("gameDone")){
+						
+						multiM.getObserText().inc("Challenger had succeeded");
+						
 					}
 					
 					

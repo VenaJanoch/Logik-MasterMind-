@@ -2,6 +2,7 @@ package Graphics;
 
 import Control.Constants;
 import Control.LogginLogics;
+import Control.NetworkLogics;
 import Network.TCPComm;
 import Run.MasterMindRun;
 import javafx.geometry.Insets;
@@ -35,14 +36,15 @@ public class WellcomeWindow extends Stage{
 	private Button signUpB;
 	private Button signOutB;
 	private LogginLogics lLog;
+	private NetworkLogics netLog;
 	
 	
-	public WellcomeWindow(MasterMindRun mMR, LogginLogics lLog) {
+	public WellcomeWindow(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
 		
 		super();
 		this.mMR = mMR;
 		this.lLog = lLog;
-		
+		this.netLog = netLog;
 		this.setTitle("MasterMind-Menu");
 		hlavniPanel = new BorderPane();
 		singlePlayer = new Button("Single mode");
@@ -113,7 +115,7 @@ public class WellcomeWindow extends Stage{
 		
 		signInB.setOnAction(event -> mMR.setSignInWindow());
 		signUpB.setOnAction(event -> mMR.setSignUpWindow());
-		signOutB.setOnAction(event -> lLog.signOutUser("LogOut,wellcomeWindow\n"));
+		signOutB.setOnAction(event -> netLog.signOutUser("LogOut,wellcomeWindow\n"));
 		
 		signInB.setMinSize(100, 50);
 		signUpB.setMinSize(100, 50);

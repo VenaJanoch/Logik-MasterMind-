@@ -6,7 +6,6 @@ import Graphics.Desk;
 import Graphics.Knob;
 import Graphics.KnobPanel;
 import Graphics.MultiMode;
-import Graphics.StartWindow;
 import Network.TCPComm;
 import Run.MasterMindRun;
 import javafx.collections.FXCollections;
@@ -27,7 +26,6 @@ public class NetworkLogics {
 	private String name;
 	private boolean challenger;
 
-	private StartWindow stWin;
 	private Color[] colors;
 	private int[] colorsIndex;
 	private Color[] checkColors;
@@ -37,11 +35,13 @@ public class NetworkLogics {
 	private int goodColors = 0;
 	private KnobPanel kP;
 	private int indexButton;
+	private LogginLogics lLog;
 	
-	public NetworkLogics(MasterMindRun mMR) {
+	public NetworkLogics(MasterMindRun mMR, LogginLogics lLog) {
 
 		this.mMR = mMR;
 		this.setChallenger(true);
+		this.setlLog(lLog);
 		colors = new Color[Constants.countKnobs];
 		colorsIndex = new int[Constants.countKnobs];
 
@@ -51,6 +51,13 @@ public class NetworkLogics {
 
 		comm.send("PlayerList,get\n");
 
+	}
+	
+public void signOutUser(String message){
+		
+		lLog.setLog(false);
+		comm.send(message);
+		mMR.setWellcomeWindow();
 	}
 
 	public ObservableList<String> creatPlayersList(String mesagge) {
@@ -121,16 +128,35 @@ public class NetworkLogics {
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 
 			} else if (controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels - 1) {
+				
+				sendKnobs(multiM.getKnobPanel()[identifikace]);
+				sendGameOver();
 				multiM.getResult().setVisible(true);
-				//multiM.getStatutL().setText("Sorry, try again");
+				multiM.getObserText().inc("Sorry, you lost");
+				
+				
 			} else {
-			//	multiM.getResult().setVisible(true);
-			//	multiM.getStatutL().setText("You Win");
+				
+				sendKnobs(multiM.getKnobPanel()[identifikace]);
+				sendGameDone();
+				multiM.getResult().setVisible(true);
+				multiM.getObserText().inc("You win");
 			}
 		}
 
 		multiM.getCp().setVisible(false);
 
+	}
+	
+	public void sendGameOver(){
+		
+		comm.send("Game,gameOver");
+		
+	}
+	
+	public void sendGameDone(){
+		
+		comm.send("Game,gameDone");
 	}
 
 	public int findColorIndex(Knob knob) {
@@ -199,7 +225,7 @@ public class NetworkLogics {
 		for (int i = 0; i < greatColor1; i++) {
 
 			multiM.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
-					new Background(new BackgroundFill(Constants.greatChoose, CornerRadii.EMPTY, Insets.EMPTY)));
+					new Background(new BackgroundFill(Constants.goodChoose, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		}
 	}
@@ -268,7 +294,7 @@ public class NetworkLogics {
 		}
 
 		System.out.println(result);
-
+		multiM.getObserText().inc("Chellanger findig combination");
 		comm.send(result + "\n");
 
 	}
@@ -299,6 +325,7 @@ public class NetworkLogics {
 
 		}
 
+		System.out.println("greatColors");
 		if (greatColors == 4) {
 			return false;
 		} else if (identifikace == Constants.countKnobsPanels - 1) {
@@ -417,6 +444,14 @@ public class NetworkLogics {
 
 	public void setColors(Color[] colors) {
 		this.colors = colors;
+	}
+
+	public LogginLogics getlLog() {
+		return lLog;
+	}
+
+	public void setlLog(LogginLogics lLog) {
+		this.lLog = lLog;
 	}
 	
 	

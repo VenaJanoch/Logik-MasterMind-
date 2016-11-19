@@ -1,5 +1,6 @@
 package Graphics;
 
+import Control.LogginLogics;
 import Control.NetworkLogics;
 import Control.ObservableText;
 import Control.ObservingLabel;
@@ -20,8 +21,8 @@ public class MultiMode extends Desk implements IGameMode {
 
 	private ObservableText obserText = new ObservableText("Find color combination");
 
-	public MultiMode(MasterMindRun mMR, NetworkLogics netLog) {
-		super(mMR, netLog);
+	public MultiMode(MasterMindRun mMR, NetworkLogics netLog, LogginLogics lLog) {
+		super(mMR, netLog, lLog,true);
 		setNetLog(netLog);
 		getHlavniPanel().setBottom(creatResultPanel());
 		getHlavniPanel().setLeft(creatLegendPanel());
@@ -42,8 +43,10 @@ public class MultiMode extends Desk implements IGameMode {
 		resultPanel.getChildren().add(getResult());
 
 		System.out.println("Hrac " + getNetLog().getName() + " je vyzivatel " + getNetLog().isChallenger() );
+		
 		if (getNetLog().isChallenger()) {
-			resultPanel.setVisible(false);
+			
+		getResult().setVisible(false);
 			
 		}else{
 			

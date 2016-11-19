@@ -13,7 +13,6 @@ import Graphics.ServerWindow;
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
 import Graphics.SingleMode;
-import Graphics.StartWindow;
 import Graphics.WellcomeWindow;
 import Interfaces.ITCP;
 import Network.TCPComm;
@@ -36,7 +35,6 @@ public class MasterMindRun extends Application {
 
 	/** Atributy tridy **/
 	private Stage primaryStage;
-	private StartWindow stWindow;
 	private WellcomeWindow wellcome;
 	private SingleMode sM;
 	private MultiMode mM;
@@ -62,7 +60,7 @@ public class MasterMindRun extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		this.logLogics = new LogginLogics(this);
-		this.netLog = new NetworkLogics(this);
+		this.netLog = new NetworkLogics(this, logLogics);
 		this.primaryStage = primaryStage;
 
 		setServerWindow();
@@ -72,6 +70,7 @@ public class MasterMindRun extends Application {
 		 primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		       @Override
 		       public void handle(WindowEvent e) {
+		    	  netLog.signOutUser("LogOut,end\n");
 		          Platform.exit();
 		          System.exit(0);
 		       }
@@ -102,7 +101,7 @@ public class MasterMindRun extends Application {
 	}
 
 	public void setGameWindowMultiMode() {
-		mM = new MultiMode(this,netLog);
+		mM = new MultiMode(this,netLog,logLogics);
 		mM.getLogics().setMultiMode(true);
 		netLog.setMultiM(mM);
 		m_commObserver.setmultiM(mM);
@@ -112,7 +111,7 @@ public class MasterMindRun extends Application {
 	}
 
 	public void setWellcomeWindow() {
-		wellcome = new WellcomeWindow(this,logLogics);
+		wellcome = new WellcomeWindow(this,logLogics, netLog);
 
 		this.setStage(wellcome);
 

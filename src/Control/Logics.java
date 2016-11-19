@@ -6,7 +6,6 @@ import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import Graphics.Desk;
 import Graphics.KnobPanel;
-import Graphics.StartWindow;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
@@ -16,7 +15,6 @@ import javafx.scene.paint.Color;
 
 public class Logics {
 
-	private StartWindow stWin;
 	private Desk desk;
 	private Random r;
 	private Color[] colors;
@@ -27,12 +25,13 @@ public class Logics {
 	private int goodColors = 0;
 	private KnobPanel kP;
 	private int indexButton;
-	private boolean multiMode = true;
+	private boolean multiMode;
 
-	public Logics(Desk desk) {
+	public Logics(Desk desk, boolean multiMode) {
 		// this.stWin = stWin;
 
 		this.desk = desk;
+		this.multiMode = multiMode;
 		r = new Random();
 		colors = new Color[Constants.countKnobs];
 

@@ -64,12 +64,6 @@ public class LogginLogics {
 		
 	}
 	
-	public void signOutUser(String message){
-		
-		setLog(false);
-		comm.send(message);
-		mMR.setWellcomeWindow();
-	}
 	
 	
 	public String createLogMessage(String nick, String passwd){

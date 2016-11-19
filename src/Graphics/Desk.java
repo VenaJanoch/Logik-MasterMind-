@@ -48,17 +48,17 @@ public class Desk extends Stage {
 	private Button menuB;
 	private Button singOutB;
 	
-	public Desk(MasterMindRun mMR, NetworkLogics netLog) {
+	public Desk(MasterMindRun mMR, NetworkLogics netLog, LogginLogics lLog, boolean multiMode) {
 
 		super();
 		this.mMR = mMR;
 		this.netLog = netLog;
-		this.logics = new Logics(this);
+		this.logics = new Logics(this, multiMode);
 		this.cp = new ColorPalet(logics,netLog);
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
 		this.controlKnobPanel = new ControlKnobsPanel[Constants.countKnobsPanels];
-		this.lLog = mMR.getLogLogics();
+		this.lLog = lLog;
 		this.setTitle("MasterMind-GameWindow");
 
 		this.setScene(creatScene());
@@ -70,7 +70,7 @@ public class Desk extends Stage {
 
 		super();
 		this.mMR = mMR;
-		this.logics = new Logics(this);
+		this.logics = new Logics(this,false);
 		this.cp = new ColorPalet(logics,mMR.getNetLog());
 		this.knobPanel = new KnobPanel[Constants.countKnobsPanels];
 		this.lineBox = new HBox[Constants.countKnobsPanels];
@@ -114,7 +114,7 @@ public class Desk extends Stage {
 		
 		menuB.setOnAction(event -> mMR.setWellcomeWindow());
 	
-		singOutB.setOnAction(event -> lLog.signOutUser("LogOut,Desk\n"));
+		singOutB.setOnAction(event -> netLog.signOutUser("LogOut,Desk\n"));
 		menuBar.getChildren().addAll(menuB,singOutB);
 		
 		menuBar.setAlignment(Pos.CENTER_LEFT);
