@@ -50,8 +50,7 @@ public class TCPComm implements ITCP, Runnable {
 	// ---------------------------------------------------------
 
 	public void run() {
-		System.out.println("Hello from a thread!");
-
+		
 		try {
 			Socket socket = new Socket(address, port);
 			m_output = socket.getOutputStream();

@@ -36,7 +36,7 @@ public class NetworkLogics {
 	private KnobPanel kP;
 	private int indexButton;
 	private LogginLogics lLog;
-	
+
 	public NetworkLogics(MasterMindRun mMR, LogginLogics lLog) {
 
 		this.mMR = mMR;
@@ -52,9 +52,9 @@ public class NetworkLogics {
 		comm.send("PlayerList,get\n");
 
 	}
-	
-public void signOutUser(String message){
-		
+
+	public void signOutUser(String message) {
+
 		lLog.setLog(false);
 		comm.send(message);
 		mMR.setWellcomeWindow();
@@ -80,7 +80,7 @@ public void signOutUser(String message){
 	public void challengeAccepted(String player) {
 
 		comm.send("Challenge,accept," + player + "\n");
-
+		
 		mMR.setGameWindowMultiMode();
 		multiM.getLogics().setMultiMode(true);
 
@@ -107,7 +107,7 @@ public void signOutUser(String message){
 	public void returnColor(Object button) {
 
 		Button tmpButton = (Button) button;
-		
+
 		kP.getKnobs()[indexButton]
 				.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(tmpButton.getId())],
 						CornerRadii.EMPTY, Insets.EMPTY)));
@@ -115,28 +115,25 @@ public void signOutUser(String message){
 		kP.getKnobs()[indexButton].setObarven(true);
 
 		int identifikace = kP.getIdentifikace();
-		
-		
 
-		if (controlCountChoosedKnobs(kP) ) {
+		if (controlCountChoosedKnobs(kP)) {
 
 			if (evaluate(kP.getDesk(), identifikace)) {
 				multiM.getKnobPanel()[identifikace].nothig();
 				multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 				multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
-				
+
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 
 			} else if (controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels - 1) {
-				
+
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 				sendGameOver();
 				multiM.getResult().setVisible(true);
 				multiM.getObserText().inc("Sorry, you lost");
-				
-				
+
 			} else {
-				
+
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 				sendGameDone();
 				multiM.getResult().setVisible(true);
@@ -147,15 +144,15 @@ public void signOutUser(String message){
 		multiM.getCp().setVisible(false);
 
 	}
-	
-	public void sendGameOver(){
-		
+
+	public void sendGameOver() {
+
 		comm.send("Game,gameOver");
-		
+
 	}
-	
-	public void sendGameDone(){
-		
+
+	public void sendGameDone() {
+
 		comm.send("Game,gameDone");
 	}
 
@@ -183,8 +180,10 @@ public void signOutUser(String message){
 		}
 
 		comm.send(message + "\n");
-		comm.send("Game,goodColors," + knobPanel.getIdentifikace()+ "," + goodColors + ",\n");
-		comm.send("Game,greatColors," + knobPanel.getIdentifikace()+ ","  + greatColors + ",\n");
+		comm.send("Game,goodColors," + knobPanel.getIdentifikace() + "," + goodColors + ",\n");
+		comm.send("Game,greatColors," + knobPanel.getIdentifikace() + "," + greatColors + ",\n");
+		
+		
 
 	}
 
@@ -192,61 +191,58 @@ public void signOutUser(String message){
 
 		System.out.println("knobs " + message);
 		String[] pomString = message.split(";");
-		
+
 		for (int i = 0; i < Constants.countKnobs; i++) {
-		
-			multiM.getKnobPanel()[identifikace].getKnobs()[i].
-			setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])], CornerRadii.EMPTY, Insets.EMPTY)));	
-			
-		}	
-		
-		multiM.getKnobPanel()[identifikace + 1].setVisible(true);
-		multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
-		
+
+			multiM.getKnobPanel()[identifikace].getKnobs()[i]
+					.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])],
+							CornerRadii.EMPTY, Insets.EMPTY)));
+
+		}
+		if (identifikace <= Constants.countControlKnobsLine) {
+			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
+			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
+		}
+
 	}
-	
-	public void setGreatColor(int greatColor1, int identifikace){
-		
-		System.out.println("great " + greatColor1);
+
+	public void setGreatColor(int greatColor1, int identifikace) {
+
 		for (int i = 0; i < greatColor1; i++) {
 
 			multiM.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
 					new Background(new BackgroundFill(Constants.greatChoose, CornerRadii.EMPTY, Insets.EMPTY)));
-			
-			
+
 		}
 	}
-	
-	public void setGoodColor(int greatColor1, int identifikace){
-		
-		System.out.println("good " + greatColor1);
-		
-		
-		for (int i = 0; i < greatColor1; i++) {
+
+	public void setGoodColor(int goodColor1, int identifikace) {
+
+		for (int i = 0; i < goodColor1; i++) {
 
 			multiM.getControlKnobPanel()[identifikace].getControlKnob()[i].setBackground(
 					new Background(new BackgroundFill(Constants.goodChoose, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		}
 	}
-	
-	public void setResult(String message){
-		
+
+	public void setResult(String message) {
+
 		String[] pomString = message.split(";");
 		for (int i = 0; i < Constants.countKnobs; i++) {
-			
-			multiM.getResult().getKnobs()[i].
-			setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])], CornerRadii.EMPTY, Insets.EMPTY)));	
-			colors[i] = Constants.colors[Integer.parseInt(pomString[i])]; 
-		}	
-		
+
+			multiM.getResult().getKnobs()[i]
+					.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])],
+							CornerRadii.EMPTY, Insets.EMPTY)));
+			colors[i] = Constants.colors[Integer.parseInt(pomString[i])];
+		}
+
 		kP = multiM.getKnobPanel()[0];
-		
+
 	}
 
 	public boolean controlCountChoosedKnobs(KnobPanel kp) {
 
-		
 		int count = 0;
 		for (int i = 0; i < Constants.countKnobs; i++) {
 
@@ -257,24 +253,20 @@ public void signOutUser(String message){
 		}
 
 		if (count == Constants.countKnobs) {
-			
-			if(kp.getIdentifikace() == 100){
-				
+
+			if (kp.getIdentifikace() == 100) {
+
 				loadColorResult();
 				return false;
 
 			}
-			
-			
-			
+
 			return true;
-			
+
 		}
 
 		return false;
 	}
-
-	
 
 	private void loadColorResult() {
 
@@ -296,20 +288,19 @@ public void signOutUser(String message){
 		System.out.println(result);
 		multiM.getObserText().inc("Chellanger findig combination");
 		comm.send(result + "\n");
+		
 
 	}
 
 	public boolean evaluate(Desk desk, int identifikace) {
 
-		
 		greatColors = 0;
 		catchColors = 0;
 		goodColors = 0;
 
 		checkColors = new Color[Constants.countKnobs];
 		checkIndex = 0;
-		
-		
+
 		findGreatColors(desk.getKnobPanel()[identifikace], desk);
 		findGoodColors(desk.getKnobPanel()[identifikace], desk);
 
@@ -325,7 +316,6 @@ public void signOutUser(String message){
 
 		}
 
-		System.out.println("greatColors");
 		if (greatColors == 4) {
 			return false;
 		} else if (identifikace == Constants.countKnobsPanels - 1) {
@@ -377,7 +367,25 @@ public void signOutUser(String message){
 				greatColors++;
 			}
 		}
-			}
+	}
+	
+	public void checkGame(){
+		
+		comm.send("CheckGame,sdfa\n");
+		
+	}
+	
+	public void createDatabase(){
+		
+		comm.send("Challenge,invite,ja\n");
+		comm.send("Challenge,accept,test\n");
+		comm.send("Game,knobPanel,0,1;2;3;4;\n");
+		comm.send("Game,goodColors,0,2,\n");
+		comm.send("Game,greatColors,0,1,\n");
+		
+		
+		
+	}
 
 	/*****************************************
 	 * Getrs and Setrs
@@ -438,6 +446,7 @@ public void signOutUser(String message){
 	public void setIndexButton(int indexButton) {
 		this.indexButton = indexButton;
 	}
+
 	public Color[] getColors() {
 		return colors;
 	}
@@ -453,6 +462,5 @@ public void signOutUser(String message){
 	public void setlLog(LogginLogics lLog) {
 		this.lLog = lLog;
 	}
-	
-	
+
 }

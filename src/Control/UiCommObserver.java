@@ -95,18 +95,19 @@ public class UiCommObserver implements ICommObserver {
 						netLog.setResult(pomData[2]);
 						multiM.getObserText().inc("Find color combination");
 						
-					}else if(pomData[1].contains("goodColor")){
+					}else if(pomData[1].contains("goodColors")){
 						
 						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
 						
-					}else if(pomData[1].contains("greatColor")){
+					}else if(pomData[1].contains("greatColors")){
 						
 
 						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						
+						netLog.checkGame();
 					}else if(pomData[1].contains("knobPanel")){
 						
 						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
+						
 					}else if(pomData[1].contains("gameOver")){
 						
 						multiM.getObserText().inc("Challenger had failed");

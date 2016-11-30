@@ -107,12 +107,13 @@ public class MasterMindRun extends Application {
 		m_commObserver.setmultiM(mM);
 		m_commObserver.setLogics(mM.getLogics());
 		setStage(mM);
+		
 
 	}
 
 	public void setWellcomeWindow() {
 		wellcome = new WellcomeWindow(this,logLogics, netLog);
-
+		//netLog.createDatabase();
 		this.setStage(wellcome);
 
 	}

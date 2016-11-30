@@ -6,25 +6,23 @@
  * Definovani struktury grafu
  */
 typedef struct Knobs{
-
+	int free;
 	int identifikace;
-	int color1;
-	int color2;
-	int color3;
-	int color4;
+	int colors[4];
+
 
 }Knobs;
 
 typedef struct Good_color{
-
+	int free;
 	int good_color;
 	int identifikace;
 
 }Good_color;
 
 typedef struct Great_color{
-
-	int good_color;
+	int free;
+	int great_color;
 	int identifikace;
 
 }Great_color;
