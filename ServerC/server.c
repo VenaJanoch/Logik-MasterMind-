@@ -202,6 +202,170 @@ int is_bad_loggin(char* log) {
 
 }
 
+int find_game(User_conected* user) {
+
+	int i;
+	for (i = 0; i < MAX_CONECTED; ++i) {
+		if (game[i] != NULL && conected_users[game[i]->gamer2] != NULL) {
+
+			if (strcmp(conected_users[game[i]->gamer2]->nickname,
+					user->nickname) == 0
+					|| strcmp(conected_users[game[i]->gamer1]->nickname,
+							user->nickname) == 0) {
+
+				return i;
+
+			}
+		}
+	}
+
+	return -1;
+}
+
+void send_good_colors(User_conected* user,char* good_colors){
+
+	send_message(user, good_colors);
+
+
+}
+
+void send_great_colors(User_conected* user,char* great_colors){
+
+	send_message(user, great_colors);
+}
+
+void send_knobs_colors(User_conected* user,char* knob_panel){
+
+	send_message(user, knob_panel);
+}
+void reload_game(char* buffer, User_conected* user) {
+
+	printf("sracky %s \n",buffer);
+
+
+	char* player = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* good_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* great_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* knob_panel = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+	printf("sracky0\n");
+	strcpy(player, "Game,player,");
+	printf("sracky\n");
+
+	user->game = game[atoi(buffer)];
+	printf("sracky1\n");
+
+	Game* game = user->game;
+	printf("sracky2\n");
+
+	if (strcmp(conected_users[game->gamer1]->nickname, user->nickname) == 0) {
+		printf("sracky3\n");
+
+		strcat(player, "challenger,");
+		strcat(player, conected_users[game->gamer1]->nickname);
+		strcat(player, "\n");
+	} else {
+
+		printf("sracky3\n");
+
+		strcat(player, "challenger,");
+		strcat(player, conected_users[game->gamer2]->nickname);
+		strcat(player, "\n");
+	}
+
+	send_message(user, player);
+	sleep(1);
+	printf("sracky4 %s \n",player);
+
+	int i = 0;
+	int j;
+
+	for (i = 0; i < COUNT_Game; ++i) {
+			printf("%d d\n", game->knobs[i].free);
+			if (game->knobs[i].free == 1) {
+				strcpy(good_colors, "Game,goodColors,");
+				strcpy(great_colors, "Game,greatColors,");
+				strcpy(knob_panel, "Game,knobPanel,");
+
+				sprintf(pom, "%d", game->good_color[i].identifikace);
+
+				printf(" %s %d\n", pom, game->knobs[i].free);
+
+				strcat(good_colors, pom);
+				sprintf(pom, "%d", game->good_color[i].good_color);
+				strcat(good_colors, ",");
+				strcat(good_colors, pom);
+				strcat(good_colors, ",\n");
+
+				sprintf(pom, "%d", game->great_color[i].identifikace);
+				strcat(great_colors, pom);
+				sprintf(pom, "%d", game->great_color[i].great_color);
+				strcat(great_colors, ",");
+				strcat(great_colors, pom);
+				strcat(great_colors, ",\n");
+
+				sprintf(pom, "%d", game->knobs[i].identifikace);
+				strcat(knob_panel, pom);
+				strcat(knob_panel, ",");
+
+				for (j = 0; j < COUNT_KNOBS; ++j) {
+
+					sprintf(pom, "%d", game->knobs[i].colors[j]);
+					strcat(knob_panel, pom);
+					strcat(knob_panel, ";");
+
+				}
+
+				strcat(knob_panel, "\n");
+				printf("%s asd\n",good_colors);
+				printf("%s bsd\n",great_colors);
+				send_good_colors(user,good_colors);
+				sleep(1);
+				send_great_colors(user,great_colors);
+				sleep(1);
+				send_knobs_colors(user,knob_panel);
+
+			}
+
+	}
+}
+
+
+
+
+void check_game(User_conected* user) {
+
+	int i = find_game(user);
+
+	if (i != -1) {
+		printf("identifikace %d, id hry %d, vyzivatel %s \n", i, game[i]->id,
+				conected_users[game[i]->gamer1]->nickname);
+
+		char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+		char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+
+		sprintf(pom, "%d", i);
+
+		strcpy(message, "Reload,");
+		strcat(message, pom);
+		strcat(message, ",");
+
+		if (strcmp(conected_users[game[i]->gamer1]->nickname, user->nickname)
+				== 0) {
+			strcat(message, conected_users[game[i]->gamer2]->nickname);
+			strcat(message, ",1,\n");
+			printf("uz nevim %s", message);
+			send_message(user, message);
+		} else {
+			strcat(message, conected_users[game[i]->gamer1]->nickname);
+			strcat(message, ",0,\n");
+
+			send_message(user, message);
+		}
+	}
+}
+
 void log_control(User_conected* user, char* buffer) {
 
 	char *ret = strchr(buffer, ',');
@@ -228,6 +392,7 @@ void log_control(User_conected* user, char* buffer) {
 			}
 
 		}
+
 	}
 
 	if (user->isLog == 0) {
@@ -249,7 +414,8 @@ void send_free_players(User_conected* user) {
 
 	int i;
 	char strednik[2];
-
+	check_game(user);
+	sleep(1);
 	strcpy(message, "PlayerList,");
 	strcpy(strednik, ";");
 
@@ -272,8 +438,8 @@ void send_free_players(User_conected* user) {
 
 	send_message(user, finish);
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 
 }
 
@@ -300,8 +466,8 @@ void send_invitation(User_conected* user, char* player) {
 
 	}
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 
 }
 
@@ -321,7 +487,7 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 	for (i = 0; i < MAX_CONECTED; i++) {
 
 		if (game[i] == NULL) {
-
+			game1->free = 1;
 			game1->id = i;
 			game[i] = game1;
 
@@ -350,8 +516,8 @@ void send_accept_chellange(User_conected* user, char* player) {
 
 	}
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 
 }
 
@@ -379,8 +545,8 @@ void send_refuse_chellange(User_conected* user, char* player) {
 
 	}
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 
 }
 
@@ -454,8 +620,8 @@ void result_to_game(User_conected* user, char* message1) {
 	cut_result(message1, game1);
 	printf("zprava %s %d \n", message, game1->result.colors[0]);
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 }
 
 void good_color_to_game(User_conected* user, char* message1) {
@@ -474,10 +640,9 @@ void good_color_to_game(User_conected* user, char* message1) {
 
 	int identifikaceI = atoi(message1);
 
-
 	game1->good_color[identifikaceI].identifikace = identifikaceI;
 	game1->good_color[identifikaceI].good_color = atoi(identifikaceCh);
-	game1->good_color[identifikaceI].free = 1 ;
+	game1->good_color[identifikaceI].free = 1;
 
 	strcpy(message, "Game,goodColors,");
 	finish = strcat(message, messagePom);
@@ -486,8 +651,8 @@ void good_color_to_game(User_conected* user, char* message1) {
 	printf("good %s \n", message);
 	send_message(conected_users[game1->gamer2], message);
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 }
 
 void great_color_to_game(User_conected* user, char* message1) {
@@ -519,8 +684,8 @@ void great_color_to_game(User_conected* user, char* message1) {
 
 	send_message(conected_users[game1->gamer2], message);
 
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 }
 
 void knobs_panel_to_game(User_conected* user, char* message1) {
@@ -537,8 +702,8 @@ void knobs_panel_to_game(User_conected* user, char* message1) {
 	printf("konbs %s\n", message);
 	send_message(conected_users[game1->gamer2], message);
 	cut_colors(message1, game1);
-	//free(message);
-	//free(finish);
+//free(message);
+//free(finish);
 }
 
 void game_is_over(User_conected* user) {
@@ -555,104 +720,6 @@ void game_is_done(User_conected* user, char* message1) {
 	Game* game1 = user->game;
 	send_message(conected_users[game1->gamer2], "Game,gameDone,\n");
 	free(game1);
-}
-
-void reload_game(Game* game, User_conected* user) {
-
-	char* player = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	char* good_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	char* great_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	char* knob_panel = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
-	strcpy(player, "Game,player,");
-
-	if (strcmp(conected_users[game->gamer1]->nickname, user->nickname) == 0) {
-
-		strcat(player, "challenger,");
-		strcat(player, conected_users[game->gamer1]->nickname);
-		strcat(player, "\n");
-	} else {
-		strcat(player, "challenger,");
-		strcat(player, conected_users[game->gamer2]->nickname);
-		strcat(player, "\n");
-	}
-
-	send_message(user, player);
-
-	int i = 0; int j;
-
-	for (i = 0; i < COUNT_Game; ++i) {
-		strcpy(good_colors, "Game,goodColors,");
-		strcpy(great_colors, "Game,greatColors,");
-		strcpy(knob_panel, "Game,knobPanel,");
-
-
-		if (game->knobs[i].free == 1) {
-
-			sprintf(pom, "%d", game->good_color[i].identifikace);
-
-			printf(" %s %d\n", pom, game->knobs[i].free);
-
-			strcat(good_colors, pom);
-			sprintf(pom, "%d", game->good_color[i].good_color);
-			strcat(good_colors, ",");
-			strcat(good_colors, pom);
-			strcat(good_colors, ",\n");
-
-			sprintf(pom, "%d", game->great_color[i].identifikace);
-			strcat(great_colors, pom);
-			sprintf(pom, "%d", game->great_color[i].great_color);
-			strcat(great_colors, ",");
-			strcat(great_colors, pom);
-			strcat(great_colors, ",\n");
-
-
-			sprintf(pom, "%d", game->knobs[i].identifikace);
-			strcat(knob_panel, pom);
-			strcat(knob_panel, ",");
-
-			for (j = 0; j < COUNT_KNOBS; ++j) {
-
-				sprintf(pom, "%d", game->knobs[i].colors[j]);
-				strcat(knob_panel, pom);
-				strcat(knob_panel, ";");
-
-			}
-
-			strcat(knob_panel, "\n");
-
-
-		}
-
-	}
-			printf(" %s \n", good_colors);
-
-			printf(" %s \n", great_colors);
-			printf(" %s \n", knob_panel);
-
-}
-
-void check_game(User_conected* user) {
-
-	int i;
-	for (i = 0; i < MAX_CONECTED; ++i) {
-
-		if (strcmp(conected_users[game[i]->gamer2]->nickname, user->nickname)
-				== 0
-				|| strcmp(conected_users[game[i]->gamer1]->nickname,
-						user->nickname) == 0) {
-
-			printf("user %s \n", user->nickname);
-
-			reload_game(game[i], user);
-
-			break;
-
-		}
-
-	}
-
 }
 
 void *createThread(void *incoming_socket) {
@@ -691,9 +758,25 @@ void *createThread(void *incoming_socket) {
 		if (strcmp(buffer, "Registrace") == 0) {
 			reg_user(ret2, user);
 
+		}else if (strcmp(buffer, "Answer") == 0) {
+
+			printf("Answer\n");
+
 		} else if (strcmp(buffer, "CheckGame") == 0) {
-			printf("check \n");
-			check_game(user);
+			reload_game(ret2, user);
+
+		} else if (strcmp(buffer, "DeleteGame") == 0) {
+
+			int i = atoi(ret2);
+
+			if (strcmp(conected_users[game[i]->gamer1]->nickname,
+					user->nickname) == 0) {
+				send_message(conected_users[game[i]->gamer2], "GameDelete,\n");
+			} else {
+
+				send_message(conected_users[game[i]->gamer1], "GameDelete,\n");
+			}
+			free(game[i]);
 
 		} else if (strcmp(buffer, "Log") == 0) {
 

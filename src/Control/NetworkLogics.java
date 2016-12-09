@@ -180,11 +180,16 @@ public class NetworkLogics {
 		}
 
 		comm.send(message + "\n");
+	
 		comm.send("Game,goodColors," + knobPanel.getIdentifikace() + "," + goodColors + ",\n");
 		comm.send("Game,greatColors," + knobPanel.getIdentifikace() + "," + greatColors + ",\n");
 		
 		
 
+	}
+	
+	public void sendAnswer(){
+		comm.send("Answer,\n");
 	}
 
 	public void setKnobPanel(int identifikace, String message) {
@@ -369,9 +374,14 @@ public class NetworkLogics {
 		}
 	}
 	
-	public void checkGame(){
+	public void checkGame(int game){
 		
-		comm.send("CheckGame,sdfa\n");
+		comm.send("CheckGame,"+ game + "\n");
+		
+	}
+	
+	public void deleteGame(int game) {
+		comm.send("DeleteGame,"+game+"\n");
 		
 	}
 	
@@ -462,5 +472,7 @@ public class NetworkLogics {
 	public void setlLog(LogginLogics lLog) {
 		this.lLog = lLog;
 	}
+
+	
 
 }

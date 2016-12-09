@@ -29,14 +29,25 @@ public class UiCommObserver implements ICommObserver {
 
 	public void processData(String data) {
 
-		System.out.println(data);
 		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("Data " + data);
 				String[] pomData = data.split(",");
 				
+				
 				switch (pomData[0]) {
+				case "Reload":
+					boolean challenger;
+					if(pomData[3].equals("1")){
+						challenger = false;
+					}else{
+						challenger = true;
+					}
+					System.out.println(pomData[1]+ " kl;jlk" + pomData[2] + " " + challenger);
+				mMR.showReloadGameMesage(Integer.parseInt(pomData[1]),pomData[2],challenger);	
+				break;
 				case "Registrace":
 
 					if (pomData[1].contains("bad")) {
@@ -98,16 +109,16 @@ public class UiCommObserver implements ICommObserver {
 					}else if(pomData[1].contains("goodColors")){
 						
 						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						
+						netLog.sendAnswer();
 					}else if(pomData[1].contains("greatColors")){
 						
 
 						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						netLog.checkGame();
+						netLog.sendAnswer();
 					}else if(pomData[1].contains("knobPanel")){
 						
 						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
-						
+						netLog.sendAnswer();
 					}else if(pomData[1].contains("gameOver")){
 						
 						multiM.getObserText().inc("Challenger had failed");
@@ -116,9 +127,11 @@ public class UiCommObserver implements ICommObserver {
 						
 						multiM.getObserText().inc("Challenger had succeeded");
 						
+					}else if(pomData[1].contains("player")){
+						
+						netLog.setPlayerName(pomData[3]);
+						
 					}
-					
-					
 					
 					break;
 				default:

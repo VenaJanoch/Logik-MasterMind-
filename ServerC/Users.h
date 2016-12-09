@@ -29,6 +29,7 @@ typedef struct Great_color{
 
 
 typedef struct Game{
+	int free;
 	int id;
 	int gamer1;
 	int gamer2;

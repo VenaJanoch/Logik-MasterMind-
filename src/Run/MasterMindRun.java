@@ -244,6 +244,32 @@ public void showLeaveMessage(String player){
 	} 	
 	
 }
+
+public void showReloadGameMesage(int game, String player, boolean challenger) {
+	System.out.println(player);
+	Alert alert = new Alert(AlertType.CONFIRMATION);
+	alert.setTitle("Message from player");
+	alert.setHeaderText("You have game with " + player);
+
+	ButtonType submitButton = new ButtonType("Back");
+	ButtonType refuseButton = new ButtonType("Cancel");
+	
+	alert.getButtonTypes().setAll(submitButton, refuseButton);
+
+	Optional<ButtonType> result = alert.showAndWait();
+	
+	if (result.get() == submitButton){
+		
+		netLog.setChallenger(challenger);
+		setGameWindowMultiMode();
+		netLog.checkGame(game);
+		
+	
+	}else{
+		netLog.deleteGame(game);
+	}
+	
+}
 	
 	/*** Setrs and Getrs ***/
 
@@ -318,5 +344,7 @@ public void showLeaveMessage(String player){
 	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
 		this.freePlayerL = freePlayerL;
 	}
+
+	
 
 }
