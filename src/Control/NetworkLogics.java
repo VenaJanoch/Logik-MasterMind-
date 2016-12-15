@@ -129,6 +129,7 @@ public class NetworkLogics {
 
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 				sendGameOver();
+				setResult();
 				multiM.getResult().setVisible(true);
 				multiM.getObserText().inc("Sorry, you lost");
 
@@ -136,6 +137,7 @@ public class NetworkLogics {
 
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 				sendGameDone();
+				setResult();
 				multiM.getResult().setVisible(true);
 				multiM.getObserText().inc("You win");
 			}
@@ -153,9 +155,19 @@ public class NetworkLogics {
 
 	public void sendGameDone() {
 
+		
 		comm.send("Game,gameDone");
 	}
 
+	public void setResult(){
+		for (int i = 0; i < colors.length; i++) {
+			
+			
+			multiM.getResult().getKnobs()[i]
+					.setBackground(new Background(new BackgroundFill(colors[i],CornerRadii.EMPTY, Insets.EMPTY)));
+		
+		}
+	}
 	public int findColorIndex(Knob knob) {
 
 		for (int i = 0; i < Constants.countColorButton; i++) {
@@ -189,7 +201,7 @@ public class NetworkLogics {
 	}
 	
 	public void sendAnswer(){
-		comm.send("Answer,\n");
+		
 	}
 
 	public void setKnobPanel(int identifikace, String message) {
@@ -204,7 +216,7 @@ public class NetworkLogics {
 							CornerRadii.EMPTY, Insets.EMPTY)));
 
 		}
-		if (identifikace <= Constants.countControlKnobsLine) {
+		if (identifikace < Constants.countKnobsPanels-1) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
 		}
@@ -243,6 +255,17 @@ public class NetworkLogics {
 		}
 
 		kP = multiM.getKnobPanel()[0];
+
+	}
+	
+	public void setResultR(String message) {
+
+		String[] pomString = message.split(";");
+		for (int i = 0; i < Constants.countKnobs; i++) {
+
+		colors[i] = Constants.colors[Integer.parseInt(pomString[i])];
+	
+		}
 
 	}
 
@@ -285,7 +308,6 @@ public class NetworkLogics {
 
 					colors[i] = Constants.colors[j];
 					result = result + j + ";";
-					System.out.println(j + " net");
 				}
 			}
 		}
@@ -368,7 +390,7 @@ public class NetworkLogics {
 		for (int i = 0; i < Constants.countKnobs; i++) {
 
 			if (kP.getKnobs()[i].getBackground().equals(new Background(
-					new BackgroundFill(desk.getNetLog().getColors()[i], CornerRadii.EMPTY, Insets.EMPTY)))) {
+					new BackgroundFill(getColors()[i], CornerRadii.EMPTY, Insets.EMPTY)))) {
 				greatColors++;
 			}
 		}
@@ -381,7 +403,11 @@ public class NetworkLogics {
 	}
 	
 	public void deleteGame(int game) {
-		comm.send("DeleteGame,"+game+"\n");
+		comm.send("DeleteGame,"+game+",\n");
+		
+	}
+	public void deleteGameLeave(int game) {
+		comm.send("DeleteGame,"+game+",both,\n");
 		
 	}
 	

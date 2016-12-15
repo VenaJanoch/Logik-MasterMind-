@@ -189,6 +189,26 @@ public class MasterMindRun extends Application {
 		
 		
 	}
+	
+	public void showLogoutMessage(String player, int game) {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("Player " + player + "  leave game" );
+		alert.setContentText("Stay in game.");
+
+		ButtonType submitButton = new ButtonType("Yes");
+		ButtonType refuseButton = new ButtonType("Leave");
+		
+		alert.getButtonTypes().setAll(submitButton, refuseButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		
+		if (result.get() == refuseButton){
+			netLog.deleteGameLeave(game);
+			setWellcomeWindow();
+			
+		} 	
+	}
 
 public void showAcceptMessage(String player){
 		
@@ -344,6 +364,8 @@ public void showReloadGameMesage(int game, String player, boolean challenger) {
 	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
 		this.freePlayerL = freePlayerL;
 	}
+
+	
 
 	
 

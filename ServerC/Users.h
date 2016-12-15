@@ -33,6 +33,8 @@ typedef struct Game{
 	int id;
 	int gamer1;
 	int gamer2;
+	char chellanger[30];
+	char player[30];
 	int goodColor;
 	Knobs knobs[10];
 	Great_color great_color[10];

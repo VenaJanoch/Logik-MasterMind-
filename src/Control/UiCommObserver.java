@@ -29,31 +29,33 @@ public class UiCommObserver implements ICommObserver {
 
 	public void processData(String data) {
 
-		
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				System.out.println("Data " + data);
 				String[] pomData = data.split(",");
-				
-				
+
 				switch (pomData[0]) {
 				case "Reload":
 					boolean challenger;
-					if(pomData[3].equals("1")){
+					if (pomData[3].equals("1")) {
 						challenger = false;
-					}else{
+					} else {
 						challenger = true;
 					}
-					System.out.println(pomData[1]+ " kl;jlk" + pomData[2] + " " + challenger);
-				mMR.showReloadGameMesage(Integer.parseInt(pomData[1]),pomData[2],challenger);	
-				break;
+					mMR.showReloadGameMesage(Integer.parseInt(pomData[1]), pomData[2], challenger);
+					break;
 				case "Registrace":
 
-					if (pomData[1].contains("bad")) {
+					if (pomData[1].contains("bad1")) {
 						sUW.getObserText().inc("This nickname is using");
 
+					} else if (pomData[1].contains("bad2")) {
+						
+						sUW.getObserText().inc("This nickname is long, length must be less 30");
+					
 					} else {
+
 						mMR.setWellcomeWindow();
 					}
 
@@ -76,63 +78,71 @@ public class UiCommObserver implements ICommObserver {
 					freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));
 
 					break;
+				case "Logout":
+					
+				mMR.showLogoutMessage(netLog.getPlayerName(), Integer.parseInt(pomData[1]));
+					
+					break;
 				case "Challenge":
 
 					if (pomData[2].contains("invite")) {
 
 						netLog.createChallengeMesagge(pomData[1]);
-					
-					}else if (pomData[2].contains("refuse")) {
+
+					} else if (pomData[2].contains("refuse")) {
 
 						mMR.showRefusetMessage(pomData[1]);
 
 					} else {
-						
+
 						mMR.showAcceptMessage(pomData[1]);
 						netLog.setChallenger(true);
-						
+
 						mMR.setGameWindowMultiMode();
 						multiM.getObserText().inc("Wait for color combination");
-						
+
 					}
 					break;
 				case "Game":
-					if(pomData[2].contains("leave")){
-						
+					if (pomData[2].contains("leave")) {
+
 						mMR.showLeaveMessage(pomData[1]);
-						
-					}else if(pomData[1].contains("colorResult")){
-						
-						netLog.setResult(pomData[2]);
-						multiM.getObserText().inc("Find color combination");
-						
-					}else if(pomData[1].contains("goodColors")){
-						
+
+					} else if (pomData[1].contains("colorResult")) {
+						if(pomData[2].contains("R") && netLog.isChallenger()){
+							netLog.setResultR(pomData[3]);
+							multiM.getObserText().inc("Find color combination");							
+						}else{							
+							netLog.setResult(pomData[2]);
+							multiM.getObserText().inc("Find color combination");
+						}
+
+					} else if (pomData[1].contains("goodColors")) {
+
 						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
 						netLog.sendAnswer();
-					}else if(pomData[1].contains("greatColors")){
-						
+					} else if (pomData[1].contains("greatColors")) {
 
 						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
 						netLog.sendAnswer();
-					}else if(pomData[1].contains("knobPanel")){
-						
+					} else if (pomData[1].contains("knobPanel")) {
+
 						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
 						netLog.sendAnswer();
-					}else if(pomData[1].contains("gameOver")){
-						
+					} else if (pomData[1].contains("gameOver")) {
+
 						multiM.getObserText().inc("Challenger had failed");
-						
-					}else if(pomData[1].contains("gameDone")){
-						
+
+					} else if (pomData[1].contains("gameDone")) {
+
 						multiM.getObserText().inc("Challenger had succeeded");
-						
-					}else if(pomData[1].contains("player")){
-						
+
+					} else if (pomData[1].contains("player")) {
+
 						netLog.setPlayerName(pomData[3]);
-						
+
 					}
-					
+
 					break;
 				default:
 					break;
@@ -140,6 +150,8 @@ public class UiCommObserver implements ICommObserver {
 			}
 		});
 	}
+	
+	
 
 	/*************** Getrs and Setrs ******************/
 	public SignUpWindow getsUW() {
