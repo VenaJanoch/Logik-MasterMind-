@@ -6,33 +6,35 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import Control.NetworkLogics;
+import Graphics.ServerWindow;
 import Interfaces.ICommObserver;
 import Interfaces.ITCP;
-
+import Run.MasterMindRun;
+import javafx.application.Platform;
 
 public class TCPComm implements ITCP, Runnable {
-	
+
 	private ICommObserver m_observer;
 	OutputStream m_output;
 	private InetAddress address;
 	private int port;
+	private boolean isServer = true;
+	private MasterMindRun mMR;
 
-	
-	public TCPComm(InetAddress address, int port) {
+	public TCPComm(InetAddress address, int port, MasterMindRun mMR) {
 		this.address = address;
 		this.port = port;
-		
-		
-	
-	
+		this.mMR = mMR;
+
 	}
-	
+
 	// ---------------------------------------------------------
 	@Override
 	public void send(String data) {
 		assert (data != null);
 		assert (m_output != null);
-
+		System.out.println(data);
 		try {
 			m_output.write(data.getBytes());
 		} catch (IOException e) {
@@ -53,6 +55,7 @@ public class TCPComm implements ITCP, Runnable {
 		
 		try {
 			Socket socket = new Socket(address, port);
+			socket.setSoTimeout(10);
 			m_output = socket.getOutputStream();
 			InputStream input = socket.getInputStream();
 
@@ -68,16 +71,32 @@ public class TCPComm implements ITCP, Runnable {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Caught IOException: " + e.getMessage());
-		}
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+			
+				mMR.showNoServer();
+				System.err.println("Caught IOException: " + e.getMessage());
+				
+				}				
+				});
+				}
 	}
 
 	// ---------------------------------------------------------
 
 	public void start() {
-		
+
 		(new Thread(this)).start();
+		
 	}
 
-	
+	public boolean isServer() {
+		return isServer;
+	}
+
+	public void setServer(boolean isServer) {
+		this.isServer = isServer;
+	}
+
 }

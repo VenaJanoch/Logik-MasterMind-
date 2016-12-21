@@ -19,8 +19,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-public class ServerWindow extends Stage{
-	
+public class ServerWindow extends Stage {
 
 	private MasterMindRun mMR;
 
@@ -37,6 +36,7 @@ public class ServerWindow extends Stage{
 
 	private Button confirmBT;
 	
+	private boolean isServer = true;
 
 	public ServerWindow(MasterMindRun mMR) {
 
@@ -92,7 +92,7 @@ public class ServerWindow extends Stage{
 
 		netPanel.getColumnConstraints().add(column1);
 
-		netPanel.add(serverAddresLB , 0, 0);
+		netPanel.add(serverAddresLB, 0, 0);
 		netPanel.add(serverAddresTF, 1, 0);
 		netPanel.add(serverPortLB, 0, 1);
 		netPanel.add(serverPortTF, 1, 1);
@@ -105,15 +105,23 @@ public class ServerWindow extends Stage{
 		netPanel.setBackground(Constants.menuBackground);
 		return netPanel;
 
-}
-	
+	}
+
 	private void confirmForm() {
 		if (mMR.getLogLogics().confirmDataInServerForm(serverAddresTF.getText(), serverPortTF.getText())) {
-		mMR.createConnect();	
-		mMR.setWellcomeWindow();
+			mMR.createConnect(); 
 		}
-		
+
+	}
+
+	public boolean isServer() {
+		return isServer;
+	}
+
+	public void setServer(boolean isServer) {
+		this.isServer = isServer;
 	}
 
 	
+
 }

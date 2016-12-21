@@ -125,7 +125,7 @@ public class NetworkLogics {
 
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 
-			} else if (controlCountChoosedKnobs(kP) && identifikace == Constants.countKnobsPanels - 1) {
+			} else if (greatColors != Constants.countKnobs && identifikace == Constants.countKnobsPanels - 1) {
 
 				sendKnobs(multiM.getKnobPanel()[identifikace]);
 				sendGameOver();
@@ -146,6 +146,7 @@ public class NetworkLogics {
 		multiM.getCp().setVisible(false);
 
 	}
+
 
 	public void sendGameOver() {
 

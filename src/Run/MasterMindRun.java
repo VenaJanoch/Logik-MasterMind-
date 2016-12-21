@@ -47,6 +47,7 @@ public class MasterMindRun extends Application {
 	private ServerWindow serverWindow;
 	private NetworkLogics netLog;
 	private FreePlayersListWindow freePlayerL;
+	private boolean isServer = true;
 
 	public static void main(String[] args) {
 
@@ -70,9 +71,12 @@ public class MasterMindRun extends Application {
 		 primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		       @Override
 		       public void handle(WindowEvent e) {
-		    	  netLog.signOutUser("LogOut,end\n");
+		    	   if (logLogics.isLog()) {
+		    		   netLog.signOutUser("LogOut,end\n");					
+				}
 		          Platform.exit();
 		          System.exit(0);
+		          
 		       }
 		    });
 	}
@@ -127,7 +131,7 @@ public class MasterMindRun extends Application {
 	public void createConnect() {
 		try {
 
-			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()), logLogics.getServerPort());
+			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()), logLogics.getServerPort(), this);
 			
 			m_commObserver = new UiCommObserver(this,logLogics,netLog);
 			comm.registerObserver(m_commObserver);
@@ -135,6 +139,7 @@ public class MasterMindRun extends Application {
 			logLogics.setComm(comm);
 			netLog.setComm(comm);
 		} catch (NumberFormatException e) {
+		
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Spatne");
@@ -143,7 +148,6 @@ public class MasterMindRun extends Application {
 			e.printStackTrace();
 		}
 		comm.start();
-
 		
 	}
 
@@ -244,7 +248,18 @@ public void showRefusetMessage(String player){
 	} 	
 	
 }
+public void showNoServer(){
+	Alert alert = new Alert(AlertType.CONFIRMATION);
+	alert.setTitle("Message from Server");
+	alert.setHeaderText("Server is inaccessible" );
 
+	ButtonType submitButton = new ButtonType("OK");
+	
+	alert.getButtonTypes().setAll(submitButton);
+
+	Optional<ButtonType> result = alert.showAndWait();
+		
+}
 public void showLeaveMessage(String player){
 	
 	Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -363,6 +378,14 @@ public void showReloadGameMesage(int game, String player, boolean challenger) {
 
 	public void setFreePlayerL(FreePlayersListWindow freePlayerL) {
 		this.freePlayerL = freePlayerL;
+	}
+
+	public boolean isServer() {
+		return isServer;
+	}
+
+	public void setServer(boolean isServer) {
+		this.isServer = isServer;
 	}
 
 	

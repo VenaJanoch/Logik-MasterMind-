@@ -36,6 +36,10 @@ public class UiCommObserver implements ICommObserver {
 				String[] pomData = data.split(",");
 
 				switch (pomData[0]) {
+				case "Connect":
+					mMR.setWellcomeWindow();				
+					break;
+			
 				case "Reload":
 					boolean challenger;
 					if (pomData[3].equals("1")) {

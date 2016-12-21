@@ -800,6 +800,8 @@ void *createThread(void *incoming_socket) {
 	size_t buffersize = sizeof(buffer);
 	User_conected* user = put_user(socket);
 
+	send_message(user,"Connect,\n");
+	printf("Connect\n");
 	while (1) {
 
 		int ret = sgetline(socket, &buffer);
