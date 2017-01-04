@@ -61,6 +61,11 @@ public class MultiMode extends Desk implements IGameMode {
 		getNetLog().leaveGame();
 		getmMR().setWellcomeWindow();
 	}
+	
+	public void exitGame(){
+		getNetLog().signOutUser("LogOut,GameWindow,\n");
+		getmMR().getPrimaryStage().close();
+	}
 
 	@Override
 	public Node creatLegendPanel() {
@@ -76,7 +81,7 @@ public class MultiMode extends Desk implements IGameMode {
 		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
 		leaveB.setOnAction(event -> resetDesk());
-		closeB.setOnAction(event -> getmMR().getPrimaryStage().close());
+		closeB.setOnAction(event -> exitGame());
 
 		buttonPanel.getChildren().addAll(leaveB, closeB);
 		buttonPanel.setAlignment(Pos.CENTER);

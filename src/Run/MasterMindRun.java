@@ -72,7 +72,7 @@ public class MasterMindRun extends Application {
 		       @Override
 		       public void handle(WindowEvent e) {
 		    	   if (logLogics.isLog()) {
-		    		   netLog.signOutUser("LogOut,end\n");					
+		    		   netLog.signOutUser("LogOut,end,\n");					
 				}
 		          Platform.exit();
 		          System.exit(0);
@@ -131,7 +131,7 @@ public class MasterMindRun extends Application {
 	public void createConnect() {
 		try {
 
-			comm = new TCPComm(InetAddress.getByAddress(logLogics.getServerAddres()), logLogics.getServerPort(), this);
+			comm = new TCPComm(logLogics.getServerAddres(), logLogics.getServerPort(), this);
 			
 			m_commObserver = new UiCommObserver(this,logLogics,netLog);
 			comm.registerObserver(m_commObserver);
@@ -143,9 +143,6 @@ public class MasterMindRun extends Application {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Spatne");
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		comm.start();
 		
@@ -167,7 +164,7 @@ public class MasterMindRun extends Application {
 	}
 
 	public void showPlayerMessage(String player){
-		
+		System.out.println("Hovna");
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Message from player");
 		alert.setHeaderText("Player " + player + "  invited you into their game" );
@@ -260,7 +257,7 @@ public void showNoServer(){
 	Optional<ButtonType> result = alert.showAndWait();
 		
 }
-public void showLeaveMessage(String player){
+public void showLeaveMessage(String player, int i){
 	
 	Alert alert = new Alert(AlertType.CONFIRMATION);
 	alert.setTitle("Message from player");
@@ -275,6 +272,7 @@ public void showLeaveMessage(String player){
 	if (result.get() == submitButton){
 		
 		setWellcomeWindow();
+		netLog.deleteGame(i);
 	
 	} 	
 	

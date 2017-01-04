@@ -20,7 +20,7 @@ public class LogginLogics {
 	private String passwd;
 	private String passwd2;
 
-	private byte[] serverAddres;
+	private String serverAddres;
 	private int serverPort;
 
 	private SignUpWindow sUW;
@@ -30,7 +30,7 @@ public class LogginLogics {
 
 	
 	public LogginLogics(MasterMindRun mMR) {
-		serverAddres = new byte[4];
+		//serverAddres = new byte[4];
 		this.mMR = mMR;
 		
 	
@@ -91,20 +91,21 @@ public class LogginLogics {
 			alert.showAndWait();
 
 		} else {
-			convertIPAddress(addres.split("."));
+			//convertIPAddress(addres.split("."));
+			setServerAddres(addres);
 			return true;
 		}
 
 		return false;
 	}
 
-	public void convertIPAddress(String[] ip) {
+	/*public void convertIPAddress(String[] ip) {
 
 		for (int i = 0; i < ip.length; i++) {
 			serverAddres[i] = Byte.parseByte(ip[i]);
 		}
 
-	}
+	}*/
 
 	public boolean serverPortConfirm(String port) {
 		if (port.equals("nickname") || port.length() == 0) {
@@ -316,11 +317,11 @@ public class LogginLogics {
 		this.sIW = sIW;
 	}
 
-	public byte[] getServerAddres() {
+	public String getServerAddres() {
 		return serverAddres;
 	}
 
-	public void setServerAddres(byte[] serverAddres) {
+	public void setServerAddres(String serverAddres) {
 		this.serverAddres = serverAddres;
 	}
 

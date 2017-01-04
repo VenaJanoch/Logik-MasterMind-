@@ -32,10 +32,17 @@ public class UiCommObserver implements ICommObserver {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Data " + data);
+				System.out.println("Data " + data + " " + netLog.getName());
 				String[] pomData = data.split(",");
-
 				switch (pomData[0]) {
+				
+				case "NoServer":
+					mMR.showNoServer();
+					break;
+
+				case "CheckConnect":
+					netLog.checkConnect();				
+					break;
 				case "Connect":
 					mMR.setWellcomeWindow();				
 					break;
@@ -79,7 +86,11 @@ public class UiCommObserver implements ICommObserver {
 					}
 					break;
 				case "PlayerList":
-					freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));
+					if(pomData.length >0){
+						freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));						
+					}else {
+						freePlayerL.getListLV().setItems(netLog.creatPlayersList(""));							
+					}
 
 					break;
 				case "Logout":
@@ -108,9 +119,8 @@ public class UiCommObserver implements ICommObserver {
 					}
 					break;
 				case "Game":
-					if (pomData[2].contains("leave")) {
-
-						mMR.showLeaveMessage(pomData[1]);
+					if (pomData[1].contains("leave")) {
+						mMR.showLeaveMessage(pomData[2],Integer.parseInt(pomData[3]));
 
 					} else if (pomData[1].contains("colorResult")) {
 						if(pomData[2].contains("R") && netLog.isChallenger()){
@@ -124,15 +134,15 @@ public class UiCommObserver implements ICommObserver {
 					} else if (pomData[1].contains("goodColors")) {
 
 						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						netLog.sendAnswer();
+						
 					} else if (pomData[1].contains("greatColors")) {
 
 						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						netLog.sendAnswer();
+						
 					} else if (pomData[1].contains("knobPanel")) {
 
 						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
-						netLog.sendAnswer();
+						
 					} else if (pomData[1].contains("gameOver")) {
 
 						multiM.getObserText().inc("Challenger had failed");

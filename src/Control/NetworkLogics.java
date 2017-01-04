@@ -132,6 +132,7 @@ public class NetworkLogics {
 				setResult();
 				multiM.getResult().setVisible(true);
 				multiM.getObserText().inc("Sorry, you lost");
+				sendGameOver();
 
 			} else {
 
@@ -140,6 +141,7 @@ public class NetworkLogics {
 				setResult();
 				multiM.getResult().setVisible(true);
 				multiM.getObserText().inc("You win");
+				sendGameDone();
 			}
 		}
 
@@ -150,14 +152,14 @@ public class NetworkLogics {
 
 	public void sendGameOver() {
 
-		comm.send("Game,gameOver");
+		comm.send("Game,gameOver,\n");
 
 	}
 
 	public void sendGameDone() {
 
 		
-		comm.send("Game,gameDone");
+		comm.send("Game,gameDone,\n");
 	}
 
 	public void setResult(){
@@ -201,13 +203,9 @@ public class NetworkLogics {
 
 	}
 	
-	public void sendAnswer(){
-		
-	}
 
 	public void setKnobPanel(int identifikace, String message) {
 
-		System.out.println("knobs " + message);
 		String[] pomString = message.split(";");
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
@@ -217,7 +215,7 @@ public class NetworkLogics {
 							CornerRadii.EMPTY, Insets.EMPTY)));
 
 		}
-		if (identifikace < Constants.countKnobsPanels-1) {
+		if (identifikace < Constants.countKnobsPanels-1 ) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
 		}
@@ -423,6 +421,12 @@ public class NetworkLogics {
 		
 		
 	}
+	
+	public void checkConnect() {
+		
+	comm.setCounterTimeOUt(0);
+		
+	}
 
 	/*****************************************
 	 * Getrs and Setrs
@@ -499,6 +503,8 @@ public class NetworkLogics {
 	public void setlLog(LogginLogics lLog) {
 		this.lLog = lLog;
 	}
+
+	
 
 	
 

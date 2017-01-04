@@ -115,7 +115,7 @@ public class WellcomeWindow extends Stage{
 		
 		signInB.setOnAction(event -> mMR.setSignInWindow());
 		signUpB.setOnAction(event -> mMR.setSignUpWindow());
-		signOutB.setOnAction(event -> netLog.signOutUser("LogOut,wellcomeWindow\n"));
+		signOutB.setOnAction(event -> netLog.signOutUser("LogOut,wellcomeWindow,\n"));
 		
 		signInB.setMinSize(100, 50);
 		signUpB.setMinSize(100, 50);

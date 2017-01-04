@@ -4,6 +4,8 @@
 #include <string.h>
 #include <errno.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <signal.h>
 #include "Users.h"
 
 #include <sys/socket.h>
@@ -12,7 +14,6 @@
 
 //==========================================================================
 
-#define SRV_PORT 22434
 #define MAX_CONECTED 10
 #define COUNT_KNOBS 4
 #define COUNT_Game 10
@@ -22,11 +23,73 @@
 User_conected* conected_users[MAX_CONECTED];
 User_database* database_users[MAX_CONECTED];
 pthread_t threads[MAX_CONECTED];
+FILE *file = NULL;
 int lastInt = -1;
+int srv_port = 22434;
+char address[20];
+int is_address = 1;
 
 Game* game[MAX_CONECTED];
 pthread_mutex_t lock;
 
+/*
+ * void help();
+ *
+ * Vypise jednoduchy navod jak spustit program z prikazove radky
+ */
+void help() {
+	printf(
+			"Usage:\n   port \"<port>\" where \"<port>\" is number of server port\n"
+					"address \"<address>\" where \"<address>\" is address of server for example 10.10.10.38 \n");
+
+}
+
+void sigint_handler(int sig)
+{
+    /*do something*/
+    printf("killing process %d\n",getpid());
+	fclose(file);
+    exit(0);
+}
+
+void nacti_soubor() {
+
+	file = fopen("logy.log", "w");
+	printf("open file\n");
+	if (file == NULL) {
+		printf("ERR: Non-existent file!");
+	}
+
+}
+
+/*
+ * nacti_port(int argc, char **argv)
+ *
+ * argc pocet zadanych parametru
+ * argv pole se zadanymi parametry
+ *
+ * Overi zde byl opravdu zadan parametr se jmenem souboru
+ * Nacte soubor pokud existuje
+ * Overi existenci souboru
+ */
+void nacti_Port(int argc, char **argv) {
+
+	if (argc == 3) {
+		srv_port = atoi(argv[1]);
+	}
+		fprintf(file,"Server bezi na portu: %d\n", srv_port);
+}
+
+void read_address(int argc, char **argv) {
+
+	if (argc == 3) {
+
+		strcpy(address, argv[2]);
+		is_address = 0;
+
+	}
+
+}
 int sgetline(int fd, char ** out) {
 	int buf_size = 128;
 	int bytesloaded = 0;
@@ -133,7 +196,6 @@ int passwd_control(char* passwd) {
 
 void reg_user(char* buffer, User_conected* user) {
 
-
 	char *ret = strchr(buffer, ',');
 
 	*ret = '\0';
@@ -147,7 +209,6 @@ void reg_user(char* buffer, User_conected* user) {
 				&& strcmp(database_users[i]->nickname, buffer) == 0) {
 
 			send_message(user, "Registrace,bad1,This nickname is exist\n");
-
 			return;
 
 		}
@@ -157,22 +218,22 @@ void reg_user(char* buffer, User_conected* user) {
 	User_database* reg_user = malloc(sizeof(User_database));
 	memset(reg_user, 0, sizeof(User_database));
 
-	if(nickname_control(buffer) == 1 && passwd_control(ret) == 1){
-	strcpy(reg_user->nickname, buffer);
-	strcpy(reg_user->passwd, ret);
+	if (nickname_control(buffer) == 1 && passwd_control(ret) == 1) {
+		strcpy(reg_user->nickname, buffer);
+		strcpy(reg_user->passwd, ret);
 
+		for (i = 0; i < MAX_CONECTED; ++i) {
 
-	for (i = 0; i < MAX_CONECTED; ++i) {
+			if (database_users[i] == NULL) {
 
-		if (database_users[i] == NULL) {
-
-			database_users[i] = reg_user;
-			break;
+				database_users[i] = reg_user;
+				break;
+			}
 		}
-	}
-			pthread_mutex_unlock(&lock);
-	send_message(user, "Registrace,yes\n");
-	}else{
+		pthread_mutex_unlock(&lock);
+		send_message(user, "Registrace,yes\n");
+		fprintf(file,"Registrace uzivatele: %s\n", user->nickname);
+	} else {
 		send_message(user, "Registrace,bad2,\n");
 
 	}
@@ -208,12 +269,9 @@ int is_bad_loggin(char* log) {
 			if (strcmp(database_users[i]->nickname, log) == 0) {
 
 				return 1;
-				printf("bad log %s  ", database_users[i]->nickname);
 			}
 		}
 	}
-
-	printf("bad %s  ", database_users[i]->nickname);
 
 	return 0;
 
@@ -221,29 +279,16 @@ int is_bad_loggin(char* log) {
 
 int find_game(User_conected* user) {
 
-	printf("nevim\n");
 	int i;
 	for (i = 0; i < MAX_CONECTED; ++i) {
-		printf("nevim2\n");
-
 		if (game[i] != NULL) {
-			printf("game %d\n",game[i]->id);
-			printf("game %s\n",game[i]->chellanger);
-			printf("game %d\n",game[i]->gamer1);
-			printf("game %d\n",game[i]->gamer2);
-						printf("game %s\n",game[i]->player);
-
-			if (strcmp(game[i]->chellanger,user->nickname) == 0
+			if (strcmp(game[i]->chellanger, user->nickname) == 0
 					|| strcmp(game[i]->player, user->nickname) == 0) {
-				printf("return i \n");
-
 				return i;
 
 			}
 		}
 	}
-	printf("return -1\n");
-
 	return -1;
 }
 
@@ -334,7 +379,6 @@ void reload_game(char* buffer, User_conected* user) {
 	int j;
 
 	for (i = 0; i < COUNT_Game; ++i) {
-		printf("%d d\n", game->knobs[i].free);
 		if (game->knobs[i].free == 1) {
 			strcpy(knob_panel, "Game,knobPanel,");
 
@@ -349,7 +393,7 @@ void reload_game(char* buffer, User_conected* user) {
 				strcat(knob_panel, ";");
 
 			}
-			send_result_colors(game,user);
+			send_result_colors(game, user);
 			sleep(1);
 			strcat(knob_panel, "\n");
 			send_knobs_colors(user, knob_panel);
@@ -366,13 +410,9 @@ void reload_game(char* buffer, User_conected* user) {
 }
 
 void check_game(User_conected* user) {
-	printf("check game\n");
 	int i = find_game(user);
-	printf("check game2\n");
 
 	if (i != -1) {
-		printf("identifikace d, id hry d, vyzivatel s \n");
-
 		char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 		char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
@@ -399,9 +439,7 @@ void check_game(User_conected* user) {
 void log_control(User_conected* user, char* buffer) {
 
 	char *ret = strchr(buffer, ',');
-
 	*ret = '\0';
-
 	ret++;
 
 	int i = 0;
@@ -411,12 +449,11 @@ void log_control(User_conected* user, char* buffer) {
 			if (strcmp(database_users[i]->nickname, buffer) == 0
 					&& strcmp(database_users[i]->passwd, ret) == 0) {
 
-				printf("Prihlaseny uzivatel %s %d \n", buffer, i);
-
 				user->isLog = 1;
 				strcpy(user->nickname, buffer);
 				send_message(user, "Log,yes\n");
-
+				printf("Prihlaseny uzivatel %s %d \n", buffer, i);
+				fprintf(file,"Prihlaseny uzivatel: %s\n", user->nickname);
 				break;
 			}
 		}
@@ -425,8 +462,6 @@ void log_control(User_conected* user, char* buffer) {
 	if (user->isLog == 0) {
 		if (is_bad_loggin(buffer) == 0) {
 			send_message(user, "Log,no,badLog\n");
-			printf("spatne jmeno %s  \n", buffer);
-
 		} else {
 			send_message(user, "Log,no,badPasswd\n");
 		}
@@ -460,16 +495,9 @@ void send_free_players(User_conected* user) {
 	}
 
 	finish = strcat(message, "\n");
-	printf("zprava %s \n", finish);
-
 	send_message(user, finish);
-	printf("uspavam \n");
-
 	sleep(1);
-	printf("probuzen \n");
-
 	check_game(user);
-
 
 //free(message);
 //free(finish);
@@ -482,15 +510,14 @@ void send_invitation(User_conected* user, char* player) {
 	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	strcpy(message, "Challenge,");
-
+	sleep(1);
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
 		if (conected_users[i] != NULL) {
 			if (strcmp(conected_users[i]->nickname, player) == 0) {
-
 				finish = strcat(message, user->nickname);
-				message = strcat(finish, ",invite,");
-				finish = strcat(finish, ",invite,");
+				message = strcat(finish, ",invite,\n");
+				finish = strcat(finish, ",invite,\n");
 
 				send_message(conected_users[i], message);
 			}
@@ -511,16 +538,12 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 	int i;
 	for (i = 0; i < MAX_CONECTED; i++) {
 		if (game[i] == NULL) {
-		printf("%d id game\n", i);
-
-		game[i] = malloc(sizeof(Game));
-
+			game[i] = malloc(sizeof(Game));
 			memset(game[i], 0, sizeof(Game));
-
 			game[i]->gamer1 = player->id;
 			game[i]->gamer2 = chellanger->id;
-			strcpy(game[i]->chellanger,chellanger->nickname);
-			strcpy(game[i]->player,player->nickname);
+			strcpy(game[i]->chellanger, chellanger->nickname);
+			strcpy(game[i]->player, player->nickname);
 
 			player->game = game[i];
 			chellanger->game = game[i];
@@ -532,9 +555,6 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 	}
 
 	pthread_mutex_unlock(&lock);
-
-
-
 
 }
 
@@ -567,9 +587,6 @@ void send_accept_chellange(User_conected* user, char* player) {
 void send_refuse_chellange(User_conected* user, char* player) {
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
-	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
 	strcpy(message, "Challenge,");
 
 	for (i = 0; i < MAX_CONECTED; ++i) {
@@ -577,8 +594,8 @@ void send_refuse_chellange(User_conected* user, char* player) {
 		if (conected_users[i] != NULL) {
 			if (strcmp(conected_users[i]->nickname, player) == 0) {
 
-				finish = strcat(message, player);
-				message = strcat(finish, ",refuse\n");
+				message = strcat(message, player);
+				message = strcat(message, ",refuse\n");
 
 				send_message(conected_users[i], message);
 
@@ -588,13 +605,9 @@ void send_refuse_chellange(User_conected* user, char* player) {
 
 	}
 
-//free(message);
-//free(finish);
-
 }
 
 void cut_result(char* message, Game* game) {
-	printf("result");
 	game->result.identifikace = 100;
 
 	char *ret1 = strchr(message, ';');
@@ -652,25 +665,19 @@ void result_to_game(User_conected* user, char* message1) {
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
 	strcpy(message, "Game,colorResult,");
-	finish = strcat(message, message1);
+	message = strcat(message, message1);
+	message = strcat(message, "\n");
 
-	message = strcat(finish, "\n");
 	send_message(conected_users[game1->gamer1], message);
 	cut_result(message1, game1);
-	printf("zprava %s %d \n", message, game1->result.colors[0]);
 
-//free(message);
-//free(finish);
 }
 
 void good_color_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char* messagePom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	strcpy(messagePom, message1);
@@ -687,25 +694,18 @@ void good_color_to_game(User_conected* user, char* message1) {
 	game1->good_color[identifikaceI].free = 1;
 
 	strcpy(message, "Game,goodColors,");
-	finish = strcat(message, messagePom);
+	message = strcat(message, messagePom);
+	message = strcat(message, "\n");
 
-	message = strcat(finish, "\n");
-	printf("good %s \n", message);
 	send_message(conected_users[game1->gamer2], message);
 
-//free(message);
-//free(finish);
 }
 
 void great_color_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
-	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
 	char* messagePom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
 	strcpy(messagePom, message1);
 
 	char *identifikaceCh = strchr(message1, ',');
@@ -719,15 +719,11 @@ void great_color_to_game(User_conected* user, char* message1) {
 	game1->great_color[identifikaceI].free = 1;
 
 	strcpy(message, "Game,greatColors,");
-	finish = strcat(message, messagePom);
+	message = strcat(message, messagePom);
 
-	message = strcat(finish, "\n");
-	printf("great %s \n", message);
-
+	message = strcat(message, "\n");
 	send_message(conected_users[game1->gamer2], message);
 
-//free(message);
-//free(finish);
 }
 
 void knobs_panel_to_game(User_conected* user, char* message1) {
@@ -735,86 +731,112 @@ void knobs_panel_to_game(User_conected* user, char* message1) {
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
 	strcpy(message, "Game,knobPanel,");
-	finish = strcat(message, message1);
+	message = strcat(message, message1);
 
-	message = strcat(finish, "\n");
-	printf("konbs %s\n", message);
+	message = strcat(message, "\n");
 	send_message(conected_users[game1->gamer2], message);
 	cut_colors(message1, game1);
-//free(message);
-//free(finish);
+
 }
 
 void game_is_over(User_conected* user) {
 
 	Game* game1 = user->game;
-
 	send_message(conected_users[game1->gamer2], "Game,gameOver,\n");
-	free(game1);
+	}
 
-}
-
-void game_is_done(User_conected* user, char* message1) {
+void game_is_done(User_conected* user) {
 
 	Game* game1 = user->game;
 	send_message(conected_users[game1->gamer2], "Game,gameDone,\n");
-	free(game1);
 }
 
-void logout_user(User_conected* user, char* ret2) {
+void leave_game(User_conected* user, char* message1) {
+
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	sprintf(pom, "%d", user->game->id);
-	strcpy(message, "Logout,");
+	strcpy(message, "Game,leave,");
+	strcat(message, user->nickname);
+	strcat(message, ",");
 	strcat(message, pom);
 	strcat(message, ",\n");
 
+	int index;
 
-	user->isLog = 0;
-		int index;
-	if (strcmp(conected_users[user->game->gamer1]->nickname, user->nickname)
-			== 0) {
-		index = user->game->gamer2;
-	} else {
+	if(user->game != NULL){
+	if (strcmp(user->game->chellanger, user->nickname) == 0) {
 		index = user->game->gamer1;
+
+	} else {
+		index = user->game->gamer2;
 	}
 
-	printf("message %s %d",pom,index);
 	send_message(conected_users[index], message);
+	index = user->game->id;
+	free(game[index]);
+	game[index] = NULL;
+	}
+}
 
-	if (strcmp(ret2, "end") == 0) {
+void logout_user(User_conected* user, char* ret2) {
 
-			pthread_join(pthread_self(), PTHREAD_CANCELED);
+	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	if(user->game != NULL){
+	if (user->game->free == 1) {
+
+		sprintf(pom, "%d", user->game->id);
+		strcpy(message, "Logout,");
+		strcat(message, pom);
+		strcat(message, ",\n");
+
+		user->isLog = 0;
+		int index;
+
+		if (strcmp(user->game->chellanger, user->nickname) == 0) {
+			index = user->game->gamer1;
+		} else {
+			index = user->game->gamer2;
 		}
+
+		printf("message %s %d", pom, index);
+		fprintf(file,"Odhlasen uzivatel :%s \n", user->nickname);
+		send_message(conected_users[index], message);
+	} else {
+		user->isLog = 0;
+	}
+
+	}
+	if (strcmp(ret2, "end") == 0) {
+		fprintf(file,"Server konec vlakna \n");
+		pthread_join(pthread_self(), PTHREAD_CANCELED);
+	}
 
 }
 void *createThread(void *incoming_socket) {
 
 	char* buffer = malloc(1024);
 	int socket = *(int *) incoming_socket;
-
-	size_t buffersize = sizeof(buffer);
 	User_conected* user = put_user(socket);
 
-	send_message(user,"Connect,\n");
-	printf("Connect\n");
+	send_message(user, "Connect,\n");
+
 	while (1) {
 
 		int ret = sgetline(socket, &buffer);
 		if (ret < 0)
-			break; // error/disconnect
+			break;
 
-		// is it a 0-length line?
 		if (ret == 0) {
 			printf("End of Headers detected.\n");
 			break;
 		}
 
 		printf("obsah  %s \n", buffer);
+		fprintf(file,"Prijata zprava :%s \n", buffer);
 
 		char *ret2 = strchr(buffer, ',');
 
@@ -828,10 +850,12 @@ void *createThread(void *incoming_socket) {
 		} else if (strcmp(buffer, "CheckGame") == 0) {
 			reload_game(ret2, user);
 
+		} else if (strcmp(buffer, "CheckConnect") == 0) {
+
+			send_message(user, "CheckConnect,\n");
+			sleep(1);
+
 		} else if (strcmp(buffer, "DeleteGame") == 0) {
-			char *ret4 = strchr(ret2, ',');
-			*ret4 = '\0';
-			ret4++;
 			int i = atoi(ret2);
 
 			free(game[i]);
@@ -841,7 +865,6 @@ void *createThread(void *incoming_socket) {
 
 			log_control(user, ret2);
 		} else if (strcmp(buffer, "LogOut") == 0) {
-
 			logout_user(user, ret2);
 
 		} else if (strcmp(buffer, "PlayerList") == 0) {
@@ -867,13 +890,9 @@ void *createThread(void *incoming_socket) {
 		} else if (strcmp(buffer, "Game") == 0) {
 
 			char *ret3 = strchr(ret2, ',');
-
 			*ret3 = '\0';
-
 			ret3++;
-
 			if (strcmp(ret2, "colorResult") == 0) {
-				printf("nevim\n");
 				result_to_game(user, ret3);
 
 			} else if (strcmp(ret2, "goodColors") == 0) {
@@ -889,8 +908,19 @@ void *createThread(void *incoming_socket) {
 				knobs_panel_to_game(user, ret3);
 
 			} else if (strcmp(ret2, "gameOver") == 0) {
+				game_is_over(user);
+			} else if (strcmp(ret2, "leave") == 0) {
 
+				leave_game(user, ret3);
+			}else if (strcmp(ret2, "gameDone") == 0) {
+				game_is_done(user);
+			}else{
+				printf("Invalid input\n");
+				fprintf(file,"Prijata zprava :%s nevalidni vstup \n", buffer);
 			}
+		}else{
+			printf("Invalid input\n");
+			fprintf(file,"Prijata zprava :%s nevalidni vstup \n", buffer);
 		}
 
 	}
@@ -927,9 +957,23 @@ void print_err(char* msg) {
 
 //--------------------------------------------------------------------------
 
-int main(int argc, char** argv) {
-	memset(conected_users, 0, sizeof(User_conected*) * MAX_CONECTED);
+void start_server(int argc, char** argv) {
 
+	if (argc == 1 || argc == 3) {
+		nacti_soubor();
+		signal(SIGINT, sigint_handler);
+		nacti_Port(argc, argv);
+		read_address(argc, argv);
+	} else {
+
+		help();
+		exit(1);
+	}
+}
+int main(int argc, char** argv) {
+
+	memset(conected_users, 0, sizeof(User_conected*) * MAX_CONECTED);
+	start_server(argc, argv);
 	int sock = -1, incoming_sock = -1;
 	int optval = -1;
 	struct sockaddr_in addr, incoming_addr;
@@ -937,12 +981,16 @@ int main(int argc, char** argv) {
 
 	if (pthread_mutex_init(&lock, NULL) != 0) {
 		printf("\n mutex init failed\n");
+		fprintf(file,"Chyba serveru \"mutex init failed\":\n");
+
 		return 1;
 	}
 	/* create socket */
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
 	if (sock < 0) {
 		print_err("socket()");
+		fprintf(file,"Chyba serveru \"socket\":\n");
 		return 1;
 	}
 
@@ -953,15 +1001,25 @@ int main(int argc, char** argv) {
 	/* prepare inet address */
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(SRV_PORT);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY); /* listen on all interfaces */
+	addr.sin_port = htons(srv_port);
+
+	if (is_address) {
+		addr.sin_addr.s_addr = htonl(INADDR_ANY); /* listen on all interfaces */
+		fprintf(file,"Server bezi na vsech interfaces: \n");
+	} else {
+		addr.sin_addr.s_addr = inet_addr(address);
+		fprintf(file,"Server bezi na adrese %s: \n",address);
+	}
+
 	if (bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
 		print_err("bind");
+		fprintf(file,"Chyba serveru \"bind\":\n");
 		return 1;
 	}
 
 	if (listen(sock, 10) < 0) {
 		print_err("listen");
+		fprintf(file,"Chyba serveru \"listen\":\n");
 		return 1;
 	}
 
@@ -971,27 +1029,31 @@ int main(int argc, char** argv) {
 				&incoming_addr_len);
 		if (incoming_sock < 0) {
 			print_err("accept");
+			fprintf(file,"Chyba serveru \"accept\":\n");
 			close(sock);
 			continue;
 		}
 
+		char* message = "Connect\n";
 		printf("connection from %s:%i\n", inet_ntoa(incoming_addr.sin_addr),
 				ntohs(incoming_addr.sin_port));
-
+		fprintf(file,"connection from %s:%i\n", inet_ntoa(incoming_addr.sin_addr),
+				ntohs(incoming_addr.sin_port));
 		pthread_t thread;
 
 		/* create a second thread which executes inc_x(&x) */
 		if (pthread_create(&thread, NULL, createThread, &incoming_sock)) {
 
 			fprintf(stderr, "Error creating thread\n");
+			fprintf(file,"Chyba serveru \"creating thread\" \n ");
+
 			return 1;
 
 		}
 
 	}
-
 	pthread_mutex_destroy(&lock);
+	fclose(file);
 	return 0;
 }
-
 
