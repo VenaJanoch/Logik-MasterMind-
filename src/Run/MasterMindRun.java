@@ -255,7 +255,11 @@ public void showNoServer(){
 	alert.getButtonTypes().setAll(submitButton);
 
 	Optional<ButtonType> result = alert.showAndWait();
+	if (result.get() == submitButton){
 		
+		setServerWindow();
+		
+		} 
 }
 public void showLeaveMessage(String player, int i){
 	

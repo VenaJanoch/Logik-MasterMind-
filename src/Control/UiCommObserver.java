@@ -86,7 +86,7 @@ public class UiCommObserver implements ICommObserver {
 					}
 					break;
 				case "PlayerList":
-					if(pomData.length >0){
+					if(pomData.length >1){
 						freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));						
 					}else {
 						freePlayerL.getListLV().setItems(netLog.creatPlayersList(""));							
@@ -159,6 +159,7 @@ public class UiCommObserver implements ICommObserver {
 
 					break;
 				default:
+					System.out.println("Invalid input");
 					break;
 				}
 			}

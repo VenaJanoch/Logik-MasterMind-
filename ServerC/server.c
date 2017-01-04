@@ -44,12 +44,11 @@ void help() {
 
 }
 
-void sigint_handler(int sig)
-{
-    /*do something*/
-    printf("killing process %d\n",getpid());
+void sigint_handler(int sig) {
+	/*do something*/
+	printf("killing process %d\n", getpid());
 	fclose(file);
-    exit(0);
+	exit(0);
 }
 
 void nacti_soubor() {
@@ -77,7 +76,7 @@ void nacti_Port(int argc, char **argv) {
 	if (argc == 3) {
 		srv_port = atoi(argv[1]);
 	}
-		fprintf(file,"Server bezi na portu: %d\n", srv_port);
+	fprintf(file, "Server bezi na portu: %d\n", srv_port);
 }
 
 void read_address(int argc, char **argv) {
@@ -232,7 +231,7 @@ void reg_user(char* buffer, User_conected* user) {
 		}
 		pthread_mutex_unlock(&lock);
 		send_message(user, "Registrace,yes\n");
-		fprintf(file,"Registrace uzivatele: %s\n", user->nickname);
+		fprintf(file, "Registrace uzivatele: %s\n", user->nickname);
 	} else {
 		send_message(user, "Registrace,bad2,\n");
 
@@ -453,7 +452,7 @@ void log_control(User_conected* user, char* buffer) {
 				strcpy(user->nickname, buffer);
 				send_message(user, "Log,yes\n");
 				printf("Prihlaseny uzivatel %s %d \n", buffer, i);
-				fprintf(file,"Prihlaseny uzivatel: %s\n", user->nickname);
+				fprintf(file, "Prihlaseny uzivatel: %s\n", user->nickname);
 				break;
 			}
 		}
@@ -744,7 +743,7 @@ void game_is_over(User_conected* user) {
 
 	Game* game1 = user->game;
 	send_message(conected_users[game1->gamer2], "Game,gameOver,\n");
-	}
+}
 
 void game_is_done(User_conected* user) {
 
@@ -766,18 +765,18 @@ void leave_game(User_conected* user, char* message1) {
 
 	int index;
 
-	if(user->game != NULL){
-	if (strcmp(user->game->chellanger, user->nickname) == 0) {
-		index = user->game->gamer1;
+	if (user->game != NULL) {
+		if (strcmp(user->game->chellanger, user->nickname) == 0) {
+			index = user->game->gamer1;
 
-	} else {
-		index = user->game->gamer2;
-	}
+		} else {
+			index = user->game->gamer2;
+		}
 
-	send_message(conected_users[index], message);
-	index = user->game->id;
-	free(game[index]);
-	game[index] = NULL;
+		send_message(conected_users[index], message);
+		index = user->game->id;
+		free(game[index]);
+		game[index] = NULL;
 	}
 }
 
@@ -785,36 +784,92 @@ void logout_user(User_conected* user, char* ret2) {
 
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-	if(user->game != NULL){
-	if (user->game->free == 1) {
+	if (user->game != NULL) {
+		if (user->game->free == 1) {
 
-		sprintf(pom, "%d", user->game->id);
-		strcpy(message, "Logout,");
-		strcat(message, pom);
-		strcat(message, ",\n");
+			sprintf(pom, "%d", user->game->id);
+			strcpy(message, "Logout,");
+			strcat(message, pom);
+			strcat(message, ",\n");
 
-		user->isLog = 0;
-		int index;
+			user->isLog = 0;
+			int index;
 
-		if (strcmp(user->game->chellanger, user->nickname) == 0) {
-			index = user->game->gamer1;
+			if (strcmp(user->game->chellanger, user->nickname) == 0) {
+				index = user->game->gamer1;
+			} else {
+				index = user->game->gamer2;
+			}
+
+			printf("message %s %d", pom, index);
+			fprintf(file, "Odhlasen uzivatel :%s \n", user->nickname);
+			send_message(conected_users[index], message);
 		} else {
-			index = user->game->gamer2;
+			user->isLog = 0;
 		}
-
-		printf("message %s %d", pom, index);
-		fprintf(file,"Odhlasen uzivatel :%s \n", user->nickname);
-		send_message(conected_users[index], message);
-	} else {
-		user->isLog = 0;
-	}
 
 	}
 	if (strcmp(ret2, "end") == 0) {
-		fprintf(file,"Server konec vlakna \n");
+		fprintf(file, "Server konec vlakna \n");
 		pthread_join(pthread_self(), PTHREAD_CANCELED);
 	}
 
+}
+
+void receive_challenge(User_conected* user,char* message) {
+	char *ret3 = strchr(message, ',');
+
+	if(ret3 != NULL){
+	*ret3 = '\0';
+	ret3++;
+	}
+
+
+	if (strcmp(message, "accept") == 0) {
+		printf("invite\n");
+		send_accept_chellange(user, ret3);
+	} else if (strcmp(message, "refuse") == 0) {
+		send_refuse_chellange(user, ret3);
+	} else if (strcmp(message, "invite") == 0) {
+		send_invitation(user, ret3);
+	}else {
+		printf("Invalid input\n");
+		fprintf(file, "Prijata zprava :%s nevalidni vstup \n", message);
+	}
+}
+
+void receive_game(User_conected* user,char* message) {
+	char *ret3 = strchr(message, ',');
+	if(ret3 != NULL){
+		*ret3 = '\0';
+		ret3++;
+		}
+	if (strcmp(message, "colorResult") == 0) {
+		result_to_game(user, ret3);
+
+	} else if (strcmp(message, "goodColors") == 0) {
+
+		good_color_to_game(user, ret3);
+
+	} else if (strcmp(message, "greatColors") == 0) {
+
+		great_color_to_game(user, ret3);
+
+	} else if (strcmp(message, "knobPanel") == 0) {
+
+		knobs_panel_to_game(user, ret3);
+
+	} else if (strcmp(message, "gameOver") == 0) {
+		game_is_over(user);
+	} else if (strcmp(message, "leave") == 0) {
+
+		leave_game(user, ret3);
+	} else if (strcmp(message, "gameDone") == 0) {
+		game_is_done(user);
+	} else {
+		printf("Invalid input\n");
+		fprintf(file, "Prijata zprava :%s nevalidni vstup \n", message);
+	}
 }
 void *createThread(void *incoming_socket) {
 
@@ -836,13 +891,14 @@ void *createThread(void *incoming_socket) {
 		}
 
 		printf("obsah  %s \n", buffer);
-		fprintf(file,"Prijata zprava :%s \n", buffer);
+		fprintf(file, "Prijata zprava :%s \n", buffer);
 
 		char *ret2 = strchr(buffer, ',');
 
+		if(ret2 != NULL){
 		*ret2 = '\0';
-
 		ret2++;
+		}
 
 		if (strcmp(buffer, "Registrace") == 0) {
 			reg_user(ret2, user);
@@ -857,12 +913,10 @@ void *createThread(void *incoming_socket) {
 
 		} else if (strcmp(buffer, "DeleteGame") == 0) {
 			int i = atoi(ret2);
-
 			free(game[i]);
 			game[i] = NULL;
 
 		} else if (strcmp(buffer, "Log") == 0) {
-
 			log_control(user, ret2);
 		} else if (strcmp(buffer, "LogOut") == 0) {
 			logout_user(user, ret2);
@@ -872,55 +926,14 @@ void *createThread(void *incoming_socket) {
 			send_free_players(user);
 
 		} else if (strcmp(buffer, "Challenge") == 0) {
+			receive_challenge(user,ret2);
 
-			char *ret3 = strchr(ret2, ',');
-
-			*ret3 = '\0';
-
-			ret3++;
-
-			if (strcmp(ret2, "accept") == 0) {
-				printf("invite\n");
-				send_accept_chellange(user, ret3);
-			} else if (strcmp(ret2, "refuse") == 0) {
-				send_refuse_chellange(user, ret3);
-			} else if (strcmp(ret2, "invite") == 0) {
-				send_invitation(user, ret3);
-			}
 		} else if (strcmp(buffer, "Game") == 0) {
+			receive_game(user,ret2);
 
-			char *ret3 = strchr(ret2, ',');
-			*ret3 = '\0';
-			ret3++;
-			if (strcmp(ret2, "colorResult") == 0) {
-				result_to_game(user, ret3);
-
-			} else if (strcmp(ret2, "goodColors") == 0) {
-
-				good_color_to_game(user, ret3);
-
-			} else if (strcmp(ret2, "greatColors") == 0) {
-
-				great_color_to_game(user, ret3);
-
-			} else if (strcmp(ret2, "knobPanel") == 0) {
-
-				knobs_panel_to_game(user, ret3);
-
-			} else if (strcmp(ret2, "gameOver") == 0) {
-				game_is_over(user);
-			} else if (strcmp(ret2, "leave") == 0) {
-
-				leave_game(user, ret3);
-			}else if (strcmp(ret2, "gameDone") == 0) {
-				game_is_done(user);
-			}else{
-				printf("Invalid input\n");
-				fprintf(file,"Prijata zprava :%s nevalidni vstup \n", buffer);
-			}
-		}else{
+		} else {
 			printf("Invalid input\n");
-			fprintf(file,"Prijata zprava :%s nevalidni vstup \n", buffer);
+			fprintf(file, "Prijata zprava :%s nevalidni vstup \n", buffer);
 		}
 
 	}
@@ -981,7 +994,7 @@ int main(int argc, char** argv) {
 
 	if (pthread_mutex_init(&lock, NULL) != 0) {
 		printf("\n mutex init failed\n");
-		fprintf(file,"Chyba serveru \"mutex init failed\":\n");
+		fprintf(file, "Chyba serveru \"mutex init failed\":\n");
 
 		return 1;
 	}
@@ -990,7 +1003,7 @@ int main(int argc, char** argv) {
 
 	if (sock < 0) {
 		print_err("socket()");
-		fprintf(file,"Chyba serveru \"socket\":\n");
+		fprintf(file, "Chyba serveru \"socket\":\n");
 		return 1;
 	}
 
@@ -1005,21 +1018,21 @@ int main(int argc, char** argv) {
 
 	if (is_address) {
 		addr.sin_addr.s_addr = htonl(INADDR_ANY); /* listen on all interfaces */
-		fprintf(file,"Server bezi na vsech interfaces: \n");
+		fprintf(file, "Server bezi na vsech interfaces: \n");
 	} else {
 		addr.sin_addr.s_addr = inet_addr(address);
-		fprintf(file,"Server bezi na adrese %s: \n",address);
+		fprintf(file, "Server bezi na adrese %s: \n", address);
 	}
 
 	if (bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
 		print_err("bind");
-		fprintf(file,"Chyba serveru \"bind\":\n");
+		fprintf(file, "Chyba serveru \"bind\":\n");
 		return 1;
 	}
 
 	if (listen(sock, 10) < 0) {
 		print_err("listen");
-		fprintf(file,"Chyba serveru \"listen\":\n");
+		fprintf(file, "Chyba serveru \"listen\":\n");
 		return 1;
 	}
 
@@ -1029,7 +1042,7 @@ int main(int argc, char** argv) {
 				&incoming_addr_len);
 		if (incoming_sock < 0) {
 			print_err("accept");
-			fprintf(file,"Chyba serveru \"accept\":\n");
+			fprintf(file, "Chyba serveru \"accept\":\n");
 			close(sock);
 			continue;
 		}
@@ -1037,7 +1050,8 @@ int main(int argc, char** argv) {
 		char* message = "Connect\n";
 		printf("connection from %s:%i\n", inet_ntoa(incoming_addr.sin_addr),
 				ntohs(incoming_addr.sin_port));
-		fprintf(file,"connection from %s:%i\n", inet_ntoa(incoming_addr.sin_addr),
+		fprintf(file, "connection from %s:%i\n",
+				inet_ntoa(incoming_addr.sin_addr),
 				ntohs(incoming_addr.sin_port));
 		pthread_t thread;
 
@@ -1045,7 +1059,7 @@ int main(int argc, char** argv) {
 		if (pthread_create(&thread, NULL, createThread, &incoming_sock)) {
 
 			fprintf(stderr, "Error creating thread\n");
-			fprintf(file,"Chyba serveru \"creating thread\" \n ");
+			fprintf(file, "Chyba serveru \"creating thread\" \n ");
 
 			return 1;
 
