@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 
 public class WellcomeWindow extends Stage{
 
-	
+	/** Globalni promenne tridy **/
 	private MasterMindRun mMR;
 	private Scene newScena;
 	private BorderPane hlavniPanel;
@@ -38,6 +38,12 @@ public class WellcomeWindow extends Stage{
 	private LogginLogics lLog;
 	private NetworkLogics netLog;
 	
+	/**
+	 * Inicializace objektu mMR, lLog, netLog
+	 * @param mMR
+	 * @param lLog
+	 * @param netLog
+	 */
 	
 	public WellcomeWindow(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
 		
@@ -88,6 +94,10 @@ public class WellcomeWindow extends Stage{
 		return hlavniPanel;
 	}
 
+	/**
+	 * Vyhodi alert pokud neni nikdo prihlaseny
+	 * Pripadne vytvori seznam prihlasenych uzivatelu k serveru
+	 */
 	private void multiModeControl(){
 		
 		if (!mMR.getLogLogics().isLog()) {
@@ -105,6 +115,11 @@ public class WellcomeWindow extends Stage{
 		}
 		
 	}
+	
+	/**
+	 * Vytvori panel s tlacitky pro prihlaseni, odhlaseni a registraci 
+	 * @return
+	 */
 	private Node createLogBar() {
 		
 		logBarPanel = new HBox(5);

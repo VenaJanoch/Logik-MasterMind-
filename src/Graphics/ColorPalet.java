@@ -20,11 +20,17 @@ import javafx.stage.Stage;
 
 public class ColorPalet extends VBox {
 
+	/**Globalni promenne tridy	 **/
 	private Button[] colorButtons;
 	private int indexButton;
 	private Logics logics;
 	private NetworkLogics netLog;
 	
+	/**
+	 * Inicializace objektu logics a netLog
+	 * @param logics
+	 * @param netLog
+	 */
 	public ColorPalet(Logics logics, NetworkLogics netLog) {
 
 		super(4);
@@ -38,6 +44,9 @@ public class ColorPalet extends VBox {
 		
 	}
 
+	/**
+	 * Metoda pro vytvoreni barevnych tlacitek
+	 */
 	private void createColorButton() {
 
 		colorButtons = new Button[Control.Constants.countColorButton];
@@ -62,7 +71,9 @@ public class ColorPalet extends VBox {
 		}
 	}
 
-	
+	/**
+	 * Vytvori barevnou paletu pro vyber barvy tlacitka
+	 */
 	public void createColorPickerPanel() {
 
 		HBox firsLineColorBox = new HBox(4);
@@ -81,6 +92,9 @@ public class ColorPalet extends VBox {
 		
 	}
 
+	
+	/******* Getrs and seters******/
+	
 	public int getIndexButton() {
 		return indexButton;
 	}

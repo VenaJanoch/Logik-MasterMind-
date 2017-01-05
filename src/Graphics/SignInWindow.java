@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 
 public class SignInWindow extends Stage {
 
+	/** Globalni promenne tridy**/
 	private MasterMindRun mMR;
 
 	private Scene newScena;
@@ -46,6 +47,10 @@ public class SignInWindow extends Stage {
 
 	private ITCP m_comm;
 
+	/**
+	 * Inicializace objektu mMR
+	 * @param mMR
+	 */
 	public SignInWindow(MasterMindRun mMR) {
 
 		super();
@@ -79,6 +84,12 @@ public class SignInWindow extends Stage {
 
 	}
 
+	/**
+	 * createNet()
+	 * Vytvoreni prihlasovaciho formulare
+	 * @return
+	 */
+	
 	private Node createNet() {
 
 		netPanel = new GridPane();
@@ -128,6 +139,10 @@ public class SignInWindow extends Stage {
 		return netPanel;
 	}
 
+	/**
+	 * confirmForm()
+	 * Overeni vstupnich poli
+	 */
 	private void confirmForm() {
 
 		if (mMR.getLogLogics().confirmDataInForm(nicknameTF.getText(),

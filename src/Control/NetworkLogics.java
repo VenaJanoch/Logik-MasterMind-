@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 
 public class NetworkLogics {
 
+	/** Globalni promenne tridy**/
 	private TCPComm comm;
 	private MasterMindRun mMR;
 	private MultiMode multiM;
@@ -37,6 +38,11 @@ public class NetworkLogics {
 	private int indexButton;
 	private LogginLogics lLog;
 
+	/**
+	 * Inicializace objektu mMR a lLog
+	 * @param mMR
+	 * @param lLog
+	 */
 	public NetworkLogics(MasterMindRun mMR, LogginLogics lLog) {
 
 		this.mMR = mMR;
@@ -47,12 +53,19 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * Odesle zadost o ziskani uzivatelu pro dalsi hru
+	 */
 	public void getFreePlayerList() {
 
 		comm.send("PlayerList,get\n");
 
 	}
 
+	/**
+	 * Odesle zpravu s informaci o odhlaseni uzivatel
+	 * @param message 
+	 */
 	public void signOutUser(String message) {
 
 		lLog.setLog(false);
@@ -60,6 +73,11 @@ public class NetworkLogics {
 		mMR.setWellcomeWindow();
 	}
 
+	/**
+	 * Vytvori seznam prihlasenych uzivatelu se kterymi je mozne hrat
+	 * @param mesagge
+	 * @return
+	 */
 	public ObservableList<String> creatPlayersList(String mesagge) {
 
 		String[] players = mesagge.split(";");
@@ -71,12 +89,20 @@ public class NetworkLogics {
 		return data;
 	}
 
+	/**
+	 * Odesle zpravu s informaci o zadost pro pripojeni daneho hrace do hry
+	 * @param playerName
+	 */
 	public void createGame(String playerName) {
 
 		comm.send("Challenge,invite," + playerName + "\n");
 
 	}
 
+	/**
+	 * Zprava o prijeti vyzvy
+	 * @param player
+	 */
 	public void challengeAccepted(String player) {
 
 		comm.send("Challenge,accept," + player + "\n");
@@ -86,24 +112,40 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * Zprava o odmituti vyzvy
+	 * @param player
+	 */
 	public void challengeRefuse(String player) {
 
 		comm.send("Challenge,refuse," + player + "\n");
 
 	}
 
+	/**
+	 * Zavola metodu mMR pro messagebox o pozvani do hry
+	 * @param player
+	 */
 	public void createChallengeMesagge(String player) {
 
 		mMR.showPlayerMessage(player);
 
 	}
 
+	/**
+	 * Zprava o opusteni hry
+	 */
 	public void leaveGame() {
 
 		comm.send("Game,leave," + name + "\n");
 
 	}
 
+	/**
+	 * Metoda vyhodnocujici pocet obarvenych tlacitek 
+	 * Urcuje zda bylo ve hre dosazeno uspechu ci ne
+	 * @param button
+	 */
 	public void returnColor(Object button) {
 
 		Button tmpButton = (Button) button;
@@ -149,19 +191,27 @@ public class NetworkLogics {
 
 	}
 
-
+	/**
+	 * Zprava o prohre vyzivatele 
+	 */
 	public void sendGameOver() {
 
 		comm.send("Game,gameOver,\n");
 
 	}
 
+	/**
+	 * Zprava o vyhre vyzivatele
+	 */
 	public void sendGameDone() {
 
 		
 		comm.send("Game,gameDone,\n");
 	}
 
+	/**
+	 * Nastaveni zadaneho vysledku od porotihrace
+	 */
 	public void setResult(){
 		for (int i = 0; i < colors.length; i++) {
 			
@@ -171,6 +221,12 @@ public class NetworkLogics {
 		
 		}
 	}
+	
+	/**
+	 * Najde index 
+	 * @param knob
+	 * @return
+	 */
 	public int findColorIndex(Knob knob) {
 
 		for (int i = 0; i < Constants.countColorButton; i++) {
@@ -185,6 +241,10 @@ public class NetworkLogics {
 		return -1;
 	}
 
+	/**
+	 * Posle zvolenou barevnou kombinaci a jeji vyhodnoceni
+	 * @param knobPanel
+	 */
 	private void sendKnobs(KnobPanel knobPanel) {
 		String message = "Game,knobPanel," + knobPanel.getIdentifikace() + ",";
 
@@ -204,6 +264,11 @@ public class NetworkLogics {
 	}
 	
 
+	/**
+	 * Nastaveni prijatych barev v tahu
+	 * @param identifikace
+	 * @param message
+	 */
 	public void setKnobPanel(int identifikace, String message) {
 
 		String[] pomString = message.split(";");
@@ -221,7 +286,11 @@ public class NetworkLogics {
 		}
 
 	}
-
+	/**
+	 * Nastaveni prijateho vyhodnoceni poctu pozic barev
+	 * @param greatColor1
+	 * @param identifikace
+	 */
 	public void setGreatColor(int greatColor1, int identifikace) {
 
 		for (int i = 0; i < greatColor1; i++) {
@@ -232,6 +301,11 @@ public class NetworkLogics {
 		}
 	}
 
+	/**
+	 * Nastaveni prijateho vyhodnoceni poctu barev
+	 * @param goodColor1
+	 * @param identifikace
+	 */
 	public void setGoodColor(int goodColor1, int identifikace) {
 
 		for (int i = 0; i < goodColor1; i++) {
@@ -241,7 +315,10 @@ public class NetworkLogics {
 
 		}
 	}
-
+	/**
+	 * Nastaveni prijateho vysledku 2
+	 * @param message
+	 */
 	public void setResult(String message) {
 
 		String[] pomString = message.split(";");
@@ -256,7 +333,10 @@ public class NetworkLogics {
 		kP = multiM.getKnobPanel()[0];
 
 	}
-	
+	/**
+	 * Nastaveni prijateho vysledku
+	 * @param message
+	 */
 	public void setResultR(String message) {
 
 		String[] pomString = message.split(";");
@@ -268,6 +348,11 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * Kontrola poctu obarvenych tlacitek
+	 * @param kp
+	 * @return
+	 */
 	public boolean controlCountChoosedKnobs(KnobPanel kp) {
 
 		int count = 0;
@@ -295,6 +380,9 @@ public class NetworkLogics {
 		return false;
 	}
 
+	/**
+	 * Nacteni vysledku
+	 */
 	private void loadColorResult() {
 
 		String result = "Game,colorResult,";
@@ -318,6 +406,12 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * Vyhodnoceni zadanych barve v aktualnim tahu
+	 * @param desk
+	 * @param identifikace
+	 * @return
+	 */
 	public boolean evaluate(Desk desk, int identifikace) {
 
 		greatColors = 0;
@@ -352,6 +446,11 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * Vyhodnoceni nalezenych barev v tahu
+	 * @param kP
+	 * @param desk
+	 */
 	public void findGoodColors(KnobPanel kP, Desk desk) {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
@@ -372,6 +471,11 @@ public class NetworkLogics {
 
 	}
 
+	/**
+	 * 
+	 * @param color
+	 * @return
+	 */
 	public boolean checkColor(Color color) {
 
 		for (int i = 0; i < checkColors.length; i++) {
@@ -384,6 +488,11 @@ public class NetworkLogics {
 		return true;
 	}
 
+	/**
+	 * Vyhodnoceni pozic barev
+	 * @param kP
+	 * @param desk
+	 */
 	public void findGreatColors(KnobPanel kP, Desk desk) {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
@@ -395,33 +504,36 @@ public class NetworkLogics {
 		}
 	}
 	
+	/**
+	 * Odesle dotaz pro kontrolu, zda nema uzivatel rozehranou nejakou hru
+	 * @param game
+	 */
 	public void checkGame(int game){
 		
 		comm.send("CheckGame,"+ game + "\n");
 		
 	}
 	
+	/**
+	 * Odesle zpravu s informaci o smazani hry ze serveru
+	 * @param game
+	 */
 	public void deleteGame(int game) {
 		comm.send("DeleteGame,"+game+",\n");
 		
 	}
+	/**
+	 * Odesle zpravu s informaci o smazani hry ze serveru
+	 * @param game
+	 */
 	public void deleteGameLeave(int game) {
 		comm.send("DeleteGame,"+game+",both,\n");
 		
 	}
 	
-	public void createDatabase(){
-		
-		comm.send("Challenge,invite,ja\n");
-		comm.send("Challenge,accept,test\n");
-		comm.send("Game,knobPanel,0,1;2;3;4;\n");
-		comm.send("Game,goodColors,0,2,\n");
-		comm.send("Game,greatColors,0,1,\n");
-		
-		
-		
-	}
-	
+	/**
+	 * Vynulovani pocitadla pro timeouty
+	 */
 	public void checkConnect() {
 		
 	comm.setCounterTimeOUt(0);

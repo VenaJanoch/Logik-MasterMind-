@@ -17,9 +17,11 @@
 #define MAX_CONECTED 10
 #define COUNT_KNOBS 4
 #define COUNT_Game 10
+#define FILE_NAME "logy.log"
 
 //--------------------------------------------------------------------------
 
+/* Globalni promenne tridy*/
 User_conected* conected_users[MAX_CONECTED];
 User_database* database_users[MAX_CONECTED];
 pthread_t threads[MAX_CONECTED];
@@ -44,16 +46,28 @@ void help() {
 
 }
 
+/*
+ * void sigint_handler(int sig);
+ *
+ * Nastavi handler pro zachyceni ukonceni procesu
+ */
 void sigint_handler(int sig) {
-	/*do something*/
+
 	printf("killing process %d\n", getpid());
+	int i;
+	pthread_mutex_destroy(&lock);
 	fclose(file);
 	exit(0);
 }
 
+/*
+ * void nacti_soubor();
+ *
+ *Nacte logovaci soubor
+ */
 void nacti_soubor() {
 
-	file = fopen("logy.log", "w");
+	file = fopen(FILE_NAME, "w");
 	printf("open file\n");
 	if (file == NULL) {
 		printf("ERR: Non-existent file!");
@@ -67,9 +81,7 @@ void nacti_soubor() {
  * argc pocet zadanych parametru
  * argv pole se zadanymi parametry
  *
- * Overi zde byl opravdu zadan parametr se jmenem souboru
- * Nacte soubor pokud existuje
- * Overi existenci souboru
+ * Nacte port pokud byl zadan z cmd
  */
 void nacti_Port(int argc, char **argv) {
 
@@ -79,6 +91,14 @@ void nacti_Port(int argc, char **argv) {
 	fprintf(file, "Server bezi na portu: %d\n", srv_port);
 }
 
+/*
+ * read_address(int argc, char **argv)
+ *
+ * argc pocet zadanych parametru
+ * argv pole se zadanymi parametry
+ *
+ * Nacte adresu pokud byla zadana z cmd
+ */
 void read_address(int argc, char **argv) {
 
 	if (argc == 3) {
@@ -89,6 +109,14 @@ void read_address(int argc, char **argv) {
 	}
 
 }
+/*
+ * sgetline(int fd, char **out)
+ *
+ * argc pocet zadanych parametru
+ * argv pole se zadanymi parametry
+ *
+ * Nacte zpravu
+ */
 int sgetline(int fd, char ** out) {
 	int buf_size = 128;
 	int bytesloaded = 0;
@@ -139,6 +167,10 @@ int sgetline(int fd, char ** out) {
 	return bytesloaded; // number of bytes in the line, not counting the line break
 }
 
+/*
+ * pull_user(User_conected* user)
+ *Vyjme uzivatele z pole pripojenych uzivatelu
+ */
 void pull_user(User_conected* user) {
 
 	pthread_mutex_lock(&lock);
@@ -149,6 +181,12 @@ void pull_user(User_conected* user) {
 
 }
 
+/*
+ * put_user(int socket)
+ *
+ *Vlozi uzivatele z pole pripojenych uzivatelu pomoci prijateho socketu
+ *
+ */
 User_conected* put_user(int socket) {
 	User_conected* user = malloc(sizeof(User_conected));
 
@@ -173,19 +211,36 @@ User_conected* put_user(int socket) {
 
 }
 
+/*
+ * send_message(User_conected* user, char* message)
+ *
+ * Odesle zadanou zpravu zadanemu uzivateli na zaklade socketu uzivatele
+ *
+ */
 void send_message(User_conected* user, char* message) {
 
 	send(user->socket, message, strlen(message), 0);
 
 }
 
+/*
+ * nickname_control(char* nickname)
+ *
+ * Kontrola velikosti uzivatelskeho jmena
+ *
+ */
 int nickname_control(char* nickname) {
 	if (strlen(nickname) > 30) {
 		return 0;
 	}
 	return 1;
 }
-
+/*
+ * passwd_control(char* nickname)
+ *
+ * Kontrola velikosti hesla
+ *
+ */
 int passwd_control(char* passwd) {
 	if (strlen(passwd) > 32) {
 		return 0;
@@ -193,13 +248,23 @@ int passwd_control(char* passwd) {
 	return 1;
 }
 
+/*
+ * reg_user(char* buffer, User_conected* user)
+ *
+ * Registrace uzivatele na zaklade prijatych dat
+ * Kontrola existence jmena v databazi
+ * Odpovedi s informacinimy hlaskami
+ *
+ */
 void reg_user(char* buffer, User_conected* user) {
 
 	char *ret = strchr(buffer, ',');
 
-	*ret = '\0';
+	if (ret != NULL) {
+		*ret = '\0';
+		ret++;
+	}
 
-	ret++;
 	pthread_mutex_lock(&lock);
 	int i;
 	for (i = 0; i < MAX_CONECTED; ++i) {
@@ -238,7 +303,12 @@ void reg_user(char* buffer, User_conected* user) {
 	}
 
 }
-
+/*
+ * is_bad_passwd(char* passwd)
+ *
+ * Pomocna funkce pro kontrolu spravnosti hesla uzivatele
+ *
+ */
 int is_bad_passwd(char* passwd) {
 
 	int i = 0;
@@ -257,7 +327,12 @@ int is_bad_passwd(char* passwd) {
 	return 0;
 
 }
-
+/*
+ * is_bad_loggin(char* passwd)
+ *
+ * Pomocna funkce pro kontrolu spravnosti logginu uzivatele
+ *
+ */
 int is_bad_loggin(char* log) {
 
 	int i = 0;
@@ -276,6 +351,12 @@ int is_bad_loggin(char* log) {
 
 }
 
+/*
+ * find_game(User_conected* user)
+ *
+ * Funkce zjisti zda jiz nema uzivatel rozehranou nejakou hru
+ *
+ */
 int find_game(User_conected* user) {
 
 	int i;
@@ -291,6 +372,12 @@ int find_game(User_conected* user) {
 	return -1;
 }
 
+/*
+ * send_good_colors(Game* game, User_conected* user, int i)
+ *
+ * Funkce odesle uzivateli pocet uhodnutych barev, v rozehrane hre a ve zvolenem tahu
+ *
+ */
 void send_good_colors(Game* game, User_conected* user, int i) {
 
 	char* good_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -307,6 +394,12 @@ void send_good_colors(Game* game, User_conected* user, int i) {
 	send_message(user, good_colors);
 }
 
+/*
+ * send_great_colors(Game* game, User_conected* user, int i)
+ *
+ * Funkce odesle uzivateli pocet uhodnutych pozic barev, v rozehrane hre a ve zvolenem tahu
+ *
+ */
 void send_great_colors(Game* game, User_conected* user, int i) {
 
 	char* great_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -321,9 +414,23 @@ void send_great_colors(Game* game, User_conected* user, int i) {
 
 	send_message(user, great_colors);
 }
+
+/*
+ * send_knobs_colors(User_conected* user, char* knob_panel)
+ *
+ * Pomocna fce pro odeslani barev zvolenych uzivatelem
+ *
+ */
 void send_knobs_colors(User_conected* user, char* knob_panel) {
 	send_message(user, knob_panel);
 }
+
+/*
+ * send_player(Game* game, User_conected* user)
+ *
+ * Posle jmeno hrace se kterym ma uzivatel aktualne rozehranou hru
+ *
+ */
 void send_player(Game* game, User_conected* user) {
 
 	char* player = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -335,17 +442,25 @@ void send_player(Game* game, User_conected* user) {
 		strcat(player, "challenger,");
 		strcat(player, conected_users[game->gamer1]->nickname);
 		strcat(player, "\n");
+		printf("vyzivatel %s", player);
 	} else {
 
 		strcat(player, "challenger,");
 		strcat(player, conected_users[game->gamer2]->nickname);
 		strcat(player, "\n");
+		printf("hrac %s", player);
 	}
 
 	send_message(user, player);
 
 	sleep(1);
 }
+/*
+ * send_result_colors(Game* game, User_conected* user)
+ *
+ * Posle hledany vysledek rozehrane hry
+ *
+ */
 void send_result_colors(Game* game, User_conected* user) {
 
 	char* result_colors = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -363,15 +478,20 @@ void send_result_colors(Game* game, User_conected* user) {
 
 	send_message(user, result_colors);
 }
+/*
+ * reload_game(char* buffer, User_conected* user
+ *
+ * Odesle jmeno protihrace
+ * Vykona prohledani rozehrane hry a posle jednotlive stavy tahu
+ *
+ */
 void reload_game(char* buffer, User_conected* user) {
 
 	char* knob_panel = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	user->game = game[atoi(buffer)];
-
 	Game* game = user->game;
-
 	send_player(game, user);
 
 	int i = 0;
@@ -393,21 +513,27 @@ void reload_game(char* buffer, User_conected* user) {
 
 			}
 			send_result_colors(game, user);
-			sleep(1);
+
 			strcat(knob_panel, "\n");
 			send_knobs_colors(user, knob_panel);
 
-			sleep(1);
+
 			send_good_colors(game, user, i);
 
-			sleep(1);
+
 			send_great_colors(game, user, i);
 
 		}
 
 	}
 }
-
+/*
+ * check_game(User_conected* user)
+ *
+ * Odesle uzivateli zpravu zda byl v rozehrane hre vyzivatelem ci ne,
+ * pokud ma uzivatel nejakou hru rozehranou
+ *
+ */
 void check_game(User_conected* user) {
 	int i = find_game(user);
 
@@ -423,18 +549,26 @@ void check_game(User_conected* user) {
 
 		if (strcmp(conected_users[game[i]->gamer1]->nickname, user->nickname)
 				== 0) {
-			strcat(message, conected_users[game[i]->gamer2]->nickname);
+
+			strcat(message, game[i]->player);
 			strcat(message, ",1,\n");
+
 			send_message(user, message);
+
 		} else {
 			strcat(message, conected_users[game[i]->gamer1]->nickname);
 			strcat(message, ",0,\n");
-
 			send_message(user, message);
 		}
 	}
 }
-
+/*
+ * log_control(User_conected* user, char* buffer)
+ *
+ * Provede kontrolu prihlasujiciho se uzivatele
+ * Pokud jsou prihlasovaci udaje v poradku tak ho prihlasi
+ *
+ */
 void log_control(User_conected* user, char* buffer) {
 
 	char *ret = strchr(buffer, ',');
@@ -467,7 +601,12 @@ void log_control(User_conected* user, char* buffer) {
 	}
 
 }
-
+/*
+ * send_free_players(User_conected* user)
+ *
+ * Odesle vyzivateli seznam volnych prihlasenych uzivatelu
+ *
+ */
 void send_free_players(User_conected* user) {
 
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -481,7 +620,7 @@ void send_free_players(User_conected* user) {
 
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
-		if (conected_users[i] != NULL) {
+		if (conected_users[i] != NULL && conected_users[i]->play != 1) {
 			if (conected_users[i]->isLog == 1
 					&& strcmp(conected_users[i]->nickname, user->nickname)
 							!= 0) {
@@ -503,6 +642,12 @@ void send_free_players(User_conected* user) {
 
 }
 
+/*
+ * send_invitation(User_conected* user, char* player)
+ *
+ * Odesle pozvani do hry druhemu uzivateli
+ *
+ */
 void send_invitation(User_conected* user, char* player) {
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -529,7 +674,13 @@ void send_invitation(User_conected* user, char* player) {
 //free(finish);
 
 }
-
+/*
+ * find_free_game(User_conected* player, User_conected* chellanger)
+ *
+ * Najde volnou pozici pro vytvoreni hry
+ * Priradi vytvorenou hru danym hracum
+ *
+ */
 void find_free_game(User_conected* player, User_conected* chellanger) {
 
 	pthread_mutex_lock(&lock);
@@ -541,8 +692,9 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 			memset(game[i], 0, sizeof(Game));
 			game[i]->gamer1 = player->id;
 			game[i]->gamer2 = chellanger->id;
-			strcpy(game[i]->chellanger, chellanger->nickname);
-			strcpy(game[i]->player, player->nickname);
+
+			strcpy(game[i]->chellanger, player->nickname);
+			strcpy(game[i]->player, chellanger->nickname);
 
 			player->game = game[i];
 			chellanger->game = game[i];
@@ -557,6 +709,12 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 
 }
 
+/*
+ * send_accept_chellange(User_conected* user, char* player)
+ *
+ * Odesle vyzivateli informaci o prijeti jeho vyzvy druhym hracem
+ *
+ */
 void send_accept_chellange(User_conected* user, char* player) {
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -569,7 +727,7 @@ void send_accept_chellange(User_conected* user, char* player) {
 		if (conected_users[i] != NULL) {
 			if (strcmp(conected_users[i]->nickname, player) == 0) {
 				find_free_game(conected_users[i], user);
-				finish = strcat(message, player);
+				finish = strcat(message, user->nickname);
 				message = strcat(finish, ",accept\n");
 				send_message(conected_users[i], message);
 			}
@@ -583,6 +741,12 @@ void send_accept_chellange(User_conected* user, char* player) {
 
 }
 
+/*
+ * send_refuse_chellange(User_conected* user, char* player)
+ *
+ * Odesle vyzivateli informaci o odmitnuti jeho vyzvy druhym hracem
+ *
+ */
 void send_refuse_chellange(User_conected* user, char* player) {
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -606,20 +770,32 @@ void send_refuse_chellange(User_conected* user, char* player) {
 
 }
 
+/*
+ * cut_result(char* message, Game* game)
+ *
+ * Ulozi do structury Game hledany vysledek hry
+ *
+ */
 void cut_result(char* message, Game* game) {
 	game->result.identifikace = 100;
 
 	char *ret1 = strchr(message, ';');
-	*ret1 = '\0';
-	ret1++;
+	if (ret1 != NULL) {
+		*ret1 = '\0';
+		ret1++;
+	}
 
 	char *ret2 = strchr(ret1, ';');
-	*ret2 = '\0';
-	ret2++;
+	if (ret2 != NULL) {
+		*ret2 = '\0';
+		ret2++;
+	}
 
 	char *ret3 = strchr(ret2, ';');
-	*ret3 = '\0';
-	ret3++;
+	if (ret3 != NULL) {
+		*ret3 = '\0';
+		ret3++;
+	}
 
 	game->result.colors[0] = atoi(message);
 	game->result.colors[1] = atoi(ret1);
@@ -629,6 +805,12 @@ void cut_result(char* message, Game* game) {
 
 }
 
+/*
+ * cut_colors(char* message, Game* game)
+ *
+ * Ulozi do structury Game stav daneho tahu
+ *
+ */
 void cut_colors(char* message, Game* game) {
 
 	char *identifikaceCh = strchr(message, ',');
@@ -640,16 +822,22 @@ void cut_colors(char* message, Game* game) {
 	game->knobs[identifikaceI].identifikace = identifikaceI;
 
 	char *ret1 = strchr(identifikaceCh, ';');
-	*ret1 = '\0';
-	ret1++;
 
+	if (ret1 != NULL) {
+		*ret1 = '\0';
+		ret1++;
+	}
 	char *ret2 = strchr(ret1, ';');
-	*ret2 = '\0';
-	ret2++;
+	if (ret2 != NULL) {
+		*ret2 = '\0';
+		ret2++;
+	}
 
 	char *ret3 = strchr(ret2, ';');
-	*ret3 = '\0';
-	ret3++;
+	if (ret3 != NULL) {
+		*ret3 = '\0';
+		ret3++;
+	}
 
 	game->knobs[identifikaceI].colors[0] = atoi(identifikaceCh);
 	game->knobs[identifikaceI].colors[1] = atoi(ret1);
@@ -659,6 +847,12 @@ void cut_colors(char* message, Game* game) {
 
 }
 
+/*
+ * result_to_game(User_conected* user, char* message1)
+ *
+ * Odesle vyzivateli informaci o hledanem vysledku
+ *
+ */
 void result_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
@@ -673,6 +867,12 @@ void result_to_game(User_conected* user, char* message1) {
 
 }
 
+/*
+ * good_color_to_game(User_conected* user, char* message1)
+ *
+ * Odesle druhemu hraci informaci o uhodnutych barvach v tahu
+ *
+ */
 void good_color_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
@@ -700,6 +900,12 @@ void good_color_to_game(User_conected* user, char* message1) {
 
 }
 
+/*
+ * good_color_to_game(User_conected* user, char* message1)
+ *
+ * Odesle druhemu hraci informaci o uhodnutych pozicich barev v tahu
+ *
+ */
 void great_color_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
@@ -725,6 +931,12 @@ void great_color_to_game(User_conected* user, char* message1) {
 
 }
 
+/*
+ * knobs_panel_to_game(User_conected* user, char* message1)
+ *
+ * Odesle druhemu hraci informaci o barevne kombinaci v tahu
+ *
+ */
 void knobs_panel_to_game(User_conected* user, char* message1) {
 
 	Game* game1 = user->game;
@@ -739,18 +951,36 @@ void knobs_panel_to_game(User_conected* user, char* message1) {
 
 }
 
+/*
+ * game_is_over(User_conected* user)
+ *
+ * Odesle druhemu hraci informaci o neuspesnem konci hry
+ *
+ */
 void game_is_over(User_conected* user) {
 
 	Game* game1 = user->game;
 	send_message(conected_users[game1->gamer2], "Game,gameOver,\n");
 }
 
+/*
+ * game_is_over(User_conected* user)
+ *
+ * Odesle druhemu hraci informaci o uspesnem konci hry
+ *
+ */
 void game_is_done(User_conected* user) {
 
 	Game* game1 = user->game;
 	send_message(conected_users[game1->gamer2], "Game,gameDone,\n");
 }
 
+/*
+ * leave_game(User_conected* user)
+ *
+ * Odesle druhemu hraci informaci o opusteni hry
+ *
+ */
 void leave_game(User_conected* user, char* message1) {
 
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -780,6 +1010,12 @@ void leave_game(User_conected* user, char* message1) {
 	}
 }
 
+/*
+ * leave_game(User_conected* user)
+ *
+ * Odesle druhemu hraci informaci o opusteni hry po odhlaseni
+ *
+ */
 void logout_user(User_conected* user, char* ret2) {
 
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -800,8 +1036,6 @@ void logout_user(User_conected* user, char* ret2) {
 			} else {
 				index = user->game->gamer2;
 			}
-
-			printf("message %s %d", pom, index);
 			fprintf(file, "Odhlasen uzivatel :%s \n", user->nickname);
 			send_message(conected_users[index], message);
 		} else {
@@ -816,14 +1050,19 @@ void logout_user(User_conected* user, char* ret2) {
 
 }
 
-void receive_challenge(User_conected* user,char* message) {
+/*
+ * receive_challenge(User_conected* user, char* message)
+ *
+ * Pomocna fuknce pro rozdeleni zpravy obsahujici challenge a naslednou obsluhu
+ *
+ */
+void receive_challenge(User_conected* user, char* message) {
 	char *ret3 = strchr(message, ',');
 
-	if(ret3 != NULL){
-	*ret3 = '\0';
-	ret3++;
+	if (ret3 != NULL) {
+		*ret3 = '\0';
+		ret3++;
 	}
-
 
 	if (strcmp(message, "accept") == 0) {
 		printf("invite\n");
@@ -832,18 +1071,23 @@ void receive_challenge(User_conected* user,char* message) {
 		send_refuse_chellange(user, ret3);
 	} else if (strcmp(message, "invite") == 0) {
 		send_invitation(user, ret3);
-	}else {
+	} else {
 		printf("Invalid input\n");
 		fprintf(file, "Prijata zprava :%s nevalidni vstup \n", message);
 	}
 }
-
-void receive_game(User_conected* user,char* message) {
+/*
+ * receive_game(User_conected* user, char* message)
+ *
+ * Pomocna fuknce pro rozdeleni zpravy obsahujici game a naslednou obsluhu
+ *
+ */
+void receive_game(User_conected* user, char* message) {
 	char *ret3 = strchr(message, ',');
-	if(ret3 != NULL){
+	if (ret3 != NULL) {
 		*ret3 = '\0';
 		ret3++;
-		}
+	}
 	if (strcmp(message, "colorResult") == 0) {
 		result_to_game(user, ret3);
 
@@ -871,6 +1115,15 @@ void receive_game(User_conected* user,char* message) {
 		fprintf(file, "Prijata zprava :%s nevalidni vstup \n", message);
 	}
 }
+
+/*
+ * *createThread(void *incoming_socket)
+ *
+ * Funkce pro rizeni vlakna
+ * Vytvori pripojeni s klientem
+ * Prijima a rozdeluje prihozi zpravy
+ *
+ */
 void *createThread(void *incoming_socket) {
 
 	char* buffer = malloc(1024);
@@ -878,6 +1131,7 @@ void *createThread(void *incoming_socket) {
 	User_conected* user = put_user(socket);
 
 	send_message(user, "Connect,\n");
+	fprintf(file, "Pripojeni na server :%s \n", buffer);
 
 	while (1) {
 
@@ -895,9 +1149,9 @@ void *createThread(void *incoming_socket) {
 
 		char *ret2 = strchr(buffer, ',');
 
-		if(ret2 != NULL){
-		*ret2 = '\0';
-		ret2++;
+		if (ret2 != NULL) {
+			*ret2 = '\0';
+			ret2++;
 		}
 
 		if (strcmp(buffer, "Registrace") == 0) {
@@ -926,10 +1180,10 @@ void *createThread(void *incoming_socket) {
 			send_free_players(user);
 
 		} else if (strcmp(buffer, "Challenge") == 0) {
-			receive_challenge(user,ret2);
+			receive_challenge(user, ret2);
 
 		} else if (strcmp(buffer, "Game") == 0) {
-			receive_game(user,ret2);
+			receive_game(user, ret2);
 
 		} else {
 			printf("Invalid input\n");
@@ -944,6 +1198,12 @@ void *createThread(void *incoming_socket) {
 	return NULL;
 }
 
+/*
+ * find_free_index()
+ *
+ * Pomocna funkce pro nalezeni volne pozice pro prihlaseni uzivatele
+ *
+ */
 int find_free_index() {
 
 	pthread_mutex_lock(&lock);
@@ -970,6 +1230,13 @@ void print_err(char* msg) {
 
 //--------------------------------------------------------------------------
 
+/*
+ *  start_server(int argc, char** argv)
+ *
+ * Funkce pro kontrolu argumentu prijatych z prikazove radky
+ * a nasledne spusteni serveru se zadanymi argumenty
+ *
+ */
 void start_server(int argc, char** argv) {
 
 	if (argc == 1 || argc == 3) {
@@ -983,10 +1250,13 @@ void start_server(int argc, char** argv) {
 		exit(1);
 	}
 }
+
 int main(int argc, char** argv) {
 
-	memset(conected_users, 0, sizeof(User_conected*) * MAX_CONECTED);
 	start_server(argc, argv);
+
+	memset(conected_users, 0, sizeof(User_conected*) * MAX_CONECTED);
+
 	int sock = -1, incoming_sock = -1;
 	int optval = -1;
 	struct sockaddr_in addr, incoming_addr;

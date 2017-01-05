@@ -14,6 +14,10 @@ import javafx.scene.text.FontWeight;
 
 public class SingleMode extends Desk implements IGameMode {
 
+	/**
+	 * Inicializace objektu mMR
+	 * @param mMR
+	 */
 	public SingleMode(MasterMindRun mMR) {
 		super(mMR);
 		getHlavniPanel().setBottom(creatResultPanel());

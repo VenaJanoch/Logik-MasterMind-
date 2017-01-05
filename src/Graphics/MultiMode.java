@@ -61,7 +61,9 @@ public class MultiMode extends Desk implements IGameMode {
 		getNetLog().leaveGame();
 		getmMR().setWellcomeWindow();
 	}
-	
+	/**
+	 * Pomocna metoda pro ukonceni hry
+	 */
 	public void exitGame(){
 		getNetLog().signOutUser("LogOut,GameWindow,\n");
 		getmMR().getPrimaryStage().close();
@@ -95,7 +97,9 @@ public class MultiMode extends Desk implements IGameMode {
 		return legendPanel;
 
 	}
-
+	
+	/** Getrs and Setrs **/
+	
 	public ObservableText getObserText() {
 		return obserText;
 	}

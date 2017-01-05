@@ -2,6 +2,11 @@ package Graphics;
 
 import javafx.scene.control.Button;
 
+/**
+ * Trida predstavuje instatnci predstavujici jednotlive tlacitko
+ * @author Václav Janoch
+ *
+ */
 public class Knob extends Button{
 	
 	private boolean obarven;

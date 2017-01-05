@@ -29,6 +29,8 @@ import jdk.nashorn.internal.runtime.NativeJavaPackage;
 
 public class SignUpWindow extends Stage {
 
+	/** Globalni promenne tridy**/
+	
 	private MasterMindRun mMR;
 
 	private Scene newScena;
@@ -59,6 +61,10 @@ public class SignUpWindow extends Stage {
 
 	private ObservableText obserText = new ObservableText("");
 	
+	/**
+	 * Incializace objektu mMR
+	 * @param mMR
+	 */
 	public SignUpWindow(MasterMindRun mMR) {
 
 		super();
@@ -97,6 +103,11 @@ public class SignUpWindow extends Stage {
 
 	}
 
+	/**
+	 * createNet()
+	 * Vytvoreni prihlasovaciho formulare
+	 * @return
+	 */
 	private Node createNet() {
 
 		netPanel = new GridPane();
@@ -155,6 +166,10 @@ public class SignUpWindow extends Stage {
 		return netPanel;
 	}
 
+	/**
+	 * confirmForm()
+	 * Overeni vstupnich poli
+	 */
 	private void confirmForm() {
 
 		if (mMR.getLogLogics().confirmDataInForm(nameTF.getText(), surnameTF.getText(), nicknameTF.getText(),
@@ -162,13 +177,7 @@ public class SignUpWindow extends Stage {
 				mMR.getLogLogics().hashPassword(passwd2TF.getText()))) {
 
 			obserText.addObserver(regLB);
-			
-
-			
-		    
 		    m_comm.send(mMR.getLogLogics().createRegMessage());
-		    
-		     
 		}
 
 	}

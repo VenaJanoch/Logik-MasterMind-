@@ -19,10 +19,11 @@ import Run.MasterMindRun;
 import javafx.application.Platform;
 
 public class TCPComm implements ITCP, Runnable {
-
+	
+	/** Globalni promenne tridy **/
 	private ICommObserver m_observer;
-	OutputStream m_output;
-	BufferedReader input;
+	private OutputStream m_output;
+	private BufferedReader input;
 	private String address;
 	private int port;
 	private boolean isServer = true;
@@ -30,6 +31,12 @@ public class TCPComm implements ITCP, Runnable {
 	private int counterTimeOUt = 0;
 	private boolean connect = true;
 
+	/**
+	 * Inicializace promennych pro uchovani adresy a portu
+	 * @param address
+	 * @param port
+	 * @param mMR
+	 */
 	public TCPComm(String address, int port, MasterMindRun mMR) {
 
 		this.address = address;
@@ -116,6 +123,7 @@ public class TCPComm implements ITCP, Runnable {
 
 	}
 
+	/** Getrs and Setrs **/
 	public boolean isServer() {
 		return isServer;
 	}

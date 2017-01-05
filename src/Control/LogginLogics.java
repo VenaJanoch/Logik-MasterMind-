@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 
 public class LogginLogics {
 
+	/** Globalni promenne tridy **/
 	private boolean isLog = false;
 	private String userNick;
 	
@@ -30,12 +31,19 @@ public class LogginLogics {
 
 	
 	public LogginLogics(MasterMindRun mMR) {
-		//serverAddres = new byte[4];
 		this.mMR = mMR;
-		
-	
 	}
 
+	/**
+	 * Kontrola udaju zadanych do formulare pro registraci uzivatele
+	 * 
+	 * @param name
+	 * @param surname
+	 * @param nickname
+	 * @param passwd
+	 * @param passwd2
+	 * @return
+	 */
 	public boolean confirmDataInForm(String name, String surname, String nickname, String passwd, String passwd2) {
 
 		if (nameConfirm(name) && surnameConfirm(surname) && nicknameConfirm(nickname)
@@ -48,6 +56,12 @@ public class LogginLogics {
 
 	}
 
+	/**
+	 * Kontrola udaju zadanych do formulare pro pripojeni na server
+	 * @param addres
+	 * @param port
+	 * @return
+	 */
 	public boolean confirmDataInServerForm(String addres, String port) {
 
 		if (serverAddresConfirm(addres) && serverPortConfirm(port)) {
@@ -58,6 +72,10 @@ public class LogginLogics {
 
 	}
 
+	/**
+	 * Vytvoreni zpravy s registracnimi udaji
+	 * @return
+	 */
 	public String createRegMessage(){
 		
 		return "Registrace," + getNickname() + "," + getPasswd() + "\n" ; 
@@ -65,13 +83,22 @@ public class LogginLogics {
 	}
 	
 	
-	
+	/**
+	 * Vytvoreni zpravy s prihlasujicimi udaji
+	 * @return
+	 */
 	public String createLogMessage(String nick, String passwd){
 		
 		return "Log," + nick + "," + passwd + "\n" ; 
 		
 	}
 
+	/**
+	 * Kontrola udaju zadanych do formulare pro prihlaseni uzivatele
+	 * @param nickname
+	 * @param passwd
+	 * @return
+	 */
 	public boolean confirmDataInForm(String nickname, String passwd) {
 
 		if (nicknameConfirm(nickname) && passwdConfirm(passwd)){
@@ -82,7 +109,12 @@ public class LogginLogics {
 
 	}
 
-	public boolean serverAddresConfirm(String addres) {
+	/**
+	 * Kontrola zadane adresy serveru
+	 * @param addres
+	 * @return
+	 */
+	 public boolean serverAddresConfirm(String addres) {
 		if (addres.length() == 0) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
 			alert.setTitle("Sign error");
@@ -98,15 +130,11 @@ public class LogginLogics {
 
 		return false;
 	}
-
-	/*public void convertIPAddress(String[] ip) {
-
-		for (int i = 0; i < ip.length; i++) {
-			serverAddres[i] = Byte.parseByte(ip[i]);
-		}
-
-	}*/
-
+	 /**
+	  * Kontrola zadaneho portu serveru
+	  * @param port
+	  * @return
+	  */
 	public boolean serverPortConfirm(String port) {
 		if (port.equals("nickname") || port.length() == 0) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
@@ -123,6 +151,11 @@ public class LogginLogics {
 		return false;
 	}
 
+	/**
+	 * Kontrola policka se jmenem
+	 * @param nickname
+	 * @return
+	 */
 	public boolean nicknameConfirm(String nickname) {
 		if (nickname.equals("nickname") || nickname.length() == 0) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
@@ -139,6 +172,12 @@ public class LogginLogics {
 		return false;
 	}
 
+	/**
+	 * Kontrola policka s prijmenim
+	 * @param surname
+	 * @return
+	 */
+	
 	public boolean surnameConfirm(String surname) {
 
 		if (surname.equals("surname") || surname.length() == 0) {
@@ -154,7 +193,11 @@ public class LogginLogics {
 		}
 		return false;
 	}
-
+/**
+ * Kontrola policka se jmenem
+ * @param name
+ * @return
+ */
 	public boolean nameConfirm(String name) {
 
 		if (name.equals("name") || name.length() == 0) {
@@ -172,6 +215,11 @@ public class LogginLogics {
 		return false;
 	}
 
+	/**
+	 * Kontrola policka s heslem
+	 * @param passwd
+	 * @return
+	 */
 	public boolean passwdConfirm(String passwd) {
 		if (passwd.equals(Constants.nullConstat)) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
@@ -188,6 +236,11 @@ public class LogginLogics {
 		return false;
 	}
 
+	/**
+	 * Kontrola policka s kontrolnim heslem
+	 * @param passwd2
+	 * @return
+	 */
 	public boolean passwd2Confirm(String passwd2) {
 
 		if (passwd2.equals(Constants.nullConstat)) {
@@ -206,6 +259,12 @@ public class LogginLogics {
 		return false;
 	}
 
+	/**
+	 * Kontrola shody hesel
+	 * @param passwd
+	 * @param passwd2
+	 * @return
+	 */
 	public boolean passwdsConfirm(String passwd, String passwd2) {
 
 		if (passwdConfirm(passwd) && passwd2Confirm(passwd2)) {
@@ -228,6 +287,11 @@ public class LogginLogics {
 
 	}
 
+	/**
+	 * Metoda pro vytvoreni hashe z hesla uzivatele.
+	 * @param original
+	 * @return
+	 */
 	public String hashPassword(String original) {
 
 		StringBuffer sb = new StringBuffer();

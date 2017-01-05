@@ -67,18 +67,18 @@ public class MasterMindRun extends Application {
 		setServerWindow();
 
 		this.primaryStage.show();
-		
-		 primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-		       @Override
-		       public void handle(WindowEvent e) {
-		    	   if (logLogics.isLog()) {
-		    		   netLog.signOutUser("LogOut,end,\n");					
+
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent e) {
+				if (logLogics.isLog()) {
+					netLog.signOutUser("LogOut,end,\n");
 				}
-		          Platform.exit();
-		          System.exit(0);
-		          
-		       }
-		    });
+				Platform.exit();
+				System.exit(0);
+
+			}
+		});
 	}
 
 	public void setStage(Stage stage) {
@@ -88,15 +88,23 @@ public class MasterMindRun extends Application {
 
 	}
 
-	public void setFreePlayersListWindow(){
-		
+	/**
+	 * setFreePlayersListWindow()
+	 * 
+	 * Nastavi okno se seznamem volnych hracu
+	 */
+	public void setFreePlayersListWindow() {
+
 		this.freePlayerL = new FreePlayersListWindow(this, netLog);
-		
+
 		setStage(freePlayerL);
 		m_commObserver.setFreePlayerL(freePlayerL);
-		
-		
+
 	}
+
+	/**
+	 * setGameWindowSingleMode() Nastavi okno pro single player
+	 */
 	public void setGameWindowSingleMode() {
 		// stWindow = new StartWindow(this,true);
 		sM = new SingleMode(this);
@@ -104,50 +112,65 @@ public class MasterMindRun extends Application {
 		setStage(sM);
 	}
 
+	/**
+	 * setGameWindowMultiMode() Nastavi okno pro multiplayer
+	 */
 	public void setGameWindowMultiMode() {
-		mM = new MultiMode(this,netLog,logLogics);
+		mM = new MultiMode(this, netLog, logLogics);
 		mM.getLogics().setMultiMode(true);
 		netLog.setMultiM(mM);
 		m_commObserver.setmultiM(mM);
 		m_commObserver.setLogics(mM.getLogics());
 		setStage(mM);
-		
 
 	}
 
+	/**
+	 * setWellcomeWindow() Nastavi uvodni okno
+	 */
 	public void setWellcomeWindow() {
-		wellcome = new WellcomeWindow(this,logLogics, netLog);
-		//netLog.createDatabase();
+		wellcome = new WellcomeWindow(this, logLogics, netLog);
+		// netLog.createDatabase();
 		this.setStage(wellcome);
 
 	}
 
+	/**
+	 * setServerWindow() Nastavi okno s prihlasenim na server
+	 */
 	public void setServerWindow() {
 
 		serverWindow = new ServerWindow(this);
 		this.setStage(serverWindow);
 	}
 
+	/**
+	 * createConnect() Vytvori spojeni se serverem
+	 * 
+	 */
 	public void createConnect() {
 		try {
 
 			comm = new TCPComm(logLogics.getServerAddres(), logLogics.getServerPort(), this);
-			
-			m_commObserver = new UiCommObserver(this,logLogics,netLog);
+
+			m_commObserver = new UiCommObserver(this, logLogics, netLog);
 			comm.registerObserver(m_commObserver);
-		
+
 			logLogics.setComm(comm);
 			netLog.setComm(comm);
 		} catch (NumberFormatException e) {
-		
+
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Spatne");
 		}
 		comm.start();
-		
+
 	}
 
+	/**
+	 * setSignUpWindow() Nastavi okno pro registraci uzivatele
+	 */
 	public void setSignUpWindow() {
 		signUpW = new SignUpWindow(this);
 		m_commObserver.setsUW(signUpW);
@@ -156,6 +179,9 @@ public class MasterMindRun extends Application {
 
 	}
 
+	/**
+	 * setSignInWindow() Nastavi okno s prihlasenim uzivatel
+	 */
 	public void setSignInWindow() {
 		signInW = new SignInWindow(this);
 		m_commObserver.setsIW(signInW);
@@ -163,151 +189,191 @@ public class MasterMindRun extends Application {
 		this.logLogics.setsIW(signInW);
 	}
 
-	public void showPlayerMessage(String player){
-		System.out.println("Hovna");
+	/**
+	 * showPlayerMessage(String player) Zobrazi alert s informaci o vyzve jineho
+	 * uzivatele
+	 * 
+	 * @param player
+	 */
+	public void showPlayerMessage(String player) {
+
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Message from player");
-		alert.setHeaderText("Player " + player + "  invited you into their game" );
+		alert.setHeaderText("Player " + player + "  invited you into their game");
 		alert.setContentText("Choose your option.");
 
 		ButtonType submitButton = new ButtonType("Accept");
 		ButtonType refuseButton = new ButtonType("Refuse");
-		
+
 		alert.getButtonTypes().setAll(submitButton, refuseButton);
 
 		Optional<ButtonType> result = alert.showAndWait();
-		
-		if (result.get() == submitButton){
-			
+
+		if (result.get() == submitButton) {
+
 			netLog.setChallenger(false);
 			netLog.challengeAccepted(player);
-			
-		
-		} else{
+
+		} else {
 			netLog.challengeRefuse(player);
-	
+
 		}
-		
-		
+
 	}
-	
+
+	/**
+	 * showLogoutMessage(String player, int game)
+	 *  Zobrazi alert s informaci o
+	 * odhlaseni uzivatele
+	 * 
+	 * @param player
+	 * @param game
+	 */
 	public void showLogoutMessage(String player, int game) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Message from player");
-		alert.setHeaderText("Player " + player + "  leave game" );
+		alert.setHeaderText("Player " + player + "  leave game");
 		alert.setContentText("Stay in game.");
 
 		ButtonType submitButton = new ButtonType("Yes");
 		ButtonType refuseButton = new ButtonType("Leave");
-		
+
 		alert.getButtonTypes().setAll(submitButton, refuseButton);
 
 		Optional<ButtonType> result = alert.showAndWait();
-		
-		if (result.get() == refuseButton){
+
+		if (result.get() == refuseButton) {
 			netLog.deleteGameLeave(game);
 			setWellcomeWindow();
-			
-		} 	
+
+		}
 	}
 
-public void showAcceptMessage(String player){
-		
+	/**
+	 * showAcceptMessage(String player)
+	 * Zobrazi alert s informaci o prijeti vyzvi
+	 * uzivatelem
+	 * @param player
+	 */
+	public void showAcceptMessage(String player) {
+
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Message from player");
-		alert.setHeaderText("Player " + player + " accept invited into your game" );
+		alert.setHeaderText("Player " + player + " accept invited into your game");
 
 		ButtonType submitButton = new ButtonType("OK");
-		
+
 		alert.getButtonTypes().setAll(submitButton);
 
 		alert.showAndWait();
-		
+
 	}
 
-public void showRefusetMessage(String player){
-	
-	Alert alert = new Alert(AlertType.CONFIRMATION);
-	alert.setTitle("Message from player");
-	alert.setHeaderText("Player " + player + " refuse invited into your game, choose another player" );
+	/**
+	 * showRefusetMessage(String player)
+	 * Zobrazi alert s informaci o odmitnuti vyzvi
+	 * uzivatelem
+	 * @param player
+	 */
+	public void showRefusetMessage(String player) {
 
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("Player " + player + " refuse invited into your game, choose another player");
 
-	ButtonType submitButton = new ButtonType("OK");
-	
-	alert.getButtonTypes().setAll(submitButton);
+		ButtonType submitButton = new ButtonType("OK");
 
-	Optional<ButtonType> result = alert.showAndWait();
-	
-	if (result.get() == submitButton){
-		
-	netLog.getFreePlayerList();
-	
-	} 	
-	
-}
-public void showNoServer(){
-	Alert alert = new Alert(AlertType.CONFIRMATION);
-	alert.setTitle("Message from Server");
-	alert.setHeaderText("Server is inaccessible" );
+		alert.getButtonTypes().setAll(submitButton);
 
-	ButtonType submitButton = new ButtonType("OK");
-	
-	alert.getButtonTypes().setAll(submitButton);
+		Optional<ButtonType> result = alert.showAndWait();
 
-	Optional<ButtonType> result = alert.showAndWait();
-	if (result.get() == submitButton){
-		
-		setServerWindow();
-		
-		} 
-}
-public void showLeaveMessage(String player, int i){
-	
-	Alert alert = new Alert(AlertType.CONFIRMATION);
-	alert.setTitle("Message from player");
-	alert.setHeaderText("Player " + player + " leave game" );
+		if (result.get() == submitButton) {
 
-	ButtonType submitButton = new ButtonType("OK");
-	
-	alert.getButtonTypes().setAll(submitButton);
+			netLog.getFreePlayerList();
 
-	Optional<ButtonType> result = alert.showAndWait();
-	
-	if (result.get() == submitButton){
-		
-		setWellcomeWindow();
-		netLog.deleteGame(i);
-	
-	} 	
-	
-}
+		}
 
-public void showReloadGameMesage(int game, String player, boolean challenger) {
-	System.out.println(player);
-	Alert alert = new Alert(AlertType.CONFIRMATION);
-	alert.setTitle("Message from player");
-	alert.setHeaderText("You have game with " + player);
-
-	ButtonType submitButton = new ButtonType("Back");
-	ButtonType refuseButton = new ButtonType("Cancel");
-	
-	alert.getButtonTypes().setAll(submitButton, refuseButton);
-
-	Optional<ButtonType> result = alert.showAndWait();
-	
-	if (result.get() == submitButton){
-		
-		netLog.setChallenger(challenger);
-		setGameWindowMultiMode();
-		netLog.checkGame(game);
-		
-	
-	}else{
-		netLog.deleteGame(game);
 	}
-	
-}
-	
+
+	/**
+	 * showNoServer()
+	 * 
+	 * Zobrazi alert s informaci o ztrate spojeni se serverem
+	 */
+	public void showNoServer() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from Server");
+		alert.setHeaderText("Server is inaccessible");
+
+		ButtonType submitButton = new ButtonType("OK");
+
+		alert.getButtonTypes().setAll(submitButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == submitButton) {
+
+			setServerWindow();
+
+		}
+	}
+
+	/**
+	 * showLeaveMessage(String player, int i)
+	 * Zobrazi alert s informaci o opusteni hrace  hru
+	 * @param player
+	 * @param i
+	 */
+	public void showLeaveMessage(String player, int i) {
+
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("Player " + player + " leave game");
+
+		ButtonType submitButton = new ButtonType("OK");
+
+		alert.getButtonTypes().setAll(submitButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+
+		if (result.get() == submitButton) {
+
+			setWellcomeWindow();
+			netLog.deleteGame(i);
+
+		}
+
+	}
+
+	/**
+	 * Zobrazi alert zda se chce uzivatel vratit do rozehrane hry
+	 * @param game
+	 * @param player
+	 * @param challenger
+	 */
+	public void showReloadGameMesage(int game, String player, boolean challenger) {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Message from player");
+		alert.setHeaderText("You have game with " + player);
+
+		ButtonType submitButton = new ButtonType("Back");
+		ButtonType refuseButton = new ButtonType("Cancel");
+
+		alert.getButtonTypes().setAll(submitButton, refuseButton);
+
+		Optional<ButtonType> result = alert.showAndWait();
+
+		if (result.get() == submitButton) {
+
+			netLog.setChallenger(challenger);
+			setGameWindowMultiMode();
+			netLog.checkGame(game);
+
+		} else {
+			netLog.deleteGame(game);
+		}
+
+	}
+
 	/*** Setrs and Getrs ***/
 
 	public Stage getPrimaryStage() {
@@ -389,9 +455,5 @@ public void showReloadGameMesage(int game, String player, boolean challenger) {
 	public void setServer(boolean isServer) {
 		this.isServer = isServer;
 	}
-
-	
-
-	
 
 }

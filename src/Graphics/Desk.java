@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 
 public class Desk extends Stage {
 
+	/** Globalni promenne tridy**/
 	private MasterMindRun mMR;
 	private Scene newScena;
 	private BorderPane hlavniPanel;
@@ -48,6 +49,14 @@ public class Desk extends Stage {
 	private Button menuB;
 	private Button singOutB;
 	
+	/**
+	 * Inicializace objektu mMR, netLog, lLog, multiMode
+	 * @param mMR
+	 * @param netLog
+	 * @param lLog
+	 * @param multiMode
+	 */
+	
 	public Desk(MasterMindRun mMR, NetworkLogics netLog, LogginLogics lLog, boolean multiMode) {
 
 		super();
@@ -65,7 +74,11 @@ public class Desk extends Stage {
 
 	}
 
-	
+	/**
+	 * Pretizeny konstruktor
+	 * 
+	 * @param mMR
+	 */
 	public Desk(MasterMindRun mMR) {
 
 		super();
@@ -105,7 +118,11 @@ public class Desk extends Stage {
 	}
 
 
-
+	/**
+	 * Metoda pro vytvoreni menu panelu
+	 * 
+	 * @return BorderPane
+	 */
 	private Node createMenuBar() {
 		HBox menuBar = new HBox(5);
 		
@@ -122,6 +139,11 @@ public class Desk extends Stage {
 		return menuBar;
 	}
 
+	/**
+	 * Vytvoreni hraci plochu 
+	 * 
+	 * @return BorderPane
+	 */
 	public Node creatGameDesk() {
 		createKnobsPanels();
 
@@ -134,6 +156,9 @@ public class Desk extends Stage {
 		return desk;
 	}
 	
+	/**
+	 * Predela hraci stul
+	 */
 	public void repaintDesk(){
 		
 		VBox desk = new VBox(5);
@@ -145,7 +170,10 @@ public class Desk extends Stage {
 		hlavniPanel.setCenter(desk);
 	}
 	
-
+	/**
+	 *  createLineBox()
+	 *  Vytvori jednotlive hraci tahy
+	 **/
 	private void createLineBox() {
 
 		for (int i = 0; i < lineBox.length; i++) {
@@ -157,6 +185,10 @@ public class Desk extends Stage {
 		}
 	}
 
+	/**
+	 * createKnobsPanels()
+	 * Vytvori hraci tlacitka
+	 */
 	private void createKnobsPanels() {
 
 		knobPanel[0] = new KnobPanel(0, this, cp, logics, netLog);

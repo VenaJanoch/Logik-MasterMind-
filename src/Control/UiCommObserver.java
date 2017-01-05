@@ -11,6 +11,7 @@ import javafx.application.Platform;
 
 public class UiCommObserver implements ICommObserver {
 
+	/** Globani promenne tridy **/
 	private SignUpWindow sUW;
 	private SignInWindow sIW;
 	private MultiMode multiM;
@@ -21,12 +22,22 @@ public class UiCommObserver implements ICommObserver {
 	private NetworkLogics netLog;
 	private Logics logics;
 
+	/**
+	 * Inicializace objektu mMR, lLog, netLog
+	 * 
+	 * @param mMR
+	 * @param lLog
+	 * @param netLog
+	 */
 	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
 		this.mMR = mMR;
 		this.lLog = lLog;
 		this.netLog = netLog;
 	}
 
+	/**
+	 * Metoda pro zpracovani prijatych zprav ze serveru
+	 */
 	public void processData(String data) {
 
 		Platform.runLater(new Runnable() {
@@ -35,21 +46,21 @@ public class UiCommObserver implements ICommObserver {
 				System.out.println("Data " + data + " " + netLog.getName());
 				String[] pomData = data.split(",");
 				switch (pomData[0]) {
-				
+
 				case "NoServer":
 					mMR.showNoServer();
 					break;
 
 				case "CheckConnect":
-					netLog.checkConnect();				
+					netLog.checkConnect();
 					break;
 				case "Connect":
-					mMR.setWellcomeWindow();				
+					mMR.setWellcomeWindow();
 					break;
-			
+
 				case "Reload":
 					boolean challenger;
-					if (pomData[3].equals("1")) {
+					if (pomData[3].equals("0")) {
 						challenger = false;
 					} else {
 						challenger = true;
@@ -57,19 +68,7 @@ public class UiCommObserver implements ICommObserver {
 					mMR.showReloadGameMesage(Integer.parseInt(pomData[1]), pomData[2], challenger);
 					break;
 				case "Registrace":
-
-					if (pomData[1].contains("bad1")) {
-						sUW.getObserText().inc("This nickname is using");
-
-					} else if (pomData[1].contains("bad2")) {
-						
-						sUW.getObserText().inc("This nickname is long, length must be less 30");
-					
-					} else {
-
-						mMR.setWellcomeWindow();
-					}
-
+					receiveRegistrace(pomData);
 					break;
 				case "Log":
 
@@ -86,76 +85,24 @@ public class UiCommObserver implements ICommObserver {
 					}
 					break;
 				case "PlayerList":
-					if(pomData.length >1){
-						freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));						
-					}else {
-						freePlayerL.getListLV().setItems(netLog.creatPlayersList(""));							
+					if (pomData.length > 1) {
+						freePlayerL.getListLV().setItems(netLog.creatPlayersList(pomData[1]));
+					} else {
+						freePlayerL.getListLV().setItems(netLog.creatPlayersList(""));
 					}
 
 					break;
 				case "Logout":
-					
-				mMR.showLogoutMessage(netLog.getPlayerName(), Integer.parseInt(pomData[1]));
-					
+
+					mMR.showLogoutMessage(netLog.getPlayerName(), Integer.parseInt(pomData[1]));
+
 					break;
 				case "Challenge":
-
-					if (pomData[2].contains("invite")) {
-
-						netLog.createChallengeMesagge(pomData[1]);
-
-					} else if (pomData[2].contains("refuse")) {
-
-						mMR.showRefusetMessage(pomData[1]);
-
-					} else {
-
-						mMR.showAcceptMessage(pomData[1]);
-						netLog.setChallenger(true);
-
-						mMR.setGameWindowMultiMode();
-						multiM.getObserText().inc("Wait for color combination");
-
-					}
+					receiveChallenge(pomData);
+					
 					break;
 				case "Game":
-					if (pomData[1].contains("leave")) {
-						mMR.showLeaveMessage(pomData[2],Integer.parseInt(pomData[3]));
-
-					} else if (pomData[1].contains("colorResult")) {
-						if(pomData[2].contains("R") && netLog.isChallenger()){
-							netLog.setResultR(pomData[3]);
-							multiM.getObserText().inc("Find color combination");							
-						}else{							
-							netLog.setResult(pomData[2]);
-							multiM.getObserText().inc("Find color combination");
-						}
-
-					} else if (pomData[1].contains("goodColors")) {
-
-						netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						
-					} else if (pomData[1].contains("greatColors")) {
-
-						netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
-						
-					} else if (pomData[1].contains("knobPanel")) {
-
-						netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
-						
-					} else if (pomData[1].contains("gameOver")) {
-
-						multiM.getObserText().inc("Challenger had failed");
-
-					} else if (pomData[1].contains("gameDone")) {
-
-						multiM.getObserText().inc("Challenger had succeeded");
-
-					} else if (pomData[1].contains("player")) {
-
-						netLog.setPlayerName(pomData[3]);
-
-					}
+					receive_game(pomData);
 
 					break;
 				default:
@@ -163,10 +110,104 @@ public class UiCommObserver implements ICommObserver {
 					break;
 				}
 			}
+
 		});
 	}
-	
-	
+	/**
+	 * Pomocna metoda pro zpracovani zprav o registraci
+	 * @param pomData
+	 */
+	private void receiveRegistrace(String[] pomData) {
+		if (pomData[1].contains("bad1")) {
+			sUW.getObserText().inc("This nickname is using");
+
+		} else if (pomData[1].contains("bad2")) {
+
+			sUW.getObserText().inc("This nickname is long, length must be less 30");
+
+		} else {
+
+			mMR.setWellcomeWindow();
+		}
+		
+	}
+
+	/**
+	 * Pomocna metoda pro zpracovani zprav o hre
+	 * @param pomData
+	 */
+	private void receive_game(String[] pomData) {
+		if (pomData[1].contains("leave")) {
+			mMR.showLeaveMessage(pomData[2], Integer.parseInt(pomData[3]));
+
+		} else if (pomData[1].contains("colorResult")) {
+		
+			if (pomData[2].contains("R") && netLog.isChallenger()) {
+				netLog.setResultR(pomData[3]);
+				multiM.getObserText().inc("Find color combination");
+				
+			} else if(pomData[2].contains("R") && !netLog.isChallenger()) {
+			
+				netLog.setResultR(pomData[3]);
+				multiM.getObserText().inc("Challenger find combination");
+			
+			} else {
+				netLog.setResult(pomData[2]);
+				multiM.getObserText().inc("Find color combination");
+			}
+
+		} else if (pomData[1].contains("goodColors")) {
+
+			netLog.setGoodColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
+
+		} else if (pomData[1].contains("greatColors")) {
+
+			netLog.setGreatColor(Integer.parseInt(pomData[3]), Integer.parseInt(pomData[2]));
+
+		} else if (pomData[1].contains("knobPanel")) {
+
+			netLog.setKnobPanel(Integer.parseInt(pomData[2]), pomData[3]);
+
+		} else if (pomData[1].contains("gameOver")) {
+
+			multiM.getObserText().inc("Challenger had failed");
+
+		} else if (pomData[1].contains("gameDone")) {
+
+			multiM.getObserText().inc("Challenger had succeeded");
+
+		} else if (pomData[1].contains("player")) {
+
+			netLog.setPlayerName(pomData[3]);
+
+		}
+
+	}
+
+	/**
+	 * Pomocna metoda pro zpracovani zprava o vyzve
+	 * @param pomData
+	 */
+	private void receiveChallenge(String[] pomData) {
+		if (pomData[2].contains("invite")) {
+
+			netLog.createChallengeMesagge(pomData[1]);
+
+		} else if (pomData[2].contains("refuse")) {
+
+			mMR.showRefusetMessage(pomData[1]);
+
+		} else {
+
+			mMR.showAcceptMessage(pomData[1]);
+			netLog.setChallenger(true);
+
+			mMR.setGameWindowMultiMode();
+			multiM.getObserText().inc("Wait for color combination");
+
+		}
+		
+	}
 
 	/*************** Getrs and Setrs ******************/
 	public SignUpWindow getsUW() {

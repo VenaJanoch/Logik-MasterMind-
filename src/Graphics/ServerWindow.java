@@ -38,6 +38,10 @@ public class ServerWindow extends Stage {
 	
 	private boolean isServer = true;
 
+	/**
+	 * Incializace objektu mMR
+	 * @param mMR
+	 */
 	public ServerWindow(MasterMindRun mMR) {
 
 		super();
@@ -69,6 +73,11 @@ public class ServerWindow extends Stage {
 
 	}
 
+	/**
+	 * createNet()
+	 * Vytvoreni prihlasovaciho formulare
+	 * @return
+	 */
 	private Node createNet() {
 
 		netPanel = new GridPane();
@@ -107,13 +116,18 @@ public class ServerWindow extends Stage {
 
 	}
 
+	/**
+	 * confirmForm()
+	 * Overeni vstupnich poli
+	 */
 	private void confirmForm() {
 		if (mMR.getLogLogics().confirmDataInServerForm(serverAddresTF.getText(), serverPortTF.getText())) {
 			mMR.createConnect(); 
 		}
 
 	}
-
+	
+	/** Getrs and Setrs **/
 	public boolean isServer() {
 		return isServer;
 	}

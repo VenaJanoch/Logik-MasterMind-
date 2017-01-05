@@ -8,8 +8,16 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.shape.Rectangle;
 
+
+/**
+ * Trida predstavujici objekt controlniho tlacitka
+ * @author Václav Janoch
+ *
+ */
 public class ControlKnob extends Button{
 
+	
+	
 	private boolean black;
 	private boolean white;
 	

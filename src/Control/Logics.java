@@ -14,7 +14,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 
 public class Logics {
-
+	/** Globalni promenne tridy	 **/
 	private Desk desk;
 	private Random r;
 	private Color[] colors;
@@ -27,6 +27,11 @@ public class Logics {
 	private int indexButton;
 	private boolean multiMode;
 
+	/**
+	 * Inicializace objektu Desk a promenne multiMode
+	 * @param desk
+	 * @param multiMode
+	 */
 	public Logics(Desk desk, boolean multiMode) {
 		// this.stWin = stWin;
 
@@ -37,6 +42,11 @@ public class Logics {
 
 	}
 
+	/**
+	 * Metoda vyhodnocujici pocet obarvenych tlacitek 
+	 * Urcuje zda bylo ve hre dosazeno uspechu ci ne
+	 * @param button
+	 */
 	public void returnColor(Object button) {
 
 		Button tmpButton = (Button) button;
@@ -66,6 +76,10 @@ public class Logics {
 
 	}
 
+	/**
+	 * Nastaveni viditelnosti panelu s vysledky
+	 * @return
+	 */
 	private boolean resultControl() {
 
 		if (multiMode) {
@@ -79,6 +93,10 @@ public class Logics {
 		return true;
 	}
 
+	/**
+	 * Nacteni vysledu do pole 
+	 * 
+	 */
 	private void loadColorResult() {
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
@@ -94,6 +112,11 @@ public class Logics {
 		}
 	}
 
+	/**
+	 * Pomocna metoda pro kontrolu obarvenych tlacitek 
+	 * @param kp
+	 * @return
+	 */
 	public boolean controlCountChoosedKnobs(KnobPanel kp) {
 
 		int count = 0;
@@ -112,6 +135,10 @@ public class Logics {
 		return false;
 	}
 
+	/**
+	 * Metoda pro vygenerovani vysledu pro single player 
+	 * @return
+	 */
 	public Color[] creatResultColors() {
 
 		int randomc = -1;
@@ -127,6 +154,12 @@ public class Logics {
 		return colors;
 	}
 
+	/**
+	 * Vyhodnoceni zadanych barve v aktualnim tahu
+	 * @param desk
+	 * @param identifikace
+	 * @return
+	 */
 	public boolean evaluate(Desk desk, int identifikace) {
 
 		greatColors = 0;

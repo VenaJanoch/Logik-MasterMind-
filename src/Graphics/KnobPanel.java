@@ -21,7 +21,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class KnobPanel extends HBox {
-
+	/** Globalni promenne tridy **/
 	private Knob[] knobs;
 	private int identifikace;
 
@@ -53,7 +53,11 @@ public class KnobPanel extends HBox {
 		this.setIdentifikace(identifikace);
 		createKnobs();
 	}
-
+	/**
+	 *createKnobs()
+	 *Vytvori panel 
+	 *
+	 */
 	private void createKnobs() {
 
 		knobs = new Knob[Control.Constants.countKnobs];
@@ -73,7 +77,11 @@ public class KnobPanel extends HBox {
 		}
 
 	}
-
+	/**
+	 * setColor(Object button)
+	 * Nastavi barvu tlacitku
+	 * @param button
+	 */
 	private void setColor(Object button) {
 		Button pomButton = (Button) button;
 		if (logics.isMultiMode()) {
@@ -89,6 +97,11 @@ public class KnobPanel extends HBox {
 		}
 	}
 
+	/**
+	 * setResultColor(Color[] resultColor
+	 * nastavi barvy vysledku
+	 * @param resultColor
+	 */
 	public void setResultColor(Color[] resultColor) {
 
 		for (int i = 0; i < Control.Constants.countKnobs; i++) {
@@ -98,6 +111,9 @@ public class KnobPanel extends HBox {
 
 	}
 
+	/**
+	 * Vypne funkce tlacitka
+	 */
 	public void nothig() {
 
 		for (int i = 0; i < knobs.length; i++) {

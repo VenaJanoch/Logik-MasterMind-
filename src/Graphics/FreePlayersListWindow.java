@@ -24,6 +24,8 @@ import javafx.stage.Stage;
 
 public class FreePlayersListWindow extends Stage {
 
+	/** Globalni promenne tridy**/
+	
 	private MasterMindRun mMR;
 	private Scene newScena;
 	private BorderPane hlavniPanel;
@@ -66,6 +68,10 @@ public class FreePlayersListWindow extends Stage {
 		return hlavniPanel;
 	}
 
+	/**
+	 * Metoda pro vytvoreni menu panelu
+	 * 
+	 */
 	private Node createMenuBar() {
 
 		FlowPane controlPane = new FlowPane();
@@ -91,6 +97,10 @@ public class FreePlayersListWindow extends Stage {
 
 	}
 
+	/**
+	 * processSelection()
+	 * Naplni seznam prijatymi hraci 
+	 */
 	private void processSelection() {
 
 		ObservableList<String> selection = FXCollections
@@ -112,23 +122,23 @@ public class FreePlayersListWindow extends Stage {
 
 	}
 
+	private Node creatList() {
+		
+		listLV = new ListView<String>();
+		
+		listLV.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		listLV.setEditable(false);
+		BorderPane.setMargin(listLV, new Insets(5));
+		
+		netLog.getFreePlayerList();
+		
+		return listLV;
+	}
 	private ObservableList<String> getFreePlayers() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private Node creatList() {
-
-		listLV = new ListView<String>();
-
-		listLV.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		listLV.setEditable(false);
-		BorderPane.setMargin(listLV, new Insets(5));
-
-		netLog.getFreePlayerList();
-
-		return listLV;
-	}
 
 	/********************** Getrs and Setrs ******/
 
