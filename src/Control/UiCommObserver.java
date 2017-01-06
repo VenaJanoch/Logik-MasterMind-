@@ -148,7 +148,7 @@ public class UiCommObserver implements ICommObserver {
 				
 			} else if(pomData[2].contains("R") && !netLog.isChallenger()) {
 			
-				netLog.setResultR(pomData[3]);
+				netLog.setResult(pomData[3]);
 				multiM.getObserText().inc("Challenger find combination");
 			
 			} else {
