@@ -102,9 +102,16 @@ void nacti_Port(int argc, char **argv) {
 void read_address(int argc, char **argv) {
 
 	if (argc == 3) {
+		if(strlen(argv[2]) <= 16){
 
 		strcpy(address, argv[2]);
 		is_address = 0;
+
+		}else{
+			printf("Prilis dlouha adresa %s /n", argv[2]);
+			fprintf(file, "prilis dlouha adresa\n", argv[2]);
+			exit(1);
+		}
 
 	}
 
