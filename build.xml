@@ -20,7 +20,7 @@
 	    </target>
 	
 	
-    <target name="create_run_jar">
+    <target name="create_run_jar" depends="compile">
         <jar destfile="${dir.jarfile}/UPS-Klient.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="Run.MasterMindRun"/>
