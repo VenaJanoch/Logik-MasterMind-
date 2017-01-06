@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 
 /**
  * Trida predstavuji instanci panelu pro tlacitka
- * @author Václav Janoch
+ * @author Vaclav Janoch
  *
  */
 public class ControlKnobsPanel extends HBox{

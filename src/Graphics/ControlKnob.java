@@ -11,7 +11,7 @@ import javafx.scene.shape.Rectangle;
 
 /**
  * Trida predstavujici objekt controlniho tlacitka
- * @author Václav Janoch
+ * @author Vaclav Janoch
  *
  */
 public class ControlKnob extends Button{

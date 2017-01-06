@@ -6,6 +6,19 @@
     <property name="dir.buildfile" value="."/>
    
     <property name="dir.jarfile" value="./src"/>
+	
+	 <target name="clean">
+	       <delete dir="bin"/>
+	   </target>
+
+
+	    <target name="compile" depends="clean" description="Compile">
+	        <mkdir dir="bin"/>
+	        <javac srcdir="src"
+	               destdir="bin"/>
+	    </target>
+	
+	
     <target name="create_run_jar">
         <jar destfile="${dir.jarfile}/UPS-Klient.jar" filesetmanifest="mergewithoutmain">
             <manifest>

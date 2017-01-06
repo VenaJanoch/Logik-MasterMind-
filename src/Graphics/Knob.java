@@ -4,7 +4,7 @@ import javafx.scene.control.Button;
 
 /**
  * Trida predstavuje instatnci predstavujici jednotlive tlacitko
- * @author Václav Janoch
+ * @author Vaclav Janoch
  *
  */
 public class Knob extends Button{
