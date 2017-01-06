@@ -16,6 +16,7 @@
 	        <mkdir dir="bin"/>
 	        <javac srcdir="src"
 	               destdir="bin"/>
+	    	
 	    </target>
 	
 	
