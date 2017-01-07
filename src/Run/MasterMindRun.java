@@ -141,6 +141,7 @@ public class MasterMindRun extends Application {
 	public void setServerWindow() {
 
 		serverWindow = new ServerWindow(this);
+		getLogLogics().setLog(false);
 		this.setStage(serverWindow);
 	}
 
@@ -213,6 +214,7 @@ public class MasterMindRun extends Application {
 
 			netLog.setChallenger(false);
 			netLog.challengeAccepted(player);
+			netLog.setPlayerName(player);
 
 		} else {
 			netLog.challengeRefuse(player);
@@ -260,7 +262,7 @@ public class MasterMindRun extends Application {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Message from player");
 		alert.setHeaderText("Player " + player + " accept invited into your game");
-
+		netLog.setPlayerName(player);
 		ButtonType submitButton = new ButtonType("OK");
 
 		alert.getButtonTypes().setAll(submitButton);
@@ -336,9 +338,9 @@ public class MasterMindRun extends Application {
 		Optional<ButtonType> result = alert.showAndWait();
 
 		if (result.get() == submitButton) {
-
-			setWellcomeWindow();
+			System.out.println("Nevim koukate ");
 			netLog.deleteGame(i);
+			setWellcomeWindow();
 
 		}
 

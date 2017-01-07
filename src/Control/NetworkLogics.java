@@ -58,7 +58,7 @@ public class NetworkLogics {
 	 */
 	public void getFreePlayerList() {
 
-		comm.send("PlayerList,get\n");
+		comm.send("PlayerList,get,\n");
 
 	}
 
@@ -94,8 +94,7 @@ public class NetworkLogics {
 	 * @param playerName
 	 */
 	public void createGame(String playerName) {
-
-		comm.send("Challenge,invite," + playerName + "\n");
+		comm.send("Challenge,invite," + playerName + ",\n");
 
 	}
 
@@ -105,8 +104,7 @@ public class NetworkLogics {
 	 */
 	public void challengeAccepted(String player) {
 
-		comm.send("Challenge,accept," + player + "\n");
-		
+		comm.send("Challenge,accept," + player + ",\n");
 		mMR.setGameWindowMultiMode();
 		multiM.getLogics().setMultiMode(true);
 
@@ -118,7 +116,7 @@ public class NetworkLogics {
 	 */
 	public void challengeRefuse(String player) {
 
-		comm.send("Challenge,refuse," + player + "\n");
+		comm.send("Challenge,refuse," + player + ",\n");
 
 	}
 
@@ -137,7 +135,7 @@ public class NetworkLogics {
 	 */
 	public void leaveGame() {
 
-		comm.send("Game,leave," + name + "\n");
+		comm.send("Game,leave," + name + ",\n");
 
 	}
 
@@ -218,8 +216,9 @@ public class NetworkLogics {
 			
 			multiM.getResult().getKnobs()[i]
 					.setBackground(new Background(new BackgroundFill(colors[i],CornerRadii.EMPTY, Insets.EMPTY)));
-		
+			
 		}
+		multiM.getResult().nothig();
 	}
 	
 	/**
@@ -254,7 +253,7 @@ public class NetworkLogics {
 
 		}
 
-		comm.send(message + "\n");
+		comm.send(message + ",\n");
 	
 		comm.send("Game,goodColors," + knobPanel.getIdentifikace() + "," + goodColors + ",\n");
 		comm.send("Game,greatColors," + knobPanel.getIdentifikace() + "," + greatColors + ",\n");
@@ -278,8 +277,9 @@ public class NetworkLogics {
 			multiM.getKnobPanel()[identifikace].getKnobs()[i]
 					.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])],
 							CornerRadii.EMPTY, Insets.EMPTY)));
-
+			multiM.getKnobPanel()[identifikace].nothig();
 		}
+		
 		if (identifikace < Constants.countKnobsPanels-1 ) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
@@ -401,7 +401,7 @@ public class NetworkLogics {
 
 		System.out.println(result);
 		multiM.getObserText().inc("Chellanger findig combination");
-		comm.send(result + "\n");
+		comm.send(result + ",\n");
 		
 
 	}
@@ -510,7 +510,7 @@ public class NetworkLogics {
 	 */
 	public void checkGame(int game){
 		
-		comm.send("CheckGame,"+ game + "\n");
+		comm.send("CheckGame,"+ game + ",\n");
 		
 	}
 	

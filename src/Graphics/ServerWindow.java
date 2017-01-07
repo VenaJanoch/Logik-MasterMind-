@@ -86,6 +86,8 @@ public class ServerWindow extends Stage {
 		serverPortLB = new Label("Port");
 
 		serverAddresTF = new TextField("localhost");
+		//serverAddresTF = new TextField("192.168.40.131");
+		
 		serverPortTF = new TextField("22434");
 
 		confirmBT = new Button("OK");
