@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="Create Runnable Jar for Project UPS-Logik">
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
-    <!--define folder properties-->
-    <property name="dir.buildfile" value="."/>
-   
-    <property name="dir.jarfile" value=""/>
-	
-	 <target name="clean">
-	       <delete dir="bin"/>
-	   </target>
-
-
-	    <target name="compile" depends="clean" description="Compile">
+    
+	<property name="dir.buildfile" value="."/>
+    <property name="dir.jarfile" value="../APP"/>
+	<property name="dir.src" value="../src"/>
+	<property name="dir.bin" value="../bin"/>
+		 
+	<target name="clean">
+		<delete dir="dir.bin"/>
+	</target>
+	<target name="compile">
 	        <mkdir dir="bin"/>
-	        <javac srcdir="src"
-	               destdir="bin"/>
-	    	
+	        <javac srcdir="${dir.src}" destdir="${dir.bin}">
+	        </javac>
 	    </target>
 	
-	
-    <target name="create_run_jar" depends="compile">
-        <jar destfile="${dir.jarfile}/UPS-Klient.jar" filesetmanifest="mergewithoutmain">
+	<target name="create_run_jar" depends="compile">
+		<mkdir dir="jar"/>
+		<jar destfile="${dir.jarfile}/UPS-Klient.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="Run.MasterMindRun"/>
                 <attribute name="Class-Path" value="."/>

@@ -31,6 +31,8 @@ public class Desk extends Stage {
 	private MasterMindRun mMR;
 	private Scene newScena;
 	private BorderPane hlavniPanel;
+	
+	
 
 	private KnobPanel[] knobPanel;
 	private ControlKnobsPanel[] controlKnobPanel;
