@@ -54,9 +54,7 @@ void help() {
 void sigint_handler(int sig) {
 
 	printf("killing process %d\n", getpid());
-	int i;
 	pthread_mutex_destroy(&lock);
-	fclose(file);
 	exit(0);
 }
 
@@ -68,7 +66,6 @@ void sigint_handler(int sig) {
 void nacti_soubor() {
 
 	file = fopen(FILE_NAME, "a+");
-	printf("open file\n");
 
 	if (file == NULL) {
 		printf("ERR: Non-existent file!");
@@ -154,9 +151,6 @@ void read_address(int argc, char **argv) {
 		if (i != 1) {
 			strcpy(address, s);
 			is_address = 0;
-			sprintf(pom, "Server bezi na adrese: %s\n", address);
-			write_log(pom);
-
 		} else {
 			sprintf(pom, "Spatne zadana adresa: %s\n", s);
 			write_log(pom);
@@ -646,7 +640,6 @@ void log_control(User_conected* user, char* buffer) {
 				user->isLog = 1;
 				strcpy(user->nickname, buffer);
 				send_message(user, "Log,yes\n");
-				printf("Prihlaseny uzivatel %s %d \n", buffer, i);
 
 				sprintf(pom, "Prihlaseny uzivatel: %s\n", user->nickname);
 				write_log(pom);
@@ -720,7 +713,11 @@ void send_invitation(User_conected* user, char* player) {
 	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	strcpy(message, "Challenge,");
-	sleep(1);
+	char *ret1 = strchr(player, ',');
+	if (ret1 != NULL) {
+		*ret1 = '\0';
+		ret1++;
+	}
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
 		if (conected_users[i] != NULL) {
@@ -786,7 +783,12 @@ void send_accept_chellange(User_conected* user, char* player) {
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	char* finish = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
-
+	char *ret1 = strchr(player, ',');
+	if (ret1 != NULL) {
+		*ret1 = '\0';
+		ret1++;
+	}
+	printf("%s", ret1);
 	strcpy(message, "Challenge,");
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
@@ -802,8 +804,8 @@ void send_accept_chellange(User_conected* user, char* player) {
 
 	}
 
-//free(message);
-//free(finish);
+	//free(message);
+	//free(finish);
 
 }
 
@@ -814,16 +816,21 @@ void send_accept_chellange(User_conected* user, char* player) {
  *
  */
 void send_refuse_chellange(User_conected* user, char* player) {
+
 	int i;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	strcpy(message, "Challenge,");
-
+	char *ret2 = strchr(player, ',');
+	if (ret2 != NULL) {
+		*ret2 = '\0';
+		ret2++;
+	}
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
 		if (conected_users[i] != NULL) {
 			if (strcmp(conected_users[i]->nickname, player) == 0) {
 
-				message = strcat(message, player);
+				message = strcat(message, ret2);
 				message = strcat(message, ",refuse\n");
 
 				send_message(conected_users[i], message);
@@ -1063,10 +1070,10 @@ void leave_game(User_conected* user, char* message1) {
 
 	if (user->game != NULL) {
 		if (strcmp(user->game->chellanger, user->nickname) == 0) {
-			index = user->game->gamer1;
+			index = user->game->gamer2;
 
 		} else {
-			index = user->game->gamer2;
+			index = user->game->gamer1;
 		}
 
 		send_message(conected_users[index], message);
@@ -1100,12 +1107,12 @@ void logout_user(User_conected* user, char* ret2) {
 			int index;
 
 			if (strcmp(user->game->chellanger, user->nickname) == 0) {
-				index = user->game->gamer1;
-			} else {
 				index = user->game->gamer2;
+			} else {
+				index = user->game->gamer1;
 			}
 			sprintf(pom1, "Odhlasen uzivatel: %s\n)", user->nickname);
-			write_log(pom);
+			write_log(pom1);
 			send_message(conected_users[index], message);
 		} else {
 			user->isLog = 0;
@@ -1138,7 +1145,6 @@ void receive_challenge(User_conected* user, char* message) {
 	}
 
 	if (strcmp(message, "accept") == 0) {
-
 		send_accept_chellange(user, ret3);
 	} else if (strcmp(message, "refuse") == 0) {
 		send_refuse_chellange(user, ret3);
@@ -1209,80 +1215,80 @@ void receive_game(User_conected* user, char* message) {
 void *createThread(void *incoming_socket) {
 
 	char* buffer = malloc(1024);
-	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+		char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	int socket = *(int *) incoming_socket;
-	User_conected* user = put_user(socket);
+		int socket = *(int *) incoming_socket;
+		User_conected* user = put_user(socket);
 
-	send_message(user, "Connect,\n");
-	fprintf(file, "Pripojeni na server :%s \n", buffer);
-	sprintf(pom, "Pripojeni na server :%s \n", buffer);
-	write_log(pom);
+		send_message(user, "Connect,\n");
+		fprintf(file, "Pripojeni na server :%s \n", buffer);
+		sprintf(pom, "Pripojeni na server :%s \n", buffer);
+		write_log(pom);
 
-	while (1) {
+		while (1) {
 
-		int ret = sgetline(socket, &buffer);
-		if (ret < 0)
-			break;
+			int ret = sgetline(socket, &buffer);
+			if (ret < 0)
+				break;
 
-		if (ret == 0) {
-			printf("End of Headers detected.\n");
-			break;
+			if (ret == 0) {
+				printf("End of Headers detected.\n");
+				break;
+			}
+
+			printf("obsah  %s \n", buffer);
+			char *ret2 = strchr(buffer, ',');
+
+			if (ret2 != NULL) {
+				*ret2 = '\0';
+				ret2++;
+			}
+
+			if (strcmp(buffer, "Registrace") == 0) {
+				reg_user(ret2, user);
+
+			} else if (strcmp(buffer, "CheckGame") == 0) {
+				reload_game(ret2, user);
+
+			} else if (strcmp(buffer, "CheckConnect") == 0) {
+
+				send_message(user, "CheckConnect,\n");
+				sleep(1);
+
+			} else if (strcmp(buffer, "DeleteGame") == 0) {
+				int i = atoi(ret2);
+				free(game[i]);
+				game[i] = NULL;
+
+			} else if (strcmp(buffer, "Log") == 0) {
+				log_control(user, ret2);
+			} else if (strcmp(buffer, "LogOut") == 0) {
+				logout_user(user, ret2);
+
+			} else if (strcmp(buffer, "PlayerList") == 0) {
+
+				send_free_players(user);
+
+			} else if (strcmp(buffer, "Challenge") == 0) {
+				receive_challenge(user, ret2);
+
+			} else if (strcmp(buffer, "Game") == 0) {
+				receive_game(user, ret2);
+
+			} else {
+				printf("Invalid input\n");
+				sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", buffer);
+				write_log(pom);
+
+			}
+
 		}
 
-		printf("obsah  %s \n", buffer);
-		char *ret2 = strchr(buffer, ',');
-
-		if (ret2 != NULL) {
-			*ret2 = '\0';
-			ret2++;
-		}
-
-		if (strcmp(buffer, "Registrace") == 0) {
-			reg_user(ret2, user);
-
-		} else if (strcmp(buffer, "CheckGame") == 0) {
-			reload_game(ret2, user);
-
-		} else if (strcmp(buffer, "CheckConnect") == 0) {
-
-			send_message(user, "CheckConnect,\n");
-			sleep(1);
-
-		} else if (strcmp(buffer, "DeleteGame") == 0) {
-			int i = atoi(ret2);
-			free(game[i]);
-			game[i] = NULL;
-
-		} else if (strcmp(buffer, "Log") == 0) {
-			log_control(user, ret2);
-		} else if (strcmp(buffer, "LogOut") == 0) {
-			logout_user(user, ret2);
-
-		} else if (strcmp(buffer, "PlayerList") == 0) {
-
-			send_free_players(user);
-
-		} else if (strcmp(buffer, "Challenge") == 0) {
-			receive_challenge(user, ret2);
-
-		} else if (strcmp(buffer, "Game") == 0) {
-			receive_game(user, ret2);
-
-		} else {
-			printf("Invalid input\n");
-			sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", buffer);
-			write_log(pom);
-
-		}
-
-	}
-
-	free(pom);
-	free(buffer);
-	pull_user(user);
-	close(socket);
-	return NULL;
+		free(pom);
+		free(buffer);
+		pull_user(user);
+		close(socket);
+		return NULL;
 }
 
 /*
