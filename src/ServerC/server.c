@@ -104,16 +104,17 @@ int control_address(char* address) {
 	char *ret = strchr(address, '.');
 	int i;
 	char *ret1;
+
 	if (ret != NULL) {
 		*ret = '\0';
 		ret++;
 	}
 
-	if (strlen(address) > 3) {
+	if ( atoi(address) > 255) {
 		return 1;
 
 	}
-	for (i = 0; i < 2; ++i) {
+	for (i = 0; i < 3; ++i) {
 
 		ret1 = strchr(ret, '.');
 
@@ -122,13 +123,21 @@ int control_address(char* address) {
 			ret1++;
 		}
 
-		if (strlen(ret) > 3) {
+		if (atoi(ret) > 255) {
 			return 1;
 		}
 
-		strcpy(ret, ret1);
+		if (ret1 != NULL) {
+			strcpy(ret, ret1);
+		}
+
 
 	}
+
+	if(ret1 != NULL){
+		return 1;
+	}
+
 	return 0;
 
 }
@@ -145,9 +154,12 @@ void read_address(int argc, char **argv) {
 	char* pom = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
 
 	if (argc == 3) {
+
 		char* s = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 		strcpy(s, argv[2]);
+
 		int i = control_address(argv[2]);
+
 		if (i != 1) {
 			strcpy(address, s);
 			is_address = 0;
@@ -172,6 +184,7 @@ int sgetline(int fd, char ** out) {
 	int buf_size = 128;
 	int bytesloaded = 0;
 	int ret;
+	int i = 0;
 	char buf;
 	char * buffer = malloc(buf_size);
 	char * newbuf;
@@ -179,9 +192,11 @@ int sgetline(int fd, char ** out) {
 	if (NULL == buffer)
 		return -1;
 
-	while (1) {
+	while (i != 100) {
 		// read a single byte
 		ret = read(fd, &buf, 1);
+
+
 		if (ret < 1) {
 			// error or disconnect
 			free(buffer);
@@ -207,7 +222,10 @@ int sgetline(int fd, char ** out) {
 
 			buffer = newbuf;
 		}
+		i++;
 	}
+
+
 
 	// if the line was terminated by "\r\n", ignore the
 	// "\r". the "\n" is not in the buffer
@@ -1333,6 +1351,7 @@ void print_err(char* msg) {
 void start_server(int argc, char** argv) {
 
 	if (argc == 1 || argc == 3) {
+		printf("Nevim");
 		signal(SIGINT, sigint_handler);
 		nacti_Port(argc, argv);
 		read_address(argc, argv);
