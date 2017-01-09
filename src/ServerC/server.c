@@ -89,14 +89,25 @@ void write_log(char* message) {
  */
 void nacti_Port(int argc, char **argv) {
 
-	if (argc == 3) {
-		srv_port = atoi(argv[1]);
-	}
-
 	char* pom = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
-	sprintf(pom, "Server bezi na portu: %d\n", srv_port);
+	long val;
+	char *next;
 
-	write_log(pom);
+	if (argc == 3) {
+		val = strtol(argv[1], &next, 10);
+
+		if (val > 65536 || val < 1 || (next == argv[1]) || (*next != '\0')) {
+
+			sprintf(pom, "Spatny port: %s\n", argv[1]);
+			write_log(pom);
+			exit(1);
+		} else {
+
+			srv_port = atoi(argv[1]);
+			sprintf(pom, "Server bezi na portu: %d\n", srv_port);
+			write_log(pom);
+		}
+	}
 	free(pom);
 }
 
@@ -104,16 +115,26 @@ int control_address(char* address) {
 	char *ret = strchr(address, '.');
 	int i;
 	char *ret1;
+	long val;
+	char *next;
 
 	if (ret != NULL) {
 		*ret = '\0';
 		ret++;
+	} else {
+		return 1;
 	}
 
-	if ( atoi(address) > 255) {
+	val = strtol(address, &next, 10);
+
+	if (val > 255 || (next == address) || (*next != '\0')) {
 		return 1;
 
+	} else if (strcmp(address, "-a") == 0 || strcmp(address, "a") == 0) {
+		return 2;
 	}
+
+	int counter = 0;
 	for (i = 0; i < 3; ++i) {
 
 		ret1 = strchr(ret, '.');
@@ -121,20 +142,24 @@ int control_address(char* address) {
 		if (ret1 != NULL) {
 			*ret1 = '\0';
 			ret1++;
+		} else {
+			if (counter < 2) {
+				return 1;
+			}
 		}
-
-		if (atoi(ret) > 255) {
+		val = strtol(ret, &next, 10);
+		if (val > 255 || (next == address) || (*next != '\0') || val < 0) {
 			return 1;
 		}
 
 		if (ret1 != NULL) {
 			strcpy(ret, ret1);
 		}
-
+		counter++;
 
 	}
 
-	if(ret1 != NULL){
+	if (ret1 != NULL) {
 		return 1;
 	}
 
@@ -161,8 +186,10 @@ void read_address(int argc, char **argv) {
 		int i = control_address(argv[2]);
 
 		if (i != 1) {
-			strcpy(address, s);
-			is_address = 0;
+			if (i != 2) {
+				strcpy(address, s);
+				is_address = 0;
+			}
 		} else {
 			sprintf(pom, "Spatne zadana adresa: %s\n", s);
 			write_log(pom);
@@ -196,7 +223,6 @@ int sgetline(int fd, char ** out) {
 		// read a single byte
 		ret = read(fd, &buf, 1);
 
-
 		if (ret < 1) {
 			// error or disconnect
 			free(buffer);
@@ -224,8 +250,6 @@ int sgetline(int fd, char ** out) {
 		}
 		i++;
 	}
-
-
 
 	// if the line was terminated by "\r\n", ignore the
 	// "\r". the "\n" is not in the buffer
@@ -1233,80 +1257,80 @@ void receive_game(User_conected* user, char* message) {
 void *createThread(void *incoming_socket) {
 
 	char* buffer = malloc(1024);
-		char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
+	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-		int socket = *(int *) incoming_socket;
-		User_conected* user = put_user(socket);
+	int socket = *(int *) incoming_socket;
+	User_conected* user = put_user(socket);
 
-		send_message(user, "Connect,\n");
-		fprintf(file, "Pripojeni na server :%s \n", buffer);
-		sprintf(pom, "Pripojeni na server :%s \n", buffer);
-		write_log(pom);
+	send_message(user, "Connect,\n");
+	fprintf(file, "Pripojeni na server :%s \n", buffer);
+	sprintf(pom, "Pripojeni na server :%s \n", buffer);
+	write_log(pom);
 
-		while (1) {
+	while (1) {
 
-			int ret = sgetline(socket, &buffer);
-			if (ret < 0)
-				break;
+		int ret = sgetline(socket, &buffer);
+		if (ret < 0)
+			break;
 
-			if (ret == 0) {
-				printf("End of Headers detected.\n");
-				break;
-			}
+		if (ret == 0) {
+			printf("End of Headers detected.\n");
+			break;
+		}
 
-			printf("obsah  %s \n", buffer);
-			char *ret2 = strchr(buffer, ',');
+		printf("obsah  %s \n", buffer);
+		char *ret2 = strchr(buffer, ',');
 
-			if (ret2 != NULL) {
-				*ret2 = '\0';
-				ret2++;
-			}
+		if (ret2 != NULL) {
+			*ret2 = '\0';
+			ret2++;
+		}
 
-			if (strcmp(buffer, "Registrace") == 0) {
-				reg_user(ret2, user);
+		if (strcmp(buffer, "Registrace") == 0) {
+			reg_user(ret2, user);
 
-			} else if (strcmp(buffer, "CheckGame") == 0) {
-				reload_game(ret2, user);
+		} else if (strcmp(buffer, "CheckGame") == 0) {
+			reload_game(ret2, user);
 
-			} else if (strcmp(buffer, "CheckConnect") == 0) {
+		} else if (strcmp(buffer, "CheckConnect") == 0) {
 
-				send_message(user, "CheckConnect,\n");
-				sleep(1);
+			send_message(user, "CheckConnect,\n");
+			sleep(1);
 
-			} else if (strcmp(buffer, "DeleteGame") == 0) {
-				int i = atoi(ret2);
-				free(game[i]);
-				game[i] = NULL;
+		} else if (strcmp(buffer, "DeleteGame") == 0) {
+			int i = atoi(ret2);
+			free(game[i]);
+			game[i] = NULL;
 
-			} else if (strcmp(buffer, "Log") == 0) {
-				log_control(user, ret2);
-			} else if (strcmp(buffer, "LogOut") == 0) {
-				logout_user(user, ret2);
+		} else if (strcmp(buffer, "Log") == 0) {
+			log_control(user, ret2);
+		} else if (strcmp(buffer, "LogOut") == 0) {
+			logout_user(user, ret2);
 
-			} else if (strcmp(buffer, "PlayerList") == 0) {
+		} else if (strcmp(buffer, "PlayerList") == 0) {
 
-				send_free_players(user);
+			send_free_players(user);
 
-			} else if (strcmp(buffer, "Challenge") == 0) {
-				receive_challenge(user, ret2);
+		} else if (strcmp(buffer, "Challenge") == 0) {
+			receive_challenge(user, ret2);
 
-			} else if (strcmp(buffer, "Game") == 0) {
-				receive_game(user, ret2);
+		} else if (strcmp(buffer, "Game") == 0) {
+			receive_game(user, ret2);
 
-			} else {
-				printf("Invalid input\n");
-				sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", buffer);
-				write_log(pom);
-
-			}
+		} else {
+			printf("Invalid input\n");
+			sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", buffer);
+			write_log(pom);
 
 		}
 
-		free(pom);
-		free(buffer);
-		pull_user(user);
-		close(socket);
-		return NULL;
+	}
+
+	free(pom);
+	free(buffer);
+	pull_user(user);
+	close(socket);
+	return NULL;
 }
 
 /*
@@ -1351,7 +1375,6 @@ void print_err(char* msg) {
 void start_server(int argc, char** argv) {
 
 	if (argc == 1 || argc == 3) {
-		printf("Nevim");
 		signal(SIGINT, sigint_handler);
 		nacti_Port(argc, argv);
 		read_address(argc, argv);
