@@ -98,7 +98,7 @@ public class Desk extends Stage {
 	}
 	public Scene creatScene() {
 
-		newScena = new Scene(creatPanel(), 310, 600);
+		newScena = new Scene(creatPanel(), Constants.width, Constants.height);
 		return newScena;
 
 	}
@@ -196,6 +196,10 @@ public class Desk extends Stage {
 		knobPanel[0] = new KnobPanel(0, this, cp, logics, netLog);
 		controlKnobPanel[0] = new ControlKnobsPanel(0, this);
 
+		
+			knobPanel[0].nothig();
+		
+		
 		for (int i = 1; i < knobPanel.length; i++) {
 
 			knobPanel[i] = new KnobPanel(i, this, cp,logics, netLog);

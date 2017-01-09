@@ -36,5 +36,8 @@ public class Constants {
 			new BackgroundFill(Constants.menuBackgroundC, CornerRadii.EMPTY, Insets.EMPTY));
 
 	public static final String nullConstat = "d41d8cd98f00b204e9800998ecf8427e";
+	
+	public static final int width = 350;
+	public static final int height = 600;
 
 }

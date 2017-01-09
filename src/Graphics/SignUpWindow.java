@@ -81,7 +81,7 @@ public class SignUpWindow extends Stage {
 	
 	
 	public Scene creatScene() {
-		newScena = new Scene(creatPanel(), 310, 600);
+		newScena = new Scene(creatPanel(), Constants.width, Constants.height);
 		
 		return newScena;
 	}
@@ -112,8 +112,6 @@ public class SignUpWindow extends Stage {
 
 		netPanel = new GridPane();
 
-		nameLB = new Label("Name");
-		surnameLB = new Label("Surname");
 		nicknameLB = new Label("Nickname");
 		passwdLB = new Label("Password");
 		passwdLB2 = new Label("Password again");
@@ -145,10 +143,6 @@ public class SignUpWindow extends Stage {
 
 		netPanel.getColumnConstraints().add(column1);
 
-		netPanel.add(nameLB, 0, 0);
-		netPanel.add(nameTF, 1, 0);
-		netPanel.add(surnameLB, 0, 1);
-		netPanel.add(surnameTF, 1, 1);
 		netPanel.add(nicknameLB, 0, 2);
 		netPanel.add(nicknameTF, 1, 2);
 		netPanel.add(passwdLB, 0, 3);
@@ -172,7 +166,7 @@ public class SignUpWindow extends Stage {
 	 */
 	private void confirmForm() {
 
-		if (mMR.getLogLogics().confirmDataInForm(nameTF.getText(), surnameTF.getText(), nicknameTF.getText(),
+		if (mMR.getLogLogics().confirmDataInForm(nicknameTF.getText(),
 				mMR.getLogLogics().hashPassword(passwdTF.getText()),
 				mMR.getLogLogics().hashPassword(passwd2TF.getText()))) {
 

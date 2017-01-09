@@ -64,7 +64,7 @@ public class SignInWindow extends Stage {
 	}
 
 	private Scene creatScene() {
-		newScena = new Scene(creatPanel(), 310, 600);
+		newScena = new Scene(creatPanel(), Constants.width, Constants.height);
 		return newScena;
 	}
 
