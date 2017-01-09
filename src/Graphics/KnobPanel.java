@@ -123,6 +123,14 @@ public class KnobPanel extends HBox {
 		}
 
 	}
+	
+	public void getFunction(){
+		for (int i = 0; i < knobs.length; i++) {
+
+			knobs[i].setOnAction(event -> setColor(event.getSource()));
+
+		}
+	}
 
 	/************** Getrs and Setrs *******************/
 	public int getIdentifikace() {
