@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 #include "Users.h"
 
 #include <sys/socket.h>
@@ -20,8 +21,9 @@
 #define FILE_NAME "logy.log"
 
 //--------------------------------------------------------------------------
-
+struct tm *loctime;
 /* Globalni promenne tridy*/
+time_t log_time;
 User_conected* conected_users[MAX_CONECTED];
 User_database* database_users[MAX_CONECTED];
 pthread_t threads[MAX_CONECTED];
@@ -42,7 +44,8 @@ pthread_mutex_t lock;
 void help() {
 	printf(
 			"Usage:\n   port \"<port>\" where \"<port>\" is number of server port\n"
-					"address \"<address>\" where \"<address>\" is address of server for example 10.10.10.38 \n or -a for INADDR_ANY");
+					"address \"<address>\" where \"<address>\" is address of server for example 10.10.10.38 \n "
+					"or -a for INADDR_ANY\n");
 
 }
 
@@ -75,7 +78,16 @@ void nacti_soubor() {
 
 void write_log(char* message) {
 	nacti_soubor();
-	fprintf(file, "%s\n", message);
+	 char buffer[255];
+  /* Get the current time. */
+	 log_time = time (NULL);
+
+	  /* Convert it to local time representation. */
+	  loctime = localtime (&log_time);
+
+	  /* Print out the date and time in the standard format. */
+	  strftime (buffer, 255, "%A, %B %d. %I:%M %p \n", loctime);
+	fprintf(file, "%s \n %s\n", buffer, message);
 	fclose(file);
 }
 
@@ -89,14 +101,14 @@ void write_log(char* message) {
  */
 void nacti_Port(int argc, char **argv) {
 
-	char* pom = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
+	char* pom = (char*) malloc(MAX_CONECTED * 10);
 	long val;
 	char *next;
 
 	if (argc == 3) {
 		val = strtol(argv[1], &next, 10);
 
-		if (val > 65536 || val < 1 || (next == argv[1]) || (*next != '\0')) {
+		if (val > 65536 || val < 1024 || (next == argv[1]) || (*next != '\0')) {
 
 			sprintf(pom, "Spatny port: %s\n", argv[1]);
 			write_log(pom);
@@ -133,7 +145,7 @@ int control_address(char* address) {
 	}
 
 
-	printf("adsfhpoij\n");
+
 	val = strtol(address, &next, 10);
 
 	if (val > 255 || (next == address) || (*next != '\0')) {
@@ -153,8 +165,9 @@ int control_address(char* address) {
 				return 1;
 			}
 		}
+
 		val = strtol(ret, &next, 10);
-		if (val > 255 || (next == address) || (*next != '\0') || val < 0) {
+		if (val > 255 || (next == address) || (*next != '\0') || val < 0 || strlen(ret) < 1) {
 			return 1;
 		}
 
@@ -373,6 +386,7 @@ void reg_user(char* buffer, User_conected* user) {
 				&& strcmp(database_users[i]->nickname, buffer) == 0) {
 
 			send_message(user, "Registrace,bad1,This nickname is exist\n");
+			pthread_mutex_unlock(&lock);
 			return;
 
 		}
@@ -395,7 +409,7 @@ void reg_user(char* buffer, User_conected* user) {
 				break;
 			}
 		}
-		pthread_mutex_unlock(&lock);
+
 		send_message(user, "Registrace,yes\n");
 		sprintf(pom, "Registrace uzivatele: %s\n", reg_user->nickname);
 		write_log(pom);
@@ -403,6 +417,7 @@ void reg_user(char* buffer, User_conected* user) {
 		send_message(user, "Registrace,bad2,\n");
 
 	}
+	pthread_mutex_unlock(&lock);
 	free(pom);
 }
 /*
@@ -413,7 +428,7 @@ void reg_user(char* buffer, User_conected* user) {
  */
 int is_bad_passwd(char* passwd) {
 
-	int i = 0;
+	int i;
 
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
@@ -683,6 +698,7 @@ void log_control(User_conected* user, char* buffer) {
 	for (i = 0; i < MAX_CONECTED; ++i) {
 
 		if (database_users[i] != NULL) {
+			printf("%s\n", buffer);
 			if (strcmp(database_users[i]->nickname, buffer) == 0
 					&& strcmp(database_users[i]->passwd, ret) == 0) {
 
@@ -810,7 +826,8 @@ void find_free_game(User_conected* player, User_conected* chellanger) {
 
 			player->game = game[i];
 			chellanger->game = game[i];
-
+			player->play = 1;
+			chellanger->play = 1;
 			game[i]->free = 1;
 			game[i]->id = i;
 			break;
@@ -1127,6 +1144,7 @@ void leave_game(User_conected* user, char* message1) {
 
 		send_message(conected_users[index], message);
 		index = user->game->id;
+		user->play = 0;
 		free(game[index]);
 		game[index] = NULL;
 	}
@@ -1144,9 +1162,11 @@ void logout_user(User_conected* user, char* ret2) {
 	char* pom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
 	char* pom1 = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
-	if (user->game != NULL) {
-		if (user->game->free == 1) {
 
+	if (user->game != NULL) {
+		printf("game \n");
+		if (user->game->free == 1) {
+			printf("user \n");
 			sprintf(pom, "%d", user->game->id);
 			strcpy(message, "Logout,");
 			strcat(message, pom);
@@ -1157,17 +1177,29 @@ void logout_user(User_conected* user, char* ret2) {
 
 			if (strcmp(user->game->chellanger, user->nickname) == 0) {
 				index = user->game->gamer2;
+				printf("gamer2 \n");
 			} else {
 				index = user->game->gamer1;
+				printf("gamer3 \n");
 			}
 			sprintf(pom1, "Odhlasen uzivatel: %s\n)", user->nickname);
 			write_log(pom1);
 			send_message(conected_users[index], message);
 		} else {
 			user->isLog = 0;
+			printf("sam \n");
 		}
 
 	}
+	printf("envim\n");
+	printf("%s\n", ret2);
+
+
+	char *ret3 = strchr(ret2, ',');
+		if (ret3 != NULL) {
+			*ret3 = '\0';
+			ret3++;
+		}
 	if (strcmp(ret2, "end") == 0) {
 		write_log("Server konec vlakna \n");
 		pthread_join(pthread_self(), PTHREAD_CANCELED);
@@ -1185,9 +1217,9 @@ void logout_user(User_conected* user, char* ret2) {
  *
  */
 void receive_challenge(User_conected* user, char* message) {
-	char *ret3 = strchr(message, ',');
 
 	char* pom = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
+	char *ret3 = strchr(message, ',');
 	if (ret3 != NULL) {
 		*ret3 = '\0';
 		ret3++;
@@ -1270,9 +1302,6 @@ void *createThread(void *incoming_socket) {
 	User_conected* user = put_user(socket);
 
 	send_message(user, "Connect,\n");
-	fprintf(file, "Pripojeni na server :%s \n", buffer);
-	sprintf(pom, "Pripojeni na server :%s \n", buffer);
-	write_log(pom);
 
 	while (1) {
 
@@ -1306,6 +1335,8 @@ void *createThread(void *incoming_socket) {
 
 		} else if (strcmp(buffer, "DeleteGame") == 0) {
 			int i = atoi(ret2);
+			user->play = 0;
+			user->game = NULL;
 			free(game[i]);
 			game[i] = NULL;
 
@@ -1382,9 +1413,11 @@ void print_err(char* msg) {
 void start_server(int argc, char** argv) {
 
 	if (argc == 1 || argc == 3) {
+		time(&log_time);
 		signal(SIGINT, sigint_handler);
 		nacti_Port(argc, argv);
 		read_address(argc, argv);
+		printf("Start server\n");
 	} else {
 
 		help();
