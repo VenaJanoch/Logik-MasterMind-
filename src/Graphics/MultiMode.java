@@ -65,7 +65,7 @@ public class MultiMode extends Desk implements IGameMode {
 	 * Pomocna metoda pro ukonceni hry
 	 */
 	public void exitGame(){
-		getNetLog().signOutUser("LogOut,GameWindow,\n");
+		getNetLog().signOutUser("LogOut,end,\n");
 		getmMR().getPrimaryStage().close();
 	}
 

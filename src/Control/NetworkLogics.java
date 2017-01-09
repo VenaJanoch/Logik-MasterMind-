@@ -283,7 +283,9 @@ public class NetworkLogics {
 		if (identifikace < Constants.countKnobsPanels-1 ) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
-			multiM.getKnobPanel()[identifikace + 1].nothig();
+			if (!challenger) {
+				multiM.getKnobPanel()[identifikace + 1].nothig();				
+			}
 			
 		}
 
