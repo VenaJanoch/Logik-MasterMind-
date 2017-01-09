@@ -2,6 +2,7 @@ package Control;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Pattern;
 
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
@@ -115,14 +116,29 @@ public class LogginLogics {
 	 * @return
 	 */
 	 public boolean serverAddresConfirm(String addres) {
-		if (addres.length() == 0) {
+		
+		 String[] pom = addres.split(Pattern.quote("."));
+		 if (addres.length() == 0) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
 			alert.setTitle("Sign error");
 			alert.setHeaderText("No IP address!");
 			alert.setContentText("You must fill IP address of server !");
 			alert.showAndWait();
 
-		} else {
+		}else if(!addres.contains("localhost")){
+			
+			if (pom.length < 4 || confirmAddressBlock(pom)) {
+				Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
+				alert.setTitle("Sign error");
+				alert.setHeaderText("Bad IP address!");
+				alert.setContentText("You must fill IP address in this style \" 127.0.0.1\"  !");
+				alert.showAndWait();				
+			}else{
+				setServerAddres(addres);
+				return true;
+			}
+
+		}else {
 			//convertIPAddress(addres.split("."));
 			setServerAddres(addres);
 			return true;
@@ -130,24 +146,64 @@ public class LogginLogics {
 
 		return false;
 	}
-	 /**
+	 
+	 private boolean confirmAddressBlock(String[] pom) {
+		 int number;
+		 try{
+			 
+			 for (int i = 0; i < pom.length; i++) {				 
+				 number = Integer.parseInt(pom[i]);
+				 if(number > 255 ){
+					 return true;
+				 }
+			 }
+			 
+		 }catch(NumberFormatException e){
+			 System.out.println("Bad ip address format");
+			 return true;
+		 }
+		 
+		 
+		return false;
+	}
+
+	/**
 	  * Kontrola zadaneho portu serveru
 	  * @param port
 	  * @return
 	  */
 	public boolean serverPortConfirm(String port) {
-		if (port.equals("nickname") || port.length() == 0) {
+		if (port.length() == 0 || confirmPortNumber(port)) {
 			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
 			alert.setTitle("Sign error");
-			alert.setHeaderText("No nickname!");
-			alert.setContentText("You must fill nickname !");
+			alert.setHeaderText("Bad port!");
+			alert.setContentText("You must fill port in range <1024,65535>!");
 			alert.showAndWait();
 
-		} else {
+		}else {
 			this.serverPort = Integer.parseInt(port);
 			return true;
 		}
 
+		return false;
+	}
+
+	private boolean confirmPortNumber(String port) {
+		int number;
+		try{
+			
+			number = Integer.parseInt(port);
+			
+			if (number > 65536 || number < 1024) {
+				return true;
+			}
+			
+		}catch (NumberFormatException e) {
+			System.out.println("Bad type of port");
+			return true;
+		}
+		
+		
 		return false;
 	}
 

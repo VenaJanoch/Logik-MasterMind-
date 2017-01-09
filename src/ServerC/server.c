@@ -42,7 +42,7 @@ pthread_mutex_t lock;
 void help() {
 	printf(
 			"Usage:\n   port \"<port>\" where \"<port>\" is number of server port\n"
-					"address \"<address>\" where \"<address>\" is address of server for example 10.10.10.38 \n");
+					"address \"<address>\" where \"<address>\" is address of server for example 10.10.10.38 \n or -a for INADDR_ANY");
 
 }
 
@@ -100,6 +100,7 @@ void nacti_Port(int argc, char **argv) {
 
 			sprintf(pom, "Spatny port: %s\n", argv[1]);
 			write_log(pom);
+			help();
 			exit(1);
 		} else {
 
@@ -118,6 +119,12 @@ int control_address(char* address) {
 	long val;
 	char *next;
 
+
+	if (strcmp(address, "-a") == 0 || strcmp(address, "a") == 0) {
+
+			return 2;
+		}
+
 	if (ret != NULL) {
 		*ret = '\0';
 		ret++;
@@ -125,15 +132,14 @@ int control_address(char* address) {
 		return 1;
 	}
 
+
+	printf("adsfhpoij\n");
 	val = strtol(address, &next, 10);
 
 	if (val > 255 || (next == address) || (*next != '\0')) {
 		return 1;
 
-	} else if (strcmp(address, "-a") == 0 || strcmp(address, "a") == 0) {
-		return 2;
 	}
-
 	int counter = 0;
 	for (i = 0; i < 3; ++i) {
 
@@ -193,6 +199,7 @@ void read_address(int argc, char **argv) {
 		} else {
 			sprintf(pom, "Spatne zadana adresa: %s\n", s);
 			write_log(pom);
+			help();
 			exit(1);
 		}
 	}
