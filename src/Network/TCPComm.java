@@ -68,8 +68,8 @@ public class TCPComm implements ITCP, Runnable {
 
 	public void run() {
 
+		Socket socket = new Socket();
 				try {
-					Socket socket = new Socket();
 					socket.connect(new InetSocketAddress(address, port));
 					socket.setSoTimeout(30000);
 					m_output = socket.getOutputStream();
@@ -86,6 +86,7 @@ public class TCPComm implements ITCP, Runnable {
 								}
 							}else{
 								m_observer.processData("NoServer");
+								end(socket);
 								break;
 							}
 
@@ -96,9 +97,7 @@ public class TCPComm implements ITCP, Runnable {
 
 							if (counterTimeOUt > 0) {
 								m_observer.processData("NoServer");
-								socket.close();
-								m_output.close();
-								input.close();
+								end(socket);
 							}
 
 							counterTimeOUt++;
@@ -108,6 +107,7 @@ public class TCPComm implements ITCP, Runnable {
 
 				} catch (IOException e) {
 					m_observer.processData("NoServer");
+					end(socket);
 					System.err.println("Caught IOException: " + e.getMessage());
 
 				}
@@ -117,6 +117,20 @@ public class TCPComm implements ITCP, Runnable {
 	
 	// ---------------------------------------------------------
 
+	public void end(Socket socket){
+		try {
+			socket.close();
+			m_output.close();
+			input.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
 	public void start() {
 
 		(new Thread(this)).start();

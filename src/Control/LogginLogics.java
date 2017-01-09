@@ -45,9 +45,9 @@ public class LogginLogics {
 	 * @param passwd2
 	 * @return
 	 */
-	public boolean confirmDataInForm(String name, String surname, String nickname, String passwd, String passwd2) {
+	public boolean confirmDataInForm(String nickname, String passwd, String passwd2) {
 
-		if (nameConfirm(name) && surnameConfirm(surname) && nicknameConfirm(nickname)
+		if (nicknameConfirm(nickname)
 				&& passwdsConfirm(passwd, passwd2)) {
 			return true;
 		}
@@ -220,7 +220,13 @@ public class LogginLogics {
 			alert.setContentText("You must fill nickname !");
 			alert.showAndWait();
 
-		} else {
+		}else if(nickname.length() > 30){
+			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
+			alert.setTitle("Sign error");
+			alert.setHeaderText("Bad nickname!");
+			alert.setContentText("Your nickname must be 30 char long !");
+			alert.showAndWait();
+		}else {
 			this.nickname = nickname;
 			return true;
 		}

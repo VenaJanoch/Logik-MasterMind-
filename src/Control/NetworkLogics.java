@@ -283,6 +283,8 @@ public class NetworkLogics {
 		if (identifikace < Constants.countKnobsPanels-1 ) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
+			multiM.getKnobPanel()[identifikace + 1].nothig();
+			
 		}
 
 	}
@@ -328,9 +330,11 @@ public class NetworkLogics {
 					.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])],
 							CornerRadii.EMPTY, Insets.EMPTY)));
 			colors[i] = Constants.colors[Integer.parseInt(pomString[i])];
+			multiM.getResult().nothig();
 		}
 
 		kP = multiM.getKnobPanel()[0];
+		kP.getFunction();
 
 	}
 	/**
@@ -398,7 +402,7 @@ public class NetworkLogics {
 				}
 			}
 		}
-
+		kP.nothig();
 		System.out.println(result);
 		multiM.getObserText().inc("Chellanger findig combination");
 		comm.send(result + ",\n");
