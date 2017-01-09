@@ -82,7 +82,7 @@ public class FreePlayersListWindow extends Stage {
 		Button back	= new Button("Back");
 		readBTN.setOnAction(event -> netLog.getFreePlayerList());
 		selectBTN.setOnAction(event -> processSelection());
-		back.setOnAction(event -> mMR.setServerWindow());
+		back.setOnAction(event -> mMR.setWellcomeWindow());
 		controlPane.getChildren().addAll(readBTN, selectBTN, back);
 
 		controlPane.getChildren().forEach(node -> FlowPane.setMargin(node, new Insets(3)));
