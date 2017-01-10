@@ -371,12 +371,23 @@ int passwd_control(char* passwd) {
  */
 void reg_user(char* buffer, User_conected* user) {
 
+	if (buffer == NULL) {
+		printf("Nevalidni vstup");
+		send_message(user,"Nevalidni vstup\n");
+		return;
+	}
 	char *ret = strchr(buffer, ',');
 
 	if (ret != NULL) {
 		*ret = '\0';
 		ret++;
+	}else{
+		printf("Nevalidni vstup");
+		send_message(user,"Nevalidni vstup\n");
+
+		return;
 	}
+
 
 	pthread_mutex_lock(&lock);
 	int i;
@@ -686,8 +697,25 @@ void check_game(User_conected* user) {
  */
 void log_control(User_conected* user, char* buffer) {
 
+	if (buffer == NULL) {
+			printf("Nevalidni vstup");
+			send_message(user,"Nevalidni vstup\n");
+			return;
+		}
+
 	char *ret = strchr(buffer, ',');
 	char* pom = (char*) malloc(MAX_CONECTED * 60 + MAX_CONECTED);
+
+
+		if (ret != NULL) {
+			*ret = '\0';
+			ret++;
+		}else{
+			printf("Nevalidni vstup");
+			send_message(user,"Nevalidni vstup\n");
+
+			return;
+		}
 
 	if (ret != NULL) {
 		*ret = '\0';
@@ -1191,15 +1219,13 @@ void logout_user(User_conected* user, char* ret2) {
 		}
 
 	}
-	printf("envim\n");
-	printf("%s\n", ret2);
-
 
 	char *ret3 = strchr(ret2, ',');
 		if (ret3 != NULL) {
 			*ret3 = '\0';
 			ret3++;
 		}
+
 	if (strcmp(ret2, "end") == 0) {
 		write_log("Server konec vlakna \n");
 		pthread_join(pthread_self(), PTHREAD_CANCELED);
@@ -1233,6 +1259,7 @@ void receive_challenge(User_conected* user, char* message) {
 		send_invitation(user, ret3);
 	} else {
 		printf("Invalid input\n");
+		send_message(user,"Nevalidni zprava");
 		sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", message);
 		write_log(pom);
 	}
@@ -1278,6 +1305,7 @@ void receive_game(User_conected* user, char* message) {
 		game_is_done(user);
 	} else {
 		printf("Invalid input\n");
+		send_message(user,"Nevalidni zprava");
 		sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", message);
 		write_log(pom);
 	}
@@ -1320,6 +1348,10 @@ void *createThread(void *incoming_socket) {
 		if (ret2 != NULL) {
 			*ret2 = '\0';
 			ret2++;
+		}else{
+			send_message(user,"Nevalidni zprava");
+			printf("nevalidni vstup");
+			continue;
 		}
 
 		if (strcmp(buffer, "Registrace") == 0) {
@@ -1357,6 +1389,7 @@ void *createThread(void *incoming_socket) {
 
 		} else {
 			printf("Invalid input\n");
+			send_message(user,"Nevalidni zprava");
 			sprintf(pom, "Prijata zprava :%s nevalidni vstup \n", buffer);
 			write_log(pom);
 
@@ -1413,6 +1446,7 @@ void print_err(char* msg) {
 void start_server(int argc, char** argv) {
 
 	if (argc == 1 || argc == 3) {
+		help();
 		time(&log_time);
 		signal(SIGINT, sigint_handler);
 		nacti_Port(argc, argv);
