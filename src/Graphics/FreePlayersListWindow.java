@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.Background;
@@ -21,6 +22,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import sun.print.resources.serviceui;
 
 public class FreePlayersListWindow extends Stage {
 
@@ -31,6 +33,11 @@ public class FreePlayersListWindow extends Stage {
 	private BorderPane hlavniPanel;
 	private NetworkLogics netLog;
 
+	private Label conectionServer;
+	private Button readBTN ;
+	private Button selectBTN ;
+	private Button back	;
+	
 	private ListView<String> listLV;
 
 	public FreePlayersListWindow(MasterMindRun mMR, NetworkLogics netLog) {
@@ -58,8 +65,10 @@ public class FreePlayersListWindow extends Stage {
 	 * @return BorderPane
 	 */
 	public Parent creatPanel() {
-
+		conectionServer = new Label("Waiting for server");
+		conectionServer.setVisible(false);
 		hlavniPanel = new BorderPane();
+		hlavniPanel.setTop(conectionServer);
 		hlavniPanel.setCenter(creatList());
 		hlavniPanel.setBottom(createMenuBar());
 
@@ -77,9 +86,9 @@ public class FreePlayersListWindow extends Stage {
 		FlowPane controlPane = new FlowPane();
 
 		// creating buttons
-		Button readBTN = new Button("Refresh");
-		Button selectBTN = new Button("Select");
-		Button back	= new Button("Back");
+		 readBTN = new Button("Refresh");
+		 selectBTN = new Button("Select");
+		 back	= new Button("Back");
 		readBTN.setOnAction(event -> netLog.getFreePlayerList());
 		selectBTN.setOnAction(event -> processSelection());
 		back.setOnAction(event -> mMR.setWellcomeWindow());
@@ -95,6 +104,20 @@ public class FreePlayersListWindow extends Stage {
 
 		return controlPane;
 
+	}
+	
+	public void freezButton(){
+		readBTN.setDisable(true);
+		selectBTN.setDisable(true);
+		back.setDisable(true);	
+		conectionServer.setVisible(true);
+	}
+	
+	public void unFreezButton(){
+		readBTN.setDisable(false);
+		selectBTN.setDisable(false);
+		back.setDisable(false);		
+		conectionServer.setVisible(false);
 	}
 
 	/**
@@ -134,10 +157,7 @@ public class FreePlayersListWindow extends Stage {
 		
 		return listLV;
 	}
-	private ObservableList<String> getFreePlayers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 
 	/********************** Getrs and Setrs ******/

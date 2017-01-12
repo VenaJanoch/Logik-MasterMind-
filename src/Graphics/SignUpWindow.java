@@ -1,6 +1,7 @@
 package Graphics;
 
 import Control.Constants;
+import Control.NetworkLogics;
 import Control.ObservableText;
 import Control.ObservingLabel;
 import Interfaces.ICommObserver;
@@ -55,22 +56,20 @@ public class SignUpWindow extends Stage {
 
 	private ObservingLabel regLB;
 	
-	
-	private ITCP m_comm;
 	private String changeText;
-
+	private NetworkLogics netLog;
 	private ObservableText obserText = new ObservableText("");
 	
 	/**
 	 * Incializace objektu mMR
 	 * @param mMR
 	 */
-	public SignUpWindow(MasterMindRun mMR) {
+	public SignUpWindow(MasterMindRun mMR, NetworkLogics netLog) {
 
 		super();
 		this.mMR = mMR;
 		this.changeText = "";
-		m_comm = mMR.getComm();
+		this.netLog = netLog;
 		this.setTitle("MasterMind-Sing up");
 		hlavniPanel = new BorderPane();
 
@@ -171,9 +170,26 @@ public class SignUpWindow extends Stage {
 				mMR.getLogLogics().hashPassword(passwd2TF.getText()))) {
 
 			obserText.addObserver(regLB);
-		    m_comm.send(mMR.getLogLogics().createRegMessage());
+		   netLog.sendRegForm();
+		   freezButton();
 		}
 
+	}
+	
+	
+	public void freezButton(){
+		confirmBT.setDisable(true);
+		backBT.setDisable(true);
+		
+		obserText.inc("Waiting for server");
+	}
+	
+	public void unFreezButton(){
+		confirmBT.setDisable(false);
+		backBT.setDisable(false);
+		
+		
+		
 	}
 	
 	public void regSuces(){

@@ -18,7 +18,7 @@ import javafx.scene.text.FontWeight;
 public class MultiMode extends Desk implements IGameMode {
 
 	private ObservingLabel statutL;
-
+	private Label conectLB;
 	private ObservableText obserText = new ObservableText("Find color combination");
 
 	public MultiMode(MasterMindRun mMR, NetworkLogics netLog, LogginLogics lLog) {
@@ -69,6 +69,24 @@ public class MultiMode extends Desk implements IGameMode {
 		getmMR().getPrimaryStage().close();
 	}
 
+	public void freezDesk(){
+		conectLB.setVisible(true);
+		leaveB.setDisable(true);
+		closeB.setDisable(true);
+		getMenuB().setDisable(true);
+		getSingOutB().setDisable(true);
+		
+	}
+	
+public void unFreezDesk(){
+		conectLB.setVisible(false);
+		leaveB.setDisable(false);
+		closeB.setDisable(false);
+		getMenuB().setDisable(false);
+		getSingOutB().setDisable(false);
+		
+	}
+	
 	@Override
 	public Node creatLegendPanel() {
 
@@ -79,7 +97,8 @@ public class MultiMode extends Desk implements IGameMode {
 		obserText.addObserver(statutL);
 		leaveB = new Button("Leave");
 		closeB = new Button("Exit");
-
+		conectLB = new Label("Waiting for server");
+		conectLB.setVisible(false);
 		statutL.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
 
 		leaveB.setOnAction(event -> resetDesk());
@@ -87,7 +106,7 @@ public class MultiMode extends Desk implements IGameMode {
 
 		buttonPanel.getChildren().addAll(leaveB, closeB);
 		buttonPanel.setAlignment(Pos.CENTER);
-		legendPanel.getChildren().addAll(getCp(), statutL, buttonPanel);
+		legendPanel.getChildren().addAll(conectLB,getCp(), statutL, buttonPanel);
 
 		legendPanel.setAlignment(Pos.CENTER);
 
@@ -106,6 +125,14 @@ public class MultiMode extends Desk implements IGameMode {
 
 	public void setObserText(ObservableText obserText) {
 		this.obserText = obserText;
+	}
+
+	public Label getConectLB() {
+		return conectLB;
+	}
+
+	public void setConectLB(Label conectLB) {
+		this.conectLB = conectLB;
 	}
 
 }

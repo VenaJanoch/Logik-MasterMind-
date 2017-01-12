@@ -22,8 +22,8 @@ public class LogginLogics {
 	private String passwd;
 	private String passwd2;
 
-	private String serverAddres;
-	private int serverPort;
+	private String serverAddres = "192.168.40.131";
+	private int serverPort = 1111;
 
 	private SignUpWindow sUW;
 	private SignInWindow sIW;
@@ -52,7 +52,6 @@ public class LogginLogics {
 			return true;
 		}
 
-		// Upravit
 		return false;
 
 	}
@@ -68,7 +67,7 @@ public class LogginLogics {
 		if (serverAddresConfirm(addres) && serverPortConfirm(port)) {
 			return true;
 		}
-		// Upravit
+	
 		return false;
 
 	}

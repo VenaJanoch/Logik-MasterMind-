@@ -60,7 +60,6 @@ public class ColorPalet extends VBox {
 					new Background(new BackgroundFill(Constants.colors[i], CornerRadii.EMPTY, Insets.EMPTY)));
 			
 			if(logics.isMultiMode()){
-				System.out.println(colorButtons[i]);
 				colorButtons[i].setOnAction(event -> netLog.returnColor(event.getSource()));				
 				
 			}else{

@@ -1,6 +1,7 @@
 package Graphics;
 
 import Control.Constants;
+import Control.NetworkLogics;
 import Control.ObservableText;
 import Control.ObservingLabel;
 import Interfaces.ITCP;
@@ -40,25 +41,26 @@ public class SignInWindow extends Stage {
 
 	private Button confirmBT;
 	private Button backBT;
+	private Button server;
 
 	private ObservingLabel logLB;
 
 	private ObservableText obserText = new ObservableText("");
-
-	private ITCP m_comm;
+	private NetworkLogics netLog;
+	
 
 	/**
 	 * Inicializace objektu mMR
 	 * @param mMR
 	 */
-	public SignInWindow(MasterMindRun mMR) {
+	public SignInWindow(MasterMindRun mMR, NetworkLogics netLog) {
 
 		super();
 		this.mMR = mMR;
 
 		this.setTitle("MasterMind-Sing in");
 		hlavniPanel = new BorderPane();
-		m_comm = mMR.getComm();
+		this.netLog = netLog;
 		this.setScene(creatScene());
 
 	}
@@ -128,7 +130,7 @@ public class SignInWindow extends Stage {
 
 		netPanel.add(backBT, 0, 5);
 		netPanel.add(confirmBT, 1, 5);
-		Button server = new Button("Server");
+		 server = new Button("Server");
 				server.setOnAction(event -> mMR.setServerWindow());
 				
 		netPanel.add(server, 2,5);		
@@ -149,12 +151,26 @@ public class SignInWindow extends Stage {
 				mMR.getLogLogics().hashPassword(passwdTF.getText()))) {
 
 			obserText.addObserver(logLB);
-			m_comm.send(mMR.getLogLogics().createLogMessage(nicknameTF.getText(),
-					mMR.getLogLogics().hashPassword(passwdTF.getText())));
-
+			netLog.sendSingForm(nicknameTF.getText(),passwdTF.getText());
+			freezButton();
 		}
 	}
 
+	public void freezButton(){
+		confirmBT.setDisable(true);
+		backBT.setDisable(true);
+		server.setDisable(true);
+		obserText.inc("Waiting for server");
+	}
+	
+	public void unFreezButton(){
+		confirmBT.setDisable(false);
+		backBT.setDisable(false);
+		server.setDisable(false);
+		
+		
+	}
+	
 	/*** Getrs and Setrs **/
 
 	public TextField getNicknameTF() {

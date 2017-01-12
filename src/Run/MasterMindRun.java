@@ -74,6 +74,7 @@ public class MasterMindRun extends Application {
 				if (logLogics.isLog()) {
 					netLog.signOutUser("LogOut,end,\n");
 				}
+				
 				Platform.exit();
 				System.exit(0);
 
@@ -98,6 +99,7 @@ public class MasterMindRun extends Application {
 		this.freePlayerL = new FreePlayersListWindow(this, netLog);
 
 		setStage(freePlayerL);
+		netLog.setfPLW(freePlayerL);
 		m_commObserver.setFreePlayerL(freePlayerL);
 
 	}
@@ -152,9 +154,9 @@ public class MasterMindRun extends Application {
 	public void createConnect() {
 		try {
 
-			comm = new TCPComm(logLogics.getServerAddres(), logLogics.getServerPort(), this);
+			comm = new TCPComm(logLogics.getServerAddres(), logLogics.getServerPort());
 
-			m_commObserver = new UiCommObserver(this, logLogics, netLog);
+			m_commObserver = new UiCommObserver(this, logLogics, netLog,serverWindow,mM);
 			comm.registerObserver(m_commObserver);
 
 			logLogics.setComm(comm);
@@ -173,7 +175,7 @@ public class MasterMindRun extends Application {
 	 * setSignUpWindow() Nastavi okno pro registraci uzivatele
 	 */
 	public void setSignUpWindow() {
-		signUpW = new SignUpWindow(this);
+		signUpW = new SignUpWindow(this,netLog);
 		m_commObserver.setsUW(signUpW);
 		this.setStage(signUpW);
 		this.logLogics.setsUW(signUpW);
@@ -184,7 +186,7 @@ public class MasterMindRun extends Application {
 	 * setSignInWindow() Nastavi okno s prihlasenim uzivatel
 	 */
 	public void setSignInWindow() {
-		signInW = new SignInWindow(this);
+		signInW = new SignInWindow(this,netLog);
 		m_commObserver.setsIW(signInW);
 		this.setStage(signInW);
 		this.logLogics.setsIW(signInW);
@@ -338,7 +340,6 @@ public class MasterMindRun extends Application {
 		Optional<ButtonType> result = alert.showAndWait();
 
 		if (result.get() == submitButton) {
-			System.out.println("Nevim koukate ");
 			netLog.deleteGame(i);
 			setWellcomeWindow();
 

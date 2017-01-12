@@ -3,6 +3,7 @@ package Control;
 import Graphics.Desk;
 import Graphics.FreePlayersListWindow;
 import Graphics.MultiMode;
+import Graphics.ServerWindow;
 import Graphics.SignInWindow;
 import Graphics.SignUpWindow;
 import Interfaces.ICommObserver;
@@ -14,6 +15,7 @@ public class UiCommObserver implements ICommObserver {
 	/** Globani promenne tridy **/
 	private SignUpWindow sUW;
 	private SignInWindow sIW;
+	private ServerWindow serW;
 	private MultiMode multiM;
 	private Desk desk;
 	private MasterMindRun mMR;
@@ -21,6 +23,7 @@ public class UiCommObserver implements ICommObserver {
 	private FreePlayersListWindow freePlayerL;
 	private NetworkLogics netLog;
 	private Logics logics;
+	private MessageControl messageCon;
 
 	/**
 	 * Inicializace objektu mMR, lLog, netLog
@@ -29,10 +32,14 @@ public class UiCommObserver implements ICommObserver {
 	 * @param lLog
 	 * @param netLog
 	 */
-	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog) {
+	public UiCommObserver(MasterMindRun mMR, LogginLogics lLog, NetworkLogics netLog, ServerWindow serW,
+			MultiMode multiMod) {
 		this.mMR = mMR;
 		this.lLog = lLog;
 		this.netLog = netLog;
+		this.serW = serW;
+		this.multiM = multiMod;
+		this.messageCon = new MessageControl(multiMod);
 	}
 
 	/**
@@ -44,13 +51,27 @@ public class UiCommObserver implements ICommObserver {
 			@Override
 			public void run() {
 				System.out.println("Data " + data + " " + netLog.getName());
+
+				if (!messageCon.is_valid(data)) {
+
+					System.out.println("Invalid input ");
+					return;
+				}
+
 				String[] pomData = data.split(",");
+
 				switch (pomData[0]) {
 
+				case "Nevalidni vstup":
+					System.out.println("Odeslana nevalidni zprava");
+					break;
+				case "Wait":
+					serW.getWaitLB().setVisible(true);
+					serW.getConfirmBT().setDisable(true);
+					break;
 				case "NoServer":
 					mMR.showNoServer();
 					break;
-
 				case "CheckConnect":
 					netLog.checkConnect();
 					break;
@@ -72,17 +93,22 @@ public class UiCommObserver implements ICommObserver {
 					break;
 				case "Log":
 
-					if (pomData[1].contains("yes")) {
-						lLog.setLog(true);
-						netLog.setName(sIW.getNicknameTF().getText());
-						mMR.setWellcomeWindow();
+					if (sIW != null) {
+						if (pomData[1].contains("yes")) {
+							lLog.setLog(true);
+							netLog.setName(sIW.getNicknameTF().getText());
+							mMR.setWellcomeWindow();
 
-					} else if (pomData[1].contains("no") && pomData[2].contains("badLog")) {
-						sIW.getObserText().inc("This nickname is not using");
-					} else {
-						sIW.getObserText().inc("Bad password");
+						} else if (pomData[1].contains("no") && pomData[2].contains("badLog")) {
+							sIW.getObserText().inc("This nickname is not using");
+						} else {
+							sIW.getObserText().inc("Bad password");
 
+						}
+
+						sIW.unFreezButton();
 					}
+
 					break;
 				case "PlayerList":
 					if (pomData.length > 1) {
@@ -99,41 +125,48 @@ public class UiCommObserver implements ICommObserver {
 					break;
 				case "Challenge":
 					receiveChallenge(pomData);
-					
+
 					break;
 				case "Game":
 					receive_game(pomData);
 
 					break;
 				default:
-					System.out.println("Invalid input");
 					break;
 				}
 			}
 
 		});
 	}
+
 	/**
 	 * Pomocna metoda pro zpracovani zprav o registraci
+	 * 
 	 * @param pomData
 	 */
 	private void receiveRegistrace(String[] pomData) {
-		if (pomData[1].contains("bad1")) {
-			sUW.getObserText().inc("This nickname is using");
+		if (sUW != null) {
 
-		} else if (pomData[1].contains("bad2")) {
+			if (pomData[1].contains("bad")) {
+				sUW.getObserText().inc("This nickname is using");
 
-			sUW.getObserText().inc("This nickname is long, length must be less 30");
+			} else if (pomData[1].contains("bad2")) {
 
-		} else {
+				sUW.getObserText().inc("This nickname is long, length must be less 30 and must not be 0");
 
-			mMR.setWellcomeWindow();
+			} else {
+
+				mMR.setWellcomeWindow();
+			}
+
+			sUW.unFreezButton();
 		}
-		
+
 	}
 
 	/**
 	 * Pomocna metoda pro zpracovani zprav o hre
+	 * 
 	 * @param pomData
 	 */
 	private void receive_game(String[] pomData) {
@@ -141,16 +174,16 @@ public class UiCommObserver implements ICommObserver {
 			mMR.showLeaveMessage(pomData[2], Integer.parseInt(pomData[3]));
 
 		} else if (pomData[1].contains("colorResult")) {
-		
+
 			if (pomData[2].contains("R") && netLog.isChallenger()) {
 				netLog.setResultR(pomData[3]);
 				multiM.getObserText().inc("Find color combination");
-				
-			} else if(pomData[2].contains("R") && !netLog.isChallenger()) {
-			
+
+			} else if (pomData[2].contains("R") && !netLog.isChallenger()) {
+
 				netLog.setResult(pomData[3]);
 				multiM.getObserText().inc("Challenger find combination");
-			
+
 			} else {
 				netLog.setResult(pomData[2]);
 				multiM.getObserText().inc("Find color combination");
@@ -180,12 +213,17 @@ public class UiCommObserver implements ICommObserver {
 
 			netLog.setPlayerName(pomData[3]);
 
+		} else if (pomData[1].contains("colorAccept")) {
+
+			netLog.messageAccepted();
+
 		}
 
 	}
 
 	/**
 	 * Pomocna metoda pro zpracovani zprava o vyzve
+	 * 
 	 * @param pomData
 	 */
 	private void receiveChallenge(String[] pomData) {
@@ -197,7 +235,9 @@ public class UiCommObserver implements ICommObserver {
 
 			mMR.showRefusetMessage(pomData[1]);
 
-		} else {
+		}else if(pomData[1].contains("messageAccept")){
+			netLog.invateMessageAccept();
+		}else {
 
 			mMR.showAcceptMessage(pomData[1]);
 			netLog.setChallenger(true);
@@ -206,7 +246,7 @@ public class UiCommObserver implements ICommObserver {
 			multiM.getObserText().inc("Wait for color combination");
 
 		}
-		
+
 	}
 
 	/*************** Getrs and Setrs ******************/

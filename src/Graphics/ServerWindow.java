@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 public class ServerWindow extends Stage {
@@ -30,6 +31,7 @@ public class ServerWindow extends Stage {
 
 	private Label serverAddresLB;
 	private Label serverPortLB;
+	private Label waitLB;
 
 	private TextField serverAddresTF;
 	private TextField serverPortTF;
@@ -60,9 +62,13 @@ public class ServerWindow extends Stage {
 	}
 
 	private Parent creatPanel() {
-
+		
+		waitLB = new Label("Waiting for server");
+		waitLB.setTextFill(Paint.valueOf("RED"));
+		waitLB.setVisible(false);
+				
 		hlavniPanel.setCenter(createNet());
-
+		hlavniPanel.setBottom(waitLB);
 		hlavniPanel.setBackground(
 				new Background(new BackgroundFill(Constants.menuBackgroundC, CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -84,11 +90,12 @@ public class ServerWindow extends Stage {
 
 		serverAddresLB = new Label("Server IP");
 		serverPortLB = new Label("Port");
-
-		serverAddresTF = new TextField("localhost");
-		//serverAddresTF = new TextField("192.168.40.131");
 		
-		serverPortTF = new TextField("22434");
+		//serverAddresTF = new TextField("localhost");
+		serverAddresTF = new TextField(mMR.getLogLogics().getServerAddres());
+		
+		//serverPortTF = new TextField("22434");
+		serverPortTF = new TextField(String.valueOf(mMR.getLogLogics().getServerPort()));
 
 		confirmBT = new Button("OK");
 
@@ -107,9 +114,9 @@ public class ServerWindow extends Stage {
 		netPanel.add(serverAddresTF, 1, 0);
 		netPanel.add(serverPortLB, 0, 1);
 		netPanel.add(serverPortTF, 1, 1);
-
+		
 		netPanel.add(confirmBT, 0, 5);
-
+		
 		netPanel.setHgap(10);
 		netPanel.setVgap(10);
 
@@ -138,6 +145,22 @@ public class ServerWindow extends Stage {
 		this.isServer = isServer;
 	}
 
-	
+	public Label getWaitLB() {
+		return waitLB;
+	}
 
+	public void setWaitLB(Label waitLB) {
+		this.waitLB = waitLB;
+	}
+
+	public Button getConfirmBT() {
+		return confirmBT;
+	}
+
+	public void setConfirmBT(Button confirmBT) {
+		this.confirmBT = confirmBT;
+	}
+
+	
+	
 }

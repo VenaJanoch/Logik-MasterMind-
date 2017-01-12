@@ -3,6 +3,7 @@ package Control;
 import java.util.Random;
 
 import Graphics.Desk;
+import Graphics.FreePlayersListWindow;
 import Graphics.Knob;
 import Graphics.KnobPanel;
 import Graphics.MultiMode;
@@ -23,6 +24,7 @@ public class NetworkLogics {
 	private TCPComm comm;
 	private MasterMindRun mMR;
 	private MultiMode multiM;
+	private FreePlayersListWindow fPLW;
 	private String playerName;
 	private String name;
 	private boolean challenger;
@@ -37,6 +39,7 @@ public class NetworkLogics {
 	private KnobPanel kP;
 	private int indexButton;
 	private LogginLogics lLog;
+	private int countBackPanel = 0;
 
 	/**
 	 * Inicializace objektu mMR a lLog
@@ -48,6 +51,7 @@ public class NetworkLogics {
 		this.mMR = mMR;
 		this.setChallenger(true);
 		this.setlLog(lLog);
+
 		colors = new Color[Constants.countKnobs];
 		colorsIndex = new int[Constants.countKnobs];
 
@@ -59,7 +63,7 @@ public class NetworkLogics {
 	public void getFreePlayerList() {
 
 		comm.send("PlayerList,get,\n");
-
+		
 	}
 
 	/**
@@ -95,7 +99,7 @@ public class NetworkLogics {
 	 */
 	public void createGame(String playerName) {
 		comm.send("Challenge,invite," + playerName + ",\n");
-
+		fPLW.freezButton();
 	}
 
 	/**
@@ -253,12 +257,12 @@ public class NetworkLogics {
 
 		}
 
-		comm.send(message + ",\n");
+		comm.send(message + "\n");
 	
-		comm.send("Game,goodColors," + knobPanel.getIdentifikace() + "," + goodColors + ",\n");
-		comm.send("Game,greatColors," + knobPanel.getIdentifikace() + "," + greatColors + ",\n");
+		comm.send("Game,goodColors," + knobPanel.getIdentifikace() + "," + goodColors + "\n");
+		comm.send("Game,greatColors," + knobPanel.getIdentifikace() + "," + greatColors + "\n");
 		
-		
+		multiM.freezDesk();
 
 	}
 	
@@ -269,7 +273,7 @@ public class NetworkLogics {
 	 * @param message
 	 */
 	public void setKnobPanel(int identifikace, String message) {
-
+		multiM.unFreezDesk();
 		String[] pomString = message.split(";");
 
 		for (int i = 0; i < Constants.countKnobs; i++) {
@@ -277,16 +281,18 @@ public class NetworkLogics {
 			multiM.getKnobPanel()[identifikace].getKnobs()[i]
 					.setBackground(new Background(new BackgroundFill(Constants.colors[Integer.parseInt(pomString[i])],
 							CornerRadii.EMPTY, Insets.EMPTY)));
-			multiM.getKnobPanel()[identifikace].nothig();
 		}
+		
+		multiM.getKnobPanel()[identifikace].nothig();
 		
 		if (identifikace < Constants.countKnobsPanels-1 ) {
 			multiM.getKnobPanel()[identifikace + 1].setVisible(true);
 			multiM.getControlKnobPanel()[identifikace + 1].setVisible(true);
 			if (!challenger) {
 				multiM.getKnobPanel()[identifikace + 1].nothig();				
+			}else if(identifikace == 1 && isChallenger()){
+				multiM.getKnobPanel()[identifikace - 1].getFunction();;
 			}
-			
 		}
 
 	}
@@ -349,9 +355,10 @@ public class NetworkLogics {
 		for (int i = 0; i < Constants.countKnobs; i++) {
 
 		colors[i] = Constants.colors[Integer.parseInt(pomString[i])];
-	
+		multiM.getKnobPanel()[0].getFunction();
 		}
-
+		
+		
 	}
 
 	/**
@@ -405,10 +412,10 @@ public class NetworkLogics {
 			}
 		}
 		kP.nothig();
-		System.out.println(result);
+	
+		multiM.freezDesk();
 		multiM.getObserText().inc("Chellanger findig combination");
-		comm.send(result + ",\n");
-		
+		comm.send(result + "\n");
 
 	}
 
@@ -520,6 +527,18 @@ public class NetworkLogics {
 		
 	}
 	
+	public void messageAccepted() {
+		
+		multiM.unFreezDesk();
+		
+	}
+	
+	public void invateMessageAccept() {
+		fPLW.unFreezButton();
+		
+	}
+
+	
 	/**
 	 * Odesle zpravu s informaci o smazani hry ze serveru
 	 * @param game
@@ -528,13 +547,23 @@ public class NetworkLogics {
 		comm.send("DeleteGame,"+game+",\n");
 		
 	}
+	
 	/**
 	 * Odesle zpravu s informaci o smazani hry ze serveru
 	 * @param game
 	 */
 	public void deleteGameLeave(int game) {
-		comm.send("DeleteGame,"+game+",both,\n");
+		comm.send("DeleteGame,"+game+",both\n");
 		
+	}
+	
+	
+	public void sendSingForm(String nickname, String passwd) {
+		comm.send(lLog.createLogMessage(nickname,mMR.getLogLogics().hashPassword(passwd)));
+				
+			}
+	public void sendRegForm() {
+		comm.send(lLog.createRegMessage());
 	}
 	
 	/**
@@ -621,6 +650,22 @@ public class NetworkLogics {
 	public void setlLog(LogginLogics lLog) {
 		this.lLog = lLog;
 	}
+
+	public FreePlayersListWindow getfPLW() {
+		return fPLW;
+	}
+
+	public void setfPLW(FreePlayersListWindow fPLW) {
+		this.fPLW = fPLW;
+	}
+
+	
+	
+	
+
+	
+
+	
 
 	
 

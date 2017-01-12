@@ -27,9 +27,10 @@ public class TCPComm implements ITCP, Runnable {
 	private String address;
 	private int port;
 	private boolean isServer = true;
-	private MasterMindRun mMR;
 	private int counterTimeOUt = 0;
 	private boolean connect = true;
+	private Thread netThread;
+	private Socket socket;
 
 	/**
 	 * Inicializace promennych pro uchovani adresy a portu
@@ -37,11 +38,10 @@ public class TCPComm implements ITCP, Runnable {
 	 * @param port
 	 * @param mMR
 	 */
-	public TCPComm(String address, int port, MasterMindRun mMR) {
+	public TCPComm(String address, int port) {
 
 		this.address = address;
 		this.port = port;
-		this.mMR = mMR;
 
 	}
 
@@ -53,6 +53,7 @@ public class TCPComm implements ITCP, Runnable {
 		try {
 			m_output.write(data.getBytes());
 		} catch (IOException e) {
+			endConection();
 			System.err.println("Caught IOException: " + e.getMessage());
 		}
 	}
@@ -68,12 +69,18 @@ public class TCPComm implements ITCP, Runnable {
 
 	public void run() {
 
-		Socket socket = new Socket();
+		socket = new Socket();
+		m_observer.processData("Wait,");
 				try {
 					socket.connect(new InetSocketAddress(address, port));
+					System.out.println("Spojeni");
+					
 					socket.setSoTimeout(30000);
+				
 					m_output = socket.getOutputStream();
 					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					m_observer.processData("Connect,");
+					
 					
 					for (;;) {
 						try {
@@ -86,7 +93,7 @@ public class TCPComm implements ITCP, Runnable {
 								}
 							}else{
 								m_observer.processData("NoServer");
-								end(socket);
+								endConection();
 								break;
 							}
 
@@ -97,7 +104,8 @@ public class TCPComm implements ITCP, Runnable {
 
 							if (counterTimeOUt > 0) {
 								m_observer.processData("NoServer");
-								end(socket);
+								endConection();
+								break;
 							}
 
 							counterTimeOUt++;
@@ -106,22 +114,28 @@ public class TCPComm implements ITCP, Runnable {
 					}
 
 				} catch (IOException e) {
+					
 					m_observer.processData("NoServer");
-					end(socket);
 					System.err.println("Caught IOException: " + e.getMessage());
-
+					endThread();
 				}
-
+				
+				
 			}
 		
 	
 	// ---------------------------------------------------------
 
-	public void end(Socket socket){
+	public void endConection(){
 		try {
+			
+			System.out.println("Cancel connection");
 			socket.close();
 			m_output.close();
 			input.close();
+			endThread();
+			
+		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,10 +147,20 @@ public class TCPComm implements ITCP, Runnable {
 	
 	public void start() {
 
-		(new Thread(this)).start();
+		netThread = new Thread(this);
+		netThread.start();
 
 	}
 
+	public void endThread(){
+		try {
+			netThread.join(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	/** Getrs and Setrs **/
 	public boolean isServer() {
 		return isServer;

@@ -292,6 +292,23 @@ public class Desk extends Stage {
 		this.statuL = statuL;
 	}
 
+	public Button getMenuB() {
+		return menuB;
+	}
+
+	public void setMenuB(Button menuB) {
+		this.menuB = menuB;
+	}
+
+	public Button getSingOutB() {
+		return singOutB;
+	}
+
+	public void setSingOutB(Button singOutB) {
+		this.singOutB = singOutB;
+	}
+
+	
 	
 	
 
