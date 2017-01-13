@@ -170,6 +170,8 @@ public class UiCommObserver implements ICommObserver {
 	 * @param pomData
 	 */
 	private void receive_game(String[] pomData) {
+	
+		if(multiM != null){
 		if (pomData[1].contains("leave")) {
 			mMR.showLeaveMessage(pomData[2], Integer.parseInt(pomData[3]));
 
@@ -219,6 +221,7 @@ public class UiCommObserver implements ICommObserver {
 
 		}
 
+		}
 	}
 
 	/**

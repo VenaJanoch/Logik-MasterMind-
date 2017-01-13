@@ -411,8 +411,6 @@ int passwd_control(char* passwd, User_conected* user) {
  */
 void reg_user(char* buffer, User_conected* user) {
 
-	printf("%s buffer\n", buffer);
-
 	if (buffer == NULL) {
 		invalid_input(user);
 		return;
@@ -1183,15 +1181,18 @@ void result_to_game(User_conected* user, char* message1) {
 	}
 
 	send_message(user, "Game,colorAccept,\n");
-	Game* game1 = user->game;
-	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	strcpy(message, "Game,colorResult,");
-	message = strcat(message, ret1);
-	message = strcat(message, "\n");
+	if (user->game != NULL) {
+		Game* game1 = user->game;
+		char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 
-	send_message(conected_users[game1->gamer1], message);
-	cut_result(ret1, game1);
+		strcpy(message, "Game,colorResult,");
+		message = strcat(message, ret1);
+		message = strcat(message, "\n");
+
+		send_message(conected_users[game1->gamer1], message);
+		cut_result(ret1, game1);
+	}
 
 }
 
@@ -1241,6 +1242,9 @@ void good_color_to_game(User_conected* user, char* message1) {
 		return;
 	}
 
+	if (user->game != NULL) {
+
+
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
 	char* messagePom = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -1263,7 +1267,7 @@ void good_color_to_game(User_conected* user, char* message1) {
 	message = strcat(message, "\n");
 
 	send_message(conected_users[game1->gamer2], message);
-
+	}
 }
 
 /*
@@ -1281,6 +1285,9 @@ void great_color_to_game(User_conected* user, char* message1) {
 		invalid_input(user);
 		return;
 	}
+
+	if (user->game != NULL) {
+
 
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -1302,7 +1309,7 @@ void great_color_to_game(User_conected* user, char* message1) {
 
 	message = strcat(message, "\n");
 	send_message(conected_users[game1->gamer2], message);
-
+	}
 }
 
 int control_panel(char* message1) {
@@ -1350,6 +1357,9 @@ void knobs_panel_to_game(User_conected* user, char* message1) {
 		return;
 	}
 
+	if (user->game != NULL) {
+
+
 	send_message(user, "Game,colorAccept,\n");
 	Game* game1 = user->game;
 	char* message = (char*) malloc(MAX_CONECTED * 30 + MAX_CONECTED);
@@ -1360,7 +1370,7 @@ void knobs_panel_to_game(User_conected* user, char* message1) {
 	message = strcat(message, "\n");
 	send_message(conected_users[game1->gamer2], message);
 	cut_colors(ret1, game1);
-
+	}
 }
 
 /*
@@ -1592,7 +1602,6 @@ void delete_game(User_conected* user, char* message) {
 		conected_users[id2]->game = NULL;
 		conected_users[id2]->game = NULL;
 	}
-
 
 	free(game[i]);
 	game[i] = NULL;
