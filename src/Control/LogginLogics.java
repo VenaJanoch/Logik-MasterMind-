@@ -212,19 +212,11 @@ public class LogginLogics {
 	 * @return
 	 */
 	public boolean nicknameConfirm(String nickname) {
-		if (nickname.equals("nickname") || nickname.length() == 0) {
-			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
-			alert.setTitle("Sign error");
-			alert.setHeaderText("No nickname!");
-			alert.setContentText("You must fill nickname !");
-			alert.showAndWait();
+		if (nickname.length() == 0) {
+		System.out.println(" Nezadane jmeno");
 
 		}else if(nickname.length() > 30){
-			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
-			alert.setTitle("Sign error");
-			alert.setHeaderText("Bad nickname!");
-			alert.setContentText("Your nickname must be 30 char long !");
-			alert.showAndWait();
+		System.out.println("Prilis dlouhe heslo");
 		}else {
 			this.nickname = nickname;
 			return true;
@@ -233,48 +225,7 @@ public class LogginLogics {
 		return false;
 	}
 
-	/**
-	 * Kontrola policka s prijmenim
-	 * @param surname
-	 * @return
-	 */
 	
-	public boolean surnameConfirm(String surname) {
-
-		if (surname.equals("surname") || surname.length() == 0) {
-			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
-			alert.setTitle("Sign error");
-			alert.setHeaderText("No surname!");
-			alert.setContentText("You must fill surname !");
-			alert.showAndWait();
-
-		} else {
-			this.surname = surname;
-			return true;
-		}
-		return false;
-	}
-/**
- * Kontrola policka se jmenem
- * @param name
- * @return
- */
-	public boolean nameConfirm(String name) {
-
-		if (name.equals("name") || name.length() == 0) {
-			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
-			alert.setTitle("Sign error");
-			alert.setHeaderText("No name!");
-			alert.setContentText("You must fill name !");
-			alert.showAndWait();
-
-		} else {
-			this.name = name;
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Kontrola policka s heslem

@@ -19,7 +19,7 @@ import Run.MasterMindRun;
 import javafx.application.Platform;
 
 public class TCPComm implements ITCP, Runnable {
-	
+
 	/** Globalni promenne tridy **/
 	private ICommObserver m_observer;
 	private OutputStream m_output;
@@ -34,6 +34,7 @@ public class TCPComm implements ITCP, Runnable {
 
 	/**
 	 * Inicializace promennych pro uchovani adresy a portu
+	 * 
 	 * @param address
 	 * @param port
 	 * @param mMR
@@ -71,80 +72,74 @@ public class TCPComm implements ITCP, Runnable {
 
 		socket = new Socket();
 		m_observer.processData("Wait,");
+		try {
+			socket.connect(new InetSocketAddress(address, port));
+			System.out.println("Spojeni");
+
+			socket.setSoTimeout(30000);
+
+			m_output = socket.getOutputStream();
+			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			m_observer.processData("Connect,");
+
+			for (;;) {
 				try {
-					socket.connect(new InetSocketAddress(address, port));
-					System.out.println("Spojeni");
-					
-					socket.setSoTimeout(30000);
-				
-					m_output = socket.getOutputStream();
-					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					m_observer.processData("Connect,");
-					
-					
-					for (;;) {
-						try {
 
-							String data = new String();
-							if ((data = input.readLine()) != null) {
-								if (m_observer != null) {
-									m_observer.processData(data);
-									counterTimeOUt = 0;
-								}
-							}else{
-								m_observer.processData("NoServer");
-								endConection();
-								break;
-							}
-
-						} catch (SocketTimeoutException e) {
-
-							send("CheckConnect,\n");
-							System.err.println("Caught TimeoutException: " + counterTimeOUt + " " + e.getMessage());
-
-							if (counterTimeOUt > 0) {
-								m_observer.processData("NoServer");
-								endConection();
-								break;
-							}
-
-							counterTimeOUt++;
+					String data = new String();
+					if ((data = input.readLine()) != null) {
+						if (m_observer != null) {
+							m_observer.processData(data);
+							counterTimeOUt = 0;
 						}
-
+					} else {
+						m_observer.processData("NoServer");
+						endConection();
+						break;
 					}
 
-				} catch (IOException e) {
-					
-					m_observer.processData("NoServer");
-					System.err.println("Caught IOException: " + e.getMessage());
-					endThread();
+				} catch (SocketTimeoutException e) {
+
+					send("CheckConnect,\n");
+					System.err.println("Caught TimeoutException: " + counterTimeOUt + " " + e.getMessage());
+
+					if (counterTimeOUt > 0) {
+						m_observer.processData("NoServer");
+						endConection();
+						break;
+					}
+
+					counterTimeOUt++;
 				}
-				
-				
+
 			}
-		
-	
+
+		} catch (IOException e) {
+
+			m_observer.processData("NoServer");
+			System.err.println("Caught IOException: " + e.getMessage());
+			endThread();
+		}
+
+	}
+
 	// ---------------------------------------------------------
 
-	public void endConection(){
+	public void endConection() {
 		try {
-			
+
 			System.out.println("Cancel connection");
 			socket.close();
 			m_output.close();
 			input.close();
 			endThread();
-			
-		
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
 	}
-	
-	
+
 	public void start() {
 
 		netThread = new Thread(this);
@@ -152,7 +147,7 @@ public class TCPComm implements ITCP, Runnable {
 
 	}
 
-	public void endThread(){
+	public void endThread() {
 		try {
 			netThread.join(1000);
 		} catch (InterruptedException e) {
@@ -160,7 +155,7 @@ public class TCPComm implements ITCP, Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/** Getrs and Setrs **/
 	public boolean isServer() {
 		return isServer;
