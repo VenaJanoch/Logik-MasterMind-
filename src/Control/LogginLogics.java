@@ -173,11 +173,7 @@ public class LogginLogics {
 	  */
 	public boolean serverPortConfirm(String port) {
 		if (port.length() == 0 || confirmPortNumber(port)) {
-			Alert alert = new Alert(javafx.scene.control.Alert.AlertType.WARNING);
-			alert.setTitle("Sign error");
-			alert.setHeaderText("Bad port!");
-			alert.setContentText("You must fill port in range <1024,65535>!");
-			alert.showAndWait();
+			//Dopsat vypis
 
 		}else {
 			this.serverPort = Integer.parseInt(port);
